@@ -87,7 +87,7 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
               <span className="text-lg md:text-2xl font-bold text-white tracking-tight">{stat.value}</span>
               <stat.icon className={`w-5 h-5 ${stat.color} mb-1`} />
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
@@ -124,7 +124,7 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
                     <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
                       <div 
                         className="bg-aether-neon h-full rounded-full transition-all duration-1000" 
-                        style={{ width: `${60 + Math.random() * 30}%` }}
+                        style={{ width: `${60 + (agent.id.length % 30)}%` }}
                       />
                     </div>
                     <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white transition-all transform group-hover:translate-x-1" />
@@ -193,12 +193,12 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
                     animate={{ 
                       height: [
                         '20%', 
-                        `${20 + Math.random() * 80}%`, 
+                        `${20 + ((i * 13) % 80)}%`, 
                         '20%'
                       ] 
                     }}
                     transition={{ 
-                      duration: 0.8 + Math.random(), 
+                      duration: 0.8 + ((i * 3) % 10) / 10, 
                       repeat: Infinity,
                       delay: i * 0.05
                     }}

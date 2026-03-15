@@ -1,4 +1,4 @@
-import { GoogleGenAI, ThinkingLevel } from '@google/genai';
+import { GoogleGenAI } from '@google/genai';
 import JSZip from 'jszip';
 
 // NOTE: Using public API key for the demo client-side analyzer. 
@@ -51,7 +51,8 @@ export async function analyzeRepository(repoUrl: string) {
     let combinedCode = '';
     let fileCount = 0;
 
-    for (const [filename, file] of Object.entries(zip.files)) {
+    for (const [filename, fileEntry] of Object.entries(zip.files)) {
+      const file = fileEntry as any;
       if (file.dir || shouldIgnore(filename)) continue;
 
       const actualPath = filename.split('/').slice(1).join('/');
@@ -90,16 +91,17 @@ ${combinedCode}
 استخدم أداة البحث (Google Search) إذا احتجت للتأكد من أحدث توثيق لـ Gemini Multimodal Live API أو Firebase.
 `;
 
-    const model = ai.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp', // Use stable flash for fast client-side analysis
-      systemInstruction: "أنت خبير معماريات برمجيات الذكاء الاصطناعي. أجب باللغة العربية دائماً وباحترافية عالية. قدم أكواد وأمثلة دقيقة.",
+    const modelResponse = await ai.models.generateContent({
+      model: 'gemini-2.0-flash-exp',
+      contents: [
+        { role: 'user', parts: [{ text: "System Instruction: أنت خبير معماريات برمجيات الذكاء الاصطناعي. أجب باللغة العربية دائماً وباحترافية عالية. قدم أكواد وأمثلة دقيقة." }] },
+        { role: 'user', parts: [{ text: prompt }] }
+      ],
     });
-
-    const genAIResponse = await model.generateContent(prompt);
 
     return {
       success: true,
-      analysis: genAIResponse.response.text(),
+      analysis: modelResponse.text as string,
       fileCount,
     };
 

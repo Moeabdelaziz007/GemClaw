@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
   },
   output: 'export', // Enable static export
   transpilePackages: ['framer-motion'],
-  webpack: (config, {dev}) => {
+  webpack: (config: any, { dev }: { dev: boolean }) => {
     if (dev && process.env.DISABLE_HMR === 'true') {
       config.watchOptions = {
         ignored: /.*/,
