@@ -1,0 +1,58 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of Gemigram",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "createdAt"]
+    },
+    "Agent": {
+      "title": "Agent",
+      "description": "A custom AI agent created in Aether Forge",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "systemPrompt": { "type": "string" },
+        "voiceName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "name", "systemPrompt", "voiceName", "createdAt"]
+    },
+    "Skill": {
+      "title": "Skill",
+      "description": "A skill or plugin attached to an Agent",
+      "type": "object",
+      "properties": {
+        "agentId": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "endpoint": { "type": "string", "format": "uri" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["agentId", "name", "description", "endpoint", "isActive", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/agents/{agentId}": {
+      "schema": { "$ref": "#/entities/Agent" },
+      "description": "Custom AI Agents"
+    },
+    "/skills/{skillId}": {
+      "schema": { "$ref": "#/entities/Skill" },
+      "description": "Agent skills"
+    }
+  }
+}

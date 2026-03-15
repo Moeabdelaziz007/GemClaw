@@ -1,0 +1,5 @@
+{
+  "name": "Gemigram",
+  "description": "A Voice-First AI OS using Gemini Live API and Aether Forge.",
+  "requestFramePermissions": ["microphone"]
+}
