@@ -5,12 +5,20 @@ const MODEL = "models/gemini-2.5-flash-native-audio-preview-09-2025";
 export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) {
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [logs, setLogs] = useState<{ id: string; text: string; type: 'system' | 'user' | 'agent' | 'tool'; timestamp: string }[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
-  const connect = () => {
+  const addLog = (text: string, type: 'system' | 'user' | 'agent' | 'tool') => {
+    const timestamp = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    setLogs(prev => [...prev, { id: Math.random().toString(36).substring(7), text, type, timestamp }]);
+  };
+
+  const connect = (systemInstruction?: string, voiceName: string = "Zephyr", tools?: any[]) => {
     if (!apiKey) return;
+    
+    addLog("Initializing neural connection...", "system");
     
     // Endpoint: Ensure the WebSocket connects exactly to the v1beta BidiGenerateContent endpoint
     const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
@@ -18,16 +26,20 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
 
     ws.onopen = () => {
       setIsConnected(true);
-      console.log("Live API connected");
+      addLog("Live API connected successfully.", "system");
       
       // Initial Setup: Send BidiGenerateContentSetup JSON object
       ws.send(JSON.stringify({
         setup: {
           model: MODEL,
+          systemInstruction: systemInstruction ? {
+            parts: [{ text: systemInstruction }]
+          } : undefined,
+          tools: tools && tools.length > 0 ? tools : undefined,
           generationConfig: {
             responseModalities: ["AUDIO"],
             speechConfig: {
-              voiceConfig: { prebuiltVoiceConfig: { voiceName: "Zephyr" } }
+              voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } }
             }
           }
         }
@@ -47,6 +59,7 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
           const functionCalls = message.toolCall.functionCalls;
           if (functionCalls) {
             for (const call of functionCalls) {
+              addLog(`Executing tool: ${call.name}`, "tool");
               // Pause the audio stream contextually
               if (audioContextRef.current) audioContextRef.current.suspend();
               
@@ -59,6 +72,7 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
                 });
                 const result = await response.json();
                 
+                addLog(`Tool ${call.name} executed successfully.`, "tool");
                 // Update the VoiceAgent state to render the UI Widget
                 onFunctionCall(result);
 
@@ -74,6 +88,7 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
                 }));
               } catch (err) {
                 console.error("Firebase Bridge error:", err);
+                addLog(`Error executing tool ${call.name}`, "system");
               } finally {
                 // Resume audio
                 if (audioContextRef.current) audioContextRef.current.resume();
@@ -97,12 +112,13 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
 
     ws.onerror = (err) => {
       console.error("Live API error:", err);
+      addLog("Connection error occurred.", "system");
       setIsConnected(false);
     };
 
     ws.onclose = () => {
       setIsConnected(false);
-      console.log("Live API disconnected");
+      addLog("Connection closed.", "system");
     };
 
     wsRef.current = ws;
@@ -114,6 +130,7 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
       wsRef.current = null;
     }
     setIsConnected(false);
+    addLog("Disconnected.", "system");
   };
 
   const playAudio = async (base64Data: string) => {
@@ -164,8 +181,10 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
 
       mediaRecorder.start(100); // Send data every 100ms
       setIsRecording(true);
+      addLog("Microphone active. Listening...", "user");
     } catch (err) {
       console.error("Microphone access failed:", err);
+      addLog("Microphone access denied.", "system");
     }
   };
 
@@ -173,6 +192,7 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+      addLog("Microphone muted.", "user");
     }
   };
 
@@ -182,6 +202,6 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
     };
   }, []);
 
-  return { isConnected, isRecording, connect, disconnect, startRecording, stopRecording };
+  return { isConnected, isRecording, logs, connect, disconnect, startRecording, stopRecording };
 }
 

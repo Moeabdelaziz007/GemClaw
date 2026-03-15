@@ -1,25 +1,31 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  const call = await req.json();
   
-  // In a real app, this would call the Firebase Cloud Function
-  // For now, we'll mock it or call it directly if possible.
-  // Since we are in the same project, we can call the function directly
-  // or via HTTP. Let's assume we call it via HTTP.
-  
-  const FIREBASE_FUNCTION_URL = process.env.FIREBASE_FUNCTION_URL;
-  
-  if (!FIREBASE_FUNCTION_URL) {
-    return NextResponse.json({ error: "Firebase Function URL not configured" }, { status: 500 });
+  const { name, args } = call;
+
+  let result: any = { status: "success" };
+
+  if (name === 'getWeather') {
+    const location = args.location || 'Unknown';
+    result = {
+      location,
+      temperature: Math.floor(Math.random() * 30) + 10, // 10 to 40
+      condition: ['Sunny', 'Cloudy', 'Rainy', 'Partly Cloudy'][Math.floor(Math.random() * 4)],
+      humidity: Math.floor(Math.random() * 50) + 30 + '%'
+    };
+  } else if (name === 'getCryptoPrice') {
+    const symbol = (args.symbol || 'BTC').toUpperCase();
+    const basePrice = symbol === 'BTC' ? 65000 : symbol === 'ETH' ? 3500 : 100;
+    result = {
+      symbol,
+      price: `$${(basePrice + (Math.random() * basePrice * 0.05)).toFixed(2)}`,
+      change24h: `${(Math.random() * 10 - 5).toFixed(2)}%`
+    };
+  } else {
+    result = { error: `Function ${name} not implemented.` };
   }
 
-  const response = await fetch(FIREBASE_FUNCTION_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  
-  const data = await response.json();
-  return NextResponse.json(data);
+  return NextResponse.json(result);
 }
