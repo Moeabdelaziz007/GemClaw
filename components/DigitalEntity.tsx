@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Zap, Brain, Cpu, Activity } from 'lucide-react';
+import React, { useMemo, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Zap, Brain, Cpu, Activity, ShieldCheck, Radio } from 'lucide-react';
 
 interface DigitalEntityProps {
   state: 'Disconnected' | 'Listening' | 'Thinking' | 'Speaking';
@@ -11,180 +11,273 @@ interface DigitalEntityProps {
 }
 
 export function DigitalEntity({ state, volume, agentName }: DigitalEntityProps) {
-  // State Matrix for animations
-  const [threadConfigs] = React.useState(() => Array.from({ length: 10 }).map(() => ({
-    duration: 2 + Math.random() * 2,
-    delay: Math.random() * 2
-  })));
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // States: 
+  // Disconnected: Dim, static
+  // Listening: Receptive, eyes pulse cyan, ring breathes
+  // Thinking: Processing, eyes spiral, core pulses purple rapidly
+  // Speaking: Expressive, eyes expand, ring reacts to volume, arms gesture
 
   const stateConfig = useMemo(() => {
     switch (state) {
       case 'Listening':
         return {
-          color: 'from-cyan-400 to-blue-600',
-          glow: 'shadow-[0_0_50px_rgba(34,211,238,0.4)]',
-          scale: 1 + volume * 0.2,
-          rotation: -5, // Leaning head
-          corePulse: 1.5,
+          glow: 'rgba(0, 240, 255, 0.4)',
+          accent: '#00F0FF',
+          corePulse: 1.2,
+          speed: 2,
+          eyeScale: 1,
+          ringOpacity: 0.6,
         };
       case 'Thinking':
         return {
-          color: 'from-fuchsia-400 to-purple-600',
-          glow: 'shadow-[0_0_60px_rgba(192,38,211,0.5)]',
-          scale: 1.05,
-          rotation: 0,
-          corePulse: 2.5, // Heartbeat pulse
+          glow: 'rgba(168, 85, 247, 0.5)',
+          accent: '#A855F7',
+          corePulse: 1.8,
+          speed: 0.8,
+          eyeScale: 0.8,
+          ringOpacity: 0.4,
         };
       case 'Speaking':
         return {
-          color: 'from-emerald-400 to-cyan-500',
-          glow: 'shadow-[0_0_50px_rgba(52,211,153,0.4)]',
-          scale: 1 + volume * 0.5,
-          rotation: 5,
-          corePulse: 1.2,
+          glow: 'rgba(52, 211, 153, 0.4)',
+          accent: '#34D399',
+          corePulse: 1 + volume * 0.8,
+          speed: 1.5,
+          eyeScale: 1.2,
+          ringOpacity: 0.8,
         };
       default:
         return {
-          color: 'from-slate-700 to-slate-900',
-          glow: 'shadow-none',
-          scale: 1,
-          rotation: 0,
+          glow: 'rgba(255, 255, 255, 0.1)',
+          accent: '#475569',
           corePulse: 1,
+          speed: 4,
+          eyeScale: 0,
+          ringOpacity: 0.2,
         };
     }
   }, [state, volume]);
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden">
-      {/* Background Atmosphere */}
-      <div className="absolute inset-0 bg-[#030303]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,240,255,0.03)_0%,transparent_70%)]" />
+    <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden" ref={containerRef}>
+      {/* Background Atmosphere - Aether Void */}
+      <div className="absolute inset-0 bg-aether-black" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,240,255,0.05)_0%,transparent_70%)]" />
       
-      {/* The Entity Container */}
-      <motion.div 
-        className="relative z-10 flex flex-col items-center"
-        animate={{ 
-          scale: stateConfig.scale,
-          rotate: stateConfig.rotation,
-          y: [0, -10, 0]
-        }}
-        transition={{ 
-          scale: { type: 'spring', stiffness: 300, damping: 20 },
-          rotate: { type: 'spring', stiffness: 100, damping: 10 },
-          y: { duration: 4, repeat: Infinity, ease: "easeInOut" }
-        }}
-      >
-        {/* Humanoid Silhouette (CSS/SVG Hybrid) */}
-        <div className="relative w-64 h-96 flex flex-col items-center">
-          {/* Head */}
+      {/* Neural Link Status Decor */}
+      <AnimatePresence>
+        {state !== 'Disconnected' && (
           <motion.div 
-            className={`w-20 h-24 rounded-full bg-gradient-to-b ${stateConfig.color} blur-[2px] opacity-80`}
-            animate={{ y: [0, 2, 0] }}
-            transition={{ duration: 3, repeat: Infinity }}
-          />
-          
-          {/* Neck */}
-          <div className={`w-4 h-6 bg-gradient-to-b ${stateConfig.color} opacity-40 blur-[1px]`} />
-          
-          {/* Torso */}
-          <motion.div 
-            className={`w-40 h-56 rounded-[40px] bg-gradient-to-b ${stateConfig.color} opacity-60 blur-[3px] relative overflow-hidden`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute top-10 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] backdrop-blur-sm z-20"
           >
-            {/* Data Threads Effect */}
-            <div className="absolute inset-0 opacity-30">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-px h-full bg-white"
-                  style={{ left: `${i * 10}%` }}
-                  animate={{ 
-                    y: ['-100%', '100%'],
-                    opacity: [0, 1, 0]
-                  }}
-                  transition={{ 
-                    duration: threadConfigs[i].duration, 
-                    repeat: Infinity, 
-                    delay: threadConfigs[i].delay 
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Glowing Core (Heartbeat) */}
-            <motion.div 
-              className="absolute top-1/3 left-1/2 -translate-x-1/2 w-16 h-16 bg-white rounded-full blur-[15px]"
-              animate={{ 
-                scale: [1, stateConfig.corePulse, 1],
-                opacity: [0.4, 0.8, 0.4]
-              }}
-              transition={{ 
-                duration: state === 'Thinking' ? 0.8 : 2, 
-                repeat: Infinity, 
-                ease: "easeInOut" 
-              }}
-            />
+            <ShieldCheck className="w-3 h-3 text-aether-neon" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Secure Neural Link Established</span>
           </motion.div>
+        )}
+      </AnimatePresence>
 
-          {/* Arms (Abstract) */}
-          <div className="absolute top-32 -left-8 w-12 h-48 bg-gradient-to-b from-transparent via-cyan-500/20 to-transparent blur-[5px] rounded-full rotate-12" />
-          <div className="absolute top-32 -right-8 w-12 h-48 bg-gradient-to-b from-transparent via-cyan-500/20 to-transparent blur-[5px] rounded-full -rotate-12" />
-        </div>
-
-        {/* Waves for Speaking */}
-        <AnimatePresence>
-          {state === 'Speaking' && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute rounded-full border border-cyan-400/30"
-                  initial={{ width: 100, height: 100, opacity: 0.5 }}
-                  animate={{ width: 600, height: 600, opacity: 0 }}
-                  transition={{ duration: 2, delay: i * 0.6, repeat: Infinity, ease: "easeOut" }}
-                />
-              ))}
-            </div>
-          )}
-        </AnimatePresence>
-
-        {/* Name Tag */}
-        <motion.div 
-          className="mt-12 text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <h2 className="text-3xl font-black tracking-[0.2em] uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-white/40">
-            {agentName}
-          </h2>
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <div className={`w-2 h-2 rounded-full ${state !== 'Disconnected' ? 'bg-cyan-400 animate-pulse' : 'bg-red-500'}`} />
-            <span className="text-xs font-mono tracking-widest text-slate-500 uppercase">{state}</span>
-          </div>
-        </motion.div>
-      </motion.div>
-
-      {/* Orbiting Widgets (Satellites) */}
-      <div className="absolute inset-0 pointer-events-none">
-        {['Memory', 'Neural', 'Aether', 'Core'].map((label, i) => (
-          <motion.div
-            key={label}
-            className="absolute top-1/2 left-1/2 w-32 h-16 rounded-2xl quantum-glass border border-white/10 flex items-center justify-center gap-2"
+      <div className="relative z-10 flex flex-col items-center">
+        {/* The Entity Core Orbit */}
+        <div className="relative flex items-center justify-center">
+          {/* Reaction Ring (Waveform Ring) */}
+          <motion.div 
+            className="absolute rounded-full border-2 border-dashed"
+            style={{ borderColor: stateConfig.accent, opacity: stateConfig.ringOpacity }}
             animate={{ 
+              width: 380 + (state === 'Speaking' ? volume * 150 : 0),
+              height: 380 + (state === 'Speaking' ? volume * 150 : 0),
               rotate: 360,
-              x: Math.cos(i * 90 * Math.PI / 180) * 350,
-              y: Math.sin(i * 90 * Math.PI / 180) * 350,
             }}
             transition={{ 
-              rotate: { duration: 30 + i * 5, repeat: Infinity, ease: "linear" },
+              rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+              width: { type: 'spring', stiffness: 200, damping: 15 },
+              height: { type: 'spring', stiffness: 200, damping: 15 }
+            }}
+          />
+
+          {/* Secondary Orbit */}
+          <motion.div 
+            className="absolute w-[450px] h-[450px] rounded-full border border-white/5"
+            animate={{ rotate: -360 }}
+            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+          />
+
+          {/* Liquid Obsidian Mascot Silhouette */}
+          <motion.div 
+            className="relative w-72 h-[450px] flex flex-col items-center"
+            animate={{ 
+              y: [0, -15, 0],
+            }}
+            transition={{ 
+              duration: stateConfig.speed, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+          >
+            {/* The Aether Entity - Head (Floating Singularity) */}
+            <div className="relative w-28 h-32 mb-4 flex flex-col items-center justify-center">
+              {/* Head Shell */}
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-md rounded-[40px] border border-white/10 overflow-hidden">
+                {/* Circuit Veins (Procedural) */}
+                <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_30%_30%,#00F0FF_0%,transparent_50%),radial-gradient(circle_at_70%_60%,#A855F7_0%,transparent_50%)]" />
+              </div>
+              
+              {/* Sovereign Eyes (Tracking UI) */}
+              <div className="flex gap-4 z-10">
+                <motion.div 
+                  className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_15px_#fff]"
+                  animate={{ 
+                    scale: stateConfig.eyeScale,
+                    opacity: state === 'Thinking' ? [0.4, 1, 0.4] : 1,
+                    x: state === 'Listening' ? [0, 2, -2, 0] : 0
+                  }}
+                  transition={{ 
+                    duration: state === 'Thinking' ? 0.3 : 1, 
+                    repeat: Infinity 
+                  }}
+                />
+                <motion.div 
+                  className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_15px_#fff]"
+                  animate={{ 
+                    scale: stateConfig.eyeScale,
+                    opacity: state === 'Thinking' ? [0.4, 1, 0.4] : 1,
+                    x: state === 'Listening' ? [0, -2, 2, 0] : 0
+                  }}
+                  transition={{ 
+                    duration: state === 'Thinking' ? 0.3 : 1, 
+                    repeat: Infinity 
+                  }}
+                />
+              </div>
+
+              {/* Neural Activity Ray */}
+              <AnimatePresence>
+                {state === 'Speaking' && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: [0.2, 0.5, 0.2], scale: [1, 1.5, 1] }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5, repeat: Infinity }}
+                    className="absolute inset-0 bg-white/5 rounded-full blur-2xl"
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+            
+            {/* Torso - Liquid Obsidian Panel */}
+            <div className="relative w-48 h-72 rounded-[60px] bg-white/[0.03] backdrop-blur-2xl border border-white/10 overflow-hidden group">
+              {/* The Core Singularity */}
+              <motion.div 
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-[25px]"
+                style={{ backgroundColor: stateConfig.accent }}
+                animate={{ 
+                  scale: [1, stateConfig.corePulse, 1],
+                  opacity: [0.3, 0.6, 0.3]
+                }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              />
+
+              <div className="absolute inset-0 flex items-center justify-center opacity-10">
+                <Radio className={`w-32 h-32 ${state === 'Speaking' ? 'animate-pulse' : ''}`} />
+              </div>
+
+              {/* Digital Veins */}
+              <div className="absolute inset-0 pointer-events-none p-8 flex flex-col gap-4">
+                <div className="h-px w-full bg-white/10" />
+                <div className="h-px w-2/3 bg-white/10" />
+                <div className="h-px w-full bg-white/10" />
+              </div>
+            </div>
+
+            {/* Gesture Arms (Pulsing Lines) */}
+            <motion.div 
+              className="absolute top-48 -left-12 w-16 h-48 border-l border-white/20 rounded-l-full blur-[3px]"
+              animate={{ rotate: state === 'Speaking' ? -20 : -10 }}
+            />
+            <motion.div 
+              className="absolute top-48 -right-12 w-16 h-48 border-r border-white/20 rounded-r-full blur-[3px]"
+              animate={{ rotate: state === 'Speaking' ? 20 : 10 }}
+            />
+          </motion.div>
+        </div>
+
+        {/* Identity & Status */}
+        <motion.div 
+          className="mt-16 text-center space-y-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="relative inline-block">
+            <h2 className="text-4xl font-black tracking-[0.3em] uppercase text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+              {agentName}
+            </h2>
+            <div className="absolute -bottom-2 left-0 w-full h-[1px] bg-white/20" />
+          </div>
+
+          <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-3 px-4 py-1.5 rounded-full border border-white/5 bg-white/[0.02] backdrop-blur-md">
+              <div className={`w-2 h-2 rounded-full shadow-[0_0_8px_currentColor] ${
+                state === 'Disconnected' ? 'text-white/20 bg-white/20' : 
+                state === 'Listening' ? 'text-aether-neon bg-aether-neon animate-pulse' :
+                state === 'Thinking' ? 'text-purple-500 bg-purple-500 animate-pulse' :
+                'text-emerald-400 bg-emerald-400 animate-bounce'
+              }`} />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">
+                {state === 'Disconnected' ? 'Standby Matrix' : `${state} Mode`}
+              </span>
+            </div>
+            
+            {state === 'Speaking' && (
+              <motion.div 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }}
+                className="text-[9px] font-mono text-emerald-400/60 uppercase tracking-widest pt-2"
+              >
+                Output Amplitude: {(volume * 100).toFixed(1)}%
+              </motion.div>
+            )}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Sovereign Context Satellites */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[
+          { label: 'Memory', icon: Brain, color: 'text-purple-400' },
+          { label: 'Neural', icon: Cpu, color: 'text-aether-neon' },
+          { label: 'Aether', icon: Zap, color: 'text-emerald-400' },
+          { label: 'Identity', icon: ShieldCheck, color: 'text-blue-400' }
+        ].map((sys, i) => (
+          <motion.div
+            key={sys.label}
+            className="absolute top-1/2 left-1/2 w-32 h-14 rounded-full quantum-glass border border-white/5 flex items-center justify-center gap-3 group/sat"
+            animate={{ 
+              rotate: 360,
+              x: Math.cos(i * 90 * Math.PI / 180) * 440,
+              y: Math.sin(i * 90 * Math.PI / 180) * 440,
+            }}
+            transition={{ 
+              rotate: { duration: 40 + i * 10, repeat: Infinity, ease: "linear" },
               x: { duration: 0 },
               y: { duration: 0 }
             }}
           >
-            {i === 0 && <Brain className="w-4 h-4 text-purple-400" />}
-            {i === 1 && <Cpu className="w-4 h-4 text-cyan-400" />}
-            {i === 2 && <Zap className="w-4 h-4 text-emerald-400" />}
-            {i === 3 && <Activity className="w-4 h-4 text-fuchsia-400" />}
-            <span className="text-[10px] font-mono tracking-widest uppercase text-white/60">{label}</span>
+            {/* Counter-rotation to keep labels upright */}
+            <motion.div 
+              className="flex items-center gap-2"
+              animate={{ rotate: -360 }}
+              transition={{ duration: 40 + i * 10, repeat: Infinity, ease: "linear" }}
+            >
+              <sys.icon className={`w-3.5 h-3.5 ${sys.color} opacity-60`} />
+              <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/30 group-hover/sat:text-white/70 transition-colors">
+                {sys.label}
+              </span>
+            </motion.div>
           </motion.div>
         ))}
       </div>

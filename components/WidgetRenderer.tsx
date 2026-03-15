@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Code2, Cloud, Bitcoin, Sparkles } from 'lucide-react';
 import { EphemeralWidget } from './ui/EphemeralWidget';
 

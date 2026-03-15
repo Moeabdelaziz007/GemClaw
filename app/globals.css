@@ -1,12 +1,69 @@
 @import "tailwindcss";
 
+@theme {
+  --color-aether-black: #050505;
+  --color-aether-carbon: #0f0f0f;
+  --color-aether-gray: #1a1a1a;
+  --color-aether-neon: #00f2ff;
+  --color-aether-core: #7000ff;
+  --color-aether-glass: rgba(255, 255, 255, 0.03);
+  
+  --font-heading: "Outfit", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "Fira Code", monospace;
+
+  --animate-orbit: orbit 60s linear infinite;
+  --animate-pulse-core: pulse-core 4s ease-in-out infinite;
+
+  @keyframes orbit {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes pulse-core {
+    0%, 100% { opacity: 0.3; transform: scale(1); filter: blur(20px); }
+    50% { opacity: 0.7; transform: scale(1.1); filter: blur(30px); }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-aether-black text-white font-body selection:bg-aether-neon/30;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
+  }
+}
+
 @layer utilities {
   .quantum-glass {
     @apply bg-white/5 backdrop-blur-2xl border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)];
   }
+
+  .aether-border {
+    @apply border border-white/5 hover:border-aether-neon/30 transition-colors duration-500;
+  }
+
+  .neon-text {
+    @apply text-aether-neon drop-shadow-[0_0_8px_rgba(0,242,255,0.5)];
+  }
+
+  .glow-box {
+    @apply relative after:absolute after:inset-0 after:-z-10 after:bg-aether-neon/5 after:blur-3xl after:opacity-0 hover:after:opacity-100 transition-opacity duration-700;
+  }
 }
 
-body {
-  background-color: #000000;
-  color: #ffffff;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
 }

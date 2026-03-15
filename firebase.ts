@@ -8,6 +8,9 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('https://www.googleapis.com/auth/generative-language.retrieval');
+googleProvider.addScope('https://www.googleapis.com/auth/generative-language.tuning');
+googleProvider.addScope('https://www.googleapis.com/auth/cloud-platform.read-only');
 
 // Connection test
 async function testConnection() {

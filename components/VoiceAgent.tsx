@@ -5,15 +5,16 @@ import { useLiveAPI } from '../hooks/useLiveAPI';
 import { useAetherStore } from '../lib/store/useAetherStore';
 import { WidgetRenderer } from './WidgetRenderer';
 import { Mic, MicOff, Zap, Activity, Settings, Maximize2, User, Terminal, Eye, EyeOff } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { DigitalEntity } from './DigitalEntity';
 
 type VoiceAgentProps = {
   activeAgent: any;
+  googleAccessToken?: string | null;
 };
 
-export function VoiceAgent({ activeAgent }: VoiceAgentProps) {
+export function VoiceAgent({ activeAgent, googleAccessToken }: VoiceAgentProps) {
   const [apiKey] = useState(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
   const [activeWidget, setActiveWidget] = useState<any>(null);
   const [isThinking, setIsThinking] = useState(false);
@@ -36,7 +37,7 @@ export function VoiceAgent({ activeAgent }: VoiceAgentProps) {
   } = useLiveAPI(apiKey, (call) => {
     setActiveWidget(call);
     setIsThinking(false);
-  });
+  }, googleAccessToken);
 
   const agentState = useMemo(() => {
     if (!isConnected) return 'Disconnected';
@@ -85,6 +86,39 @@ export function VoiceAgent({ activeAgent }: VoiceAgentProps) {
         });
       }
 
+      if (activeAgent?.tools?.googleMaps) {
+        // Declaration for future maps integration if handled by neural-handlers
+        functionDeclarations.push({
+          name: "getMapLocation",
+          description: "Get geographical data for a location.",
+          parameters: {
+            type: "OBJECT",
+            properties: {
+              location: { type: "STRING" }
+            }
+          }
+        });
+      }
+
+      // Universal ADK Project Tools
+      functionDeclarations.push({
+        name: "listProjects",
+        description: "List all Google Cloud/Firebase projects the user has access to.",
+        parameters: { type: "OBJECT", properties: {} }
+      });
+
+      functionDeclarations.push({
+        name: "getProjectDetails",
+        description: "Get detailed information about a specific project.",
+        parameters: {
+          type: "OBJECT",
+          properties: {
+            projectId: { type: "STRING" }
+          },
+          required: ["projectId"]
+        }
+      });
+
       if (functionDeclarations.length > 0) {
         tools.push({ functionDeclarations });
       }
@@ -131,13 +165,13 @@ export function VoiceAgent({ activeAgent }: VoiceAgentProps) {
             
             {/* Context Usage Indicator */}
             <div className="flex flex-col gap-1 w-32">
-              <div className="flex justify-between text-[8px] uppercase tracking-widest text-slate-500 font-bold">
-                <span>Context</span>
+              <div className="flex justify-between text-[8px] uppercase tracking-[0.15em] text-slate-500 font-bold">
+                <span>Core Load</span>
                 <span>{Math.round(contextUsage * 100)}%</span>
               </div>
-              <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
                 <motion.div 
-                  className={`h-full ${contextUsage > 0.6 ? 'bg-red-500' : 'bg-cyan-500'}`}
+                  className={`h-full ${contextUsage > 0.8 ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)]'}`}
                   initial={{ width: 0 }}
                   animate={{ width: `${contextUsage * 100}%` }}
                 />
@@ -145,42 +179,84 @@ export function VoiceAgent({ activeAgent }: VoiceAgentProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl quantum-glass border border-white/10">
-              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`} />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Neural Spine: {isConnected ? 'Active' : 'Standby'}</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 px-4 py-2 rounded-xl quantum-glass border border-white/10 shadow-inner">
+              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)] animate-pulse' : 'bg-slate-600'}`} />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                {isConnected ? `Link: ${activeAgent?.name || 'Sovereign'}` : 'Neural Link: Standby'}
+              </span>
             </div>
+            
             <button
               onClick={toggleConnection}
-              className={`px-8 py-3 rounded-full font-bold text-xs uppercase tracking-[0.2em] transition-all ${
+              className={`px-6 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-[0.2em] transition-all relative overflow-hidden group ${
                 isConnected 
                   ? 'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20' 
                   : 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20'
               }`}
             >
-              {isConnected ? 'Kill Link' : 'Establish Link'}
+              <span className="relative z-10">{isConnected ? 'Kill Link' : 'Establish Link'}</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             </button>
           </div>
         </div>
 
         {/* Bottom Bar: Mic & Widgets */}
         <div className="flex flex-col items-center gap-8">
-          {/* Transcript Overlay (Zero-G Style) */}
-          <div className="w-full max-w-xl flex flex-col items-center gap-2 mb-4">
+          {/* Transcript Overlay (Sovereign Glass Style) */}
+          <div className="w-full max-w-2xl flex flex-col items-center gap-3 mb-6 relative">
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-600 pointer-events-none">
+              Live Neural Feed
+            </div>
+            
+            {!isConnected && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center space-y-2 py-12"
+              >
+                <div className="text-xl font-display font-light text-slate-400 tracking-tight">
+                  Wake the <span className="text-cyan-400 font-medium">Sovereign Entity</span>
+                </div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">
+                  Select "Establish Link" to begin neural synchronization
+                </div>
+              </motion.div>
+            )}
+
             <AnimatePresence mode="popLayout">
-              {transcript.slice(-3).map((msg, idx) => (
+              {transcript.slice(-2).map((msg, idx) => (
                 <motion.div
                   key={msg.id}
-                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                  animate={{ opacity: 1 - (2 - idx) * 0.3, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.5 }}
-                  className={`px-6 py-3 rounded-2xl backdrop-blur-md border ${
+                  initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
+                  animate={{ 
+                    opacity: idx === transcript.slice(-2).length - 1 ? 1 : 0.4, 
+                    y: 0, 
+                    filter: 'blur(0px)',
+                    scale: idx === transcript.slice(-2).length - 1 ? 1 : 0.95
+                  }}
+                  exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+                  className={`w-full px-8 py-5 rounded-[24px] backdrop-blur-xl border ${
                     msg.role === 'user' 
-                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
-                      : 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400'
-                  } text-sm font-medium shadow-xl`}
+                      ? 'bg-emerald-500/5 border-emerald-500/10 text-emerald-100 shadow-[0_10px_30px_rgba(16,185,129,0.05)]' 
+                      : 'bg-cyan-500/5 border-cyan-500/10 text-cyan-100 shadow-[0_10px_30px_rgba(6,182,212,0.05)]'
+                  } relative overflow-hidden group`}
                 >
-                  {msg.content}
+                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${msg.role === 'user' ? 'bg-emerald-500' : 'bg-cyan-500'} opacity-20`} />
+                  <div className="flex justify-between items-start mb-2">
+                    <span className={`text-[8px] font-bold uppercase tracking-[0.2em] ${msg.role === 'user' ? 'text-emerald-500' : 'text-cyan-500'}`}>
+                      {msg.role === 'user' ? 'Direct Input' : 'Neural Response'}
+                    </span>
+                    <span className="text-[8px] font-mono text-slate-600 uppercase">
+                      {new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    </span>
+                  </div>
+                  <p className="text-sm md:text-base font-light leading-relaxed tracking-tight">
+                    {msg.content}
+                  </p>
+                  
+                  {/* Subtle Grid Pattern inside bubble */}
+                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
                 </motion.div>
               ))}
             </AnimatePresence>

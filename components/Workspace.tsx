@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Cloud, Newspaper, Bitcoin, Calculator, Database } from 'lucide-react';
 
 type WorkspaceProps = {

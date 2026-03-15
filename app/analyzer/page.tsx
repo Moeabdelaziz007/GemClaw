@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { analyzeRepository } from '@/app/actions/analyzeRepo';
+import { analyzeRepository } from '@/lib/tools/repo-analyzer';
 import { Loader2, Github, Search, Code2, Cpu, Zap, Terminal, CheckCircle2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const LOADING_STEPS = [
   "جاري الاتصال بمستودع GitHub...",

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAetherStore } from '../lib/store/useAetherStore';
 import { useVisionPulse } from './useVisionPulse';
+import { handleNeuralTool } from '../lib/tools/neural-handlers';
 
 const MODEL = "models/gemini-2.5-flash-native-audio-preview-09-2025";
 
-export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) {
+export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void, accessToken?: string | null) {
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [logs, setLogs] = useState<{ id: string; text: string; type: 'system' | 'user' | 'agent' | 'tool'; timestamp: string }[]>([]);
@@ -18,6 +19,53 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
   const setStreamingBuffer = useAetherStore(state => state.setStreamingBuffer);
   const setInterrupted = useAetherStore(state => state.setInterrupted);
   const setContextUsage = useAetherStore(state => state.setContextUsage);
+
+  // ─── Reconnection State (Gem #7: Gateway Backpressure) ────
+  const reconnectAttemptsRef = useRef(0);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const maxReconnectAttempts = 5;
+  const baseReconnectDelay = 1000; // 1s
+  const maxReconnectDelay = 30000; // 30s
+  const intentionalDisconnectRef = useRef(false);
+  const lastConnectArgsRef = useRef<{ systemInstruction?: string; voiceName?: string; tools?: any[] }>({});
+
+  // 1. Utility Callbacks (Top-Level)
+  const addLog = useCallback((text: string, type: 'system' | 'user' | 'agent' | 'tool') => {
+    const timestamp = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    setLogs(prev => [...prev, { id: Math.random().toString(36).substring(7), text, type, timestamp }]);
+  }, []);
+
+  const updateVolume = useCallback(() => {
+    if (!analyserRef.current) return;
+    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+    analyserRef.current.getByteFrequencyData(dataArray);
+    const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+    setVolume(average / 255);
+    animationFrameRef.current = requestAnimationFrame(updateVolume);
+  }, []);
+
+  const playAudio = useCallback(async (base64Data: string) => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new AudioContext();
+    }
+    
+    const audioContext = audioContextRef.current;
+    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    const audioBuffer = await audioContext.decodeAudioData(binaryData.buffer);
+    
+    const source = audioContext.createBufferSource();
+    source.buffer = audioBuffer;
+    
+    if (!analyserRef.current) {
+      analyserRef.current = audioContext.createAnalyser();
+      analyserRef.current.fftSize = 256;
+      updateVolume();
+    }
+    
+    source.connect(analyserRef.current);
+    analyserRef.current.connect(audioContext.destination);
+    source.start();
+  }, [updateVolume]);
 
   const sendVisionFrame = useCallback((base64Data: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -35,30 +83,27 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
 
   const { isCapturing, startPulse, stopPulse } = useVisionPulse(sendVisionFrame);
 
-  const addLog = useCallback((text: string, type: 'system' | 'user' | 'agent' | 'tool') => {
-    const timestamp = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    setLogs(prev => [...prev, { id: Math.random().toString(36).substring(7), text, type, timestamp }]);
-  }, []);
-
-  const updateVolume = useCallback(() => {
-    if (!analyserRef.current) return;
-    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-    analyserRef.current.getByteFrequencyData(dataArray);
-    const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-    setVolume(average / 255);
-    animationFrameRef.current = requestAnimationFrame(updateVolume);
-  }, []);
+  // 2. Core Logic Callbacks (Reconnection & Circular Handling)
+  // We use a forward reference for reconnect to avoid TDZ in connect ws.onclose
+  const scheduleReconnectRef = useRef<() => void>(() => {});
 
   const connect = useCallback((systemInstruction?: string, voiceName: string = "Zephyr", tools?: any[]) => {
     if (!apiKey) return;
+
+    lastConnectArgsRef.current = { systemInstruction, voiceName, tools };
+    intentionalDisconnectRef.current = false;
     
     addLog("Initializing neural connection...", "system");
     
-    const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
+    const wsUrl = accessToken 
+      ? `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?accessToken=${accessToken}`
+      : `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
+    
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       setIsConnected(true);
+      reconnectAttemptsRef.current = 0;
       addLog("Live API connected successfully.", "system");
       
       ws.send(JSON.stringify({
@@ -94,12 +139,8 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
               if (audioContextRef.current) audioContextRef.current.suspend();
               
               try {
-                const response = await fetch('/api/agent/execute', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(call)
-                });
-                const result = await response.json();
+                const activeProjectId = useAetherStore.getState().activeProjectId;
+                const result = await handleNeuralTool(call.name, { ...call.args, accessToken, activeProjectId });
                 
                 addLog(`Tool ${call.name} executed successfully.`, "tool");
                 onFunctionCall(result);
@@ -114,7 +155,7 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
                   }
                 }));
               } catch (err) {
-                console.error("Firebase Bridge error:", err);
+                console.error("Neural Tool error:", err);
                 addLog(`Error executing tool ${call.name}`, "system");
               } finally {
                 if (audioContextRef.current) audioContextRef.current.resume();
@@ -141,7 +182,6 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
 
         if (message.usageMetadata) {
           const { totalTokenCount } = message.usageMetadata;
-          // Estimate usage based on a 1M token limit (Gemini 2.0 Flash limit)
           const usage = Math.min(totalTokenCount / 1000000, 1);
           setContextUsage(usage);
         }
@@ -153,18 +193,57 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
     ws.onerror = (err) => {
       console.error("Live API error:", err);
       addLog("Connection error occurred.", "system");
-      setIsConnected(false);
     };
 
-    ws.onclose = () => {
+    ws.onclose = (event) => {
       setIsConnected(false);
-      addLog("Connection closed.", "system");
+      wsRef.current = null;
+      
+      if (intentionalDisconnectRef.current) {
+        addLog("Connection closed.", "system");
+      } else {
+        addLog(`Connection lost (code: ${event.code}). Preparing reconnection...`, "system");
+        scheduleReconnectRef.current();
+      }
     };
 
     wsRef.current = ws;
   }, [apiKey, addLog, onFunctionCall, playAudio, addTranscriptMessage, setContextUsage, setInterrupted]);
 
+  const scheduleReconnect = useCallback(() => {
+    if (intentionalDisconnectRef.current) return;
+    if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+      addLog(`Max reconnection attempts (${maxReconnectAttempts}) reached. Giving up.`, "system");
+      reconnectAttemptsRef.current = 0;
+      return;
+    }
+
+    const attempt = reconnectAttemptsRef.current;
+    const delay = Math.min(baseReconnectDelay * Math.pow(2, attempt), maxReconnectDelay);
+    const jitter = delay * 0.2 * Math.random();
+    const actualDelay = Math.round(delay + jitter);
+
+    addLog(`Reconnecting in ${(actualDelay / 1000).toFixed(1)}s (attempt ${attempt + 1}/${maxReconnectAttempts})...`, "system");
+
+    reconnectTimerRef.current = setTimeout(() => {
+      reconnectAttemptsRef.current += 1;
+      const args = lastConnectArgsRef.current;
+      connect(args.systemInstruction, args.voiceName, args.tools);
+    }, actualDelay);
+  }, [addLog, connect]);
+
+  // Sync ref
+  useEffect(() => {
+    scheduleReconnectRef.current = scheduleReconnect;
+  }, [scheduleReconnect]);
+
   const disconnect = useCallback(() => {
+    intentionalDisconnectRef.current = true;
+    if (reconnectTimerRef.current) {
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
+    reconnectAttemptsRef.current = 0;
     if (wsRef.current) {
       wsRef.current.close();
       wsRef.current = null;
@@ -176,48 +255,10 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
     addLog("Disconnected.", "system");
   }, [addLog]);
 
-  const playAudio = useCallback(async (base64Data: string) => {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new AudioContext();
-    }
-    
-    const audioContext = audioContextRef.current;
-    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
-    const audioBuffer = await audioContext.decodeAudioData(binaryData.buffer);
-    
-    const source = audioContext.createBufferSource();
-    source.buffer = audioBuffer;
-    
-    // Connect to analyser for agent voice reactivity
-    if (!analyserRef.current) {
-      analyserRef.current = audioContext.createAnalyser();
-      analyserRef.current.fftSize = 256;
-      updateVolume();
-    }
-    
-    source.connect(analyserRef.current);
-    analyserRef.current.connect(audioContext.destination);
-    source.start();
-  }, [updateVolume]);
-
-  const sendAudio = (base64Data: string) => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
-        realtimeInput: {
-          audio: {
-            mimeType: 'audio/webm',
-            data: base64Data
-          }
-        }
-      }));
-    }
-  };
-
   const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
-      // Setup analyser for user voice reactivity
       if (!audioContextRef.current) {
         audioContextRef.current = new AudioContext();
       }
@@ -237,7 +278,16 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
           const reader = new FileReader();
           reader.onloadend = () => {
             const base64data = (reader.result as string).split(',')[1];
-            sendAudio(base64data);
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+              wsRef.current.send(JSON.stringify({
+                realtimeInput: {
+                  audio: {
+                    mimeType: 'audio/webm',
+                    data: base64data
+                  }
+                }
+              }));
+            }
           };
           reader.readAsDataURL(event.data);
         }
@@ -285,4 +335,3 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void) 
     stopPulse
   };
 }
-

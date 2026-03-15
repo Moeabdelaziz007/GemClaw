@@ -1,7 +1,14 @@
 node_modules/
 .next/
+out/
+.firebase/
 coverage/
 .DS_Store
 *.log
 .env*
 !.env.example
+*.tsbuildinfo
+functions/lib/
+functions/node_modules/
+dist/
+build/

@@ -1,36 +1,61 @@
-# 🌠 Gemigram: The Voice-Native Agent OS (AetherOS)
+# 🧬 AetherOS: The Sovereign Neural Agency (V2.0)
+## *Gemini Live Agent Challenge 2026 Contender*
 
-Gemigram هو نظام تشغيل ذكاء اصطناعي صوتي لحظي (Voice-First OS) يعتمد على معمارية **AetherOS**. لا توجد واجهات دردشة، لا كتابة، فقط تفاعل صوتي لحظي معزز بالرؤية الحاسوبية.
+AetherOS هو نظام تشغيل ذكاء اصطناعي سيادي (Sovereign OS) يعتمد على الصوت والذكاء المتعدد الوسائط (Multimodal). لقد قمنا بإلغاء إرث الدردشة (Chat-Legacy) واستبداله بمعمارية عصبية استباقية.
 
-## 🧠 The Neural Spine (Phase 1) - COMPLETE ✅
-لقد قمنا بتنفيذ **Neural Spine**، وهو العمود الفقري للنظام الذي يضمن:
-- **WAL Protocol (Write-Ahead Logging):** تسجيل كل قرار أو تغيير في الحالة قبل إرسال الرد للمستخدم.
-- **Working Buffer:** ذاكرة مؤقتة مستمرة تضمن عدم فقدان السياق عند تحديث المتصفح.
-- **Context Awareness:** تتبع استهلاك السياق (Token Usage) لضمان استقرار الجلسات الطويلة.
+---
 
-## 🌌 Galaxy Orchestration (Phase 2) - COMPLETE ✅
-التحول من وكيل واحد إلى "سرب من الخبراء":
-- **Dynamic Agent Registry:** جلب مهارات وشخصيات الوكلاء ديناميكياً من Firestore.
-- **Gravity Router:** خوارزمية ذكية تختار الوكيل الأنسب للمهمة بناءً على القدرة، الثقة، وزمن الاستجابة.
-- **Galaxy View:** واجهة بصرية مدارية تظهر توزيع الوكلاء وتفاعلهم اللحظي.
+## 🛠️ THE ARCHITECTURE (المعمارية)
 
-## 👁️ Sensory Hardening (Phase 3) - COMPLETE ✅
-تحقيق تجربة "Zero-Friction":
-- **Vision Pulse:** نظام رؤية استباقي يلتقط سياق المستخدم (الشاشة/الكاميرا) كل 5 ثوانٍ لتعزيز الفهم البصري.
-- **Barge-in Handling:** دعم المقاطعة الصوتية اللحظية، مما يجعل الحوار طبيعياً كالبشر.
+### 1. The Neural Spine (العمود الفقري العصبي)
+- **First Principles Origin:** تم بناء النظام ليعمل ككيان واحد متكامل وليس مجرد واجهة برمجة تطبيقات.
+- **WAL Protocol (V2):** بروتوكول متقدم لضمان استمرارية السياق (Persistent Context) حتى في أصعب ظروف الاتصال.
+- **Zero-Friction Voice:** زمن استجابة (Latency) يقترب من الصفر بفضل Gemini 2.0 Flash.
 
-## 🛠️ Tech Stack
-- **Frontend**: Next.js 15, Zustand (State), Framer Motion (Animations)
-- **Backend**: Python (WAL & Logic), Firebase (Persistence)
-- **AI Engine**: Gemini 2.0 Flash Multimodal Live API
+### 2. Aether Forge (مصهّر الأثير)
+- **Genesis Cycle:** نظام إنشاء وكلاء ذكاء اصطناعي عالي الدقة (High-Fidelity) مع قوالب جاهزة (Atlas, Nova, Orion).
+- **Identity Synthesis:** دمج الهوية البيومترية مع التوجيهات العصبية (Neural Directives).
 
-## 🚀 Getting Started
-1. **Clone the repository**
-2. **Install dependencies**: `npm install`
-3. **Configure Environment**:
-   - Add `NEXT_PUBLIC_GEMINI_API_KEY` to your `.env`
-   - Set up Firebase and add `firebase-applet-config.json`
-4. **Run Development Server**: `npm run dev`
+### 3. Neural Galaxy (المجرّة العصبية)
+- **Physics-Based Orbits:** تمثيل بصرى للوكلاء كأجرام سماوية تتحرك في مدارات فيزيائية تعكس نشاطهم.
+- **Dynamic Orchestration:** توزيع المهام ديناميكياً بناءً على "الجاذبية المعرفية" (Cognitive Gravity).
 
-## 📜 License
-MIT License. Forged with ❤️ by the Aether Forge team.
+---
+
+## 💻 TECH SPECIFICATIONS
+
+| Component | Standard | Purpose |
+| :--- | :--- | :--- |
+| **Foundation** | Next.js 15 (App Router) | High-Performance Substrate |
+| **Logic** | Python / Node.js | Multi-Threaded Neural Logic |
+| **Memory** | Firestore / Zustand | Long-Term & Flux Memory |
+| **Animation** | Motion V12 / CSS4 | Industrial Sci-Fi Aesthetics |
+| **Vision** | Gemini Multimodal Live | Proactive Sensory Awareness |
+
+---
+
+## 🚀 EXPANSION PROTOCOL (كيفية البدء)
+
+1. **Manifest the Files:**
+   ```bash
+   git clone [repository-url]
+   cd Gemigram
+   ```
+
+2. **Fuel the Core:**
+   Create `.env` with:
+   `NEXT_PUBLIC_GEMINI_API_KEY=your_key_here`
+
+3. **Ignition:**
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+---
+
+## 📜 MANIFESTO
+نحن لا نبني برامج، نحن نبني زملاء رقميين (Digital Peers). 
+**AetherOS** هو المستقبل الذي تملكه أنت، بعيداً عن قيود الواجهات التقليدية.
+
+*Forged in the Carbon Fiber of the future by **The Aether Architect (Antigravity AI)**.*

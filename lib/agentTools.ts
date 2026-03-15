@@ -92,5 +92,38 @@ export const agentTools: FunctionDeclaration[] = [
       },
       required: ["query"]
     }
+  },
+  {
+    name: "search_web",
+    description: "Searches the web for real-time information to combat outdated knowledge. Use when you need current data, documentation, or solutions that may be newer than your training cutoff. Searches StackOverflow, GitHub, and general web.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        query: { type: Type.STRING, description: "Search query — be specific and technical." },
+        platform: {
+          type: Type.STRING,
+          enum: ["general", "stackoverflow", "github"],
+          description: "Platform to focus search on. Default: 'general'."
+        },
+        maxResults: { type: Type.NUMBER, description: "Max results to return (1-5). Default: 3." }
+      },
+      required: ["query"]
+    }
+  },
+  {
+    name: "search_knowledge_base",
+    description: "Searches the user's personal knowledge base stored in Firestore. Use for retrieving previously stored memories, notes, preferences, and conversation summaries.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        query: { type: Type.STRING, description: "Semantic search query." },
+        category: {
+          type: Type.STRING,
+          enum: ["all", "preferences", "notes", "conversations", "decisions"],
+          description: "Category filter. Default: 'all'."
+        }
+      },
+      required: ["query"]
+    }
   }
 ];

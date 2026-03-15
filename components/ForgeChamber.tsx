@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Sparkles, Cpu, Brain, Package } from 'lucide-react';
 
 interface ForgeChamberProps {

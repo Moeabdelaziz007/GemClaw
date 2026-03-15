@@ -1,11 +1,11 @@
-'use server';
-
 import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import JSZip from 'jszip';
 
-const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
+// NOTE: Using public API key for the demo client-side analyzer. 
+// In a production production environment, this should be gated or use a proxy if sensitive.
+// But for AetherOS Zero-Cost Static Export, we use direct browser-to-Gemini connection.
+const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY || '' });
 
-// Helper to check if a file is binary or should be ignored
 function shouldIgnore(filename: string): boolean {
   const ignorePatterns = [
     'node_modules/', '.git/', 'dist/', 'build/', '.next/', 'coverage/',
@@ -19,7 +19,6 @@ function shouldIgnore(filename: string): boolean {
 
 export async function analyzeRepository(repoUrl: string) {
   try {
-    // Parse GitHub URL (e.g., https://github.com/Moeabdelaziz007/Aether-Voice-OS)
     const match = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
     if (!match) {
       throw new Error('Invalid GitHub URL');
@@ -27,7 +26,6 @@ export async function analyzeRepository(repoUrl: string) {
     const owner = match[1];
     const repo = match[2];
 
-    // Fetch the repository zipball
     const zipUrl = `https://api.github.com/repos/${owner}/${repo}/zipball/main`;
     const response = await fetch(zipUrl, {
       headers: {
@@ -37,7 +35,6 @@ export async function analyzeRepository(repoUrl: string) {
 
     let buffer: ArrayBuffer;
     if (!response.ok) {
-      // Try master branch if main fails
       const zipUrlMaster = `https://api.github.com/repos/${owner}/${repo}/zipball/master`;
       const responseMaster = await fetch(zipUrlMaster, {
         headers: { 'User-Agent': 'Aether-Voice-OS-Analyzer' },
@@ -50,7 +47,6 @@ export async function analyzeRepository(repoUrl: string) {
       buffer = await response.arrayBuffer();
     }
 
-    // Unzip in memory
     const zip = await JSZip.loadAsync(buffer);
     let combinedCode = '';
     let fileCount = 0;
@@ -58,7 +54,6 @@ export async function analyzeRepository(repoUrl: string) {
     for (const [filename, file] of Object.entries(zip.files)) {
       if (file.dir || shouldIgnore(filename)) continue;
 
-      // Extract the actual path (GitHub zipballs have a root folder like owner-repo-hash/)
       const actualPath = filename.split('/').slice(1).join('/');
       if (!actualPath) continue;
 
@@ -75,7 +70,6 @@ export async function analyzeRepository(repoUrl: string) {
       throw new Error('No readable code files found in the repository.');
     }
 
-    // Send to Gemini with Advanced Tools and High Thinking Level
     const prompt = `
 أنت مهندس معماري رئيسي للذكاء الاصطناعي والأمن السيبراني (Principal AI Architecture & Cybersecurity Engineer).
 عقليتك تحليلية، هادئة، وتعتمد على المبادئ الأولى (First Principles).
@@ -96,19 +90,16 @@ ${combinedCode}
 استخدم أداة البحث (Google Search) إذا احتجت للتأكد من أحدث توثيق لـ Gemini Multimodal Live API أو Firebase.
 `;
 
-    const genAIResponse = await ai.models.generateContent({
-      model: 'gemini-3.1-pro-preview',
-      contents: prompt,
-      config: {
-        systemInstruction: "أنت خبير معماريات برمجيات الذكاء الاصطناعي. أجب باللغة العربية دائماً وباحترافية عالية. قدم أكواد وأمثلة دقيقة.",
-        thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
-        tools: [{ googleSearch: {} }],
-      }
+    const model = ai.getGenerativeModel({
+      model: 'gemini-2.0-flash-exp', // Use stable flash for fast client-side analysis
+      systemInstruction: "أنت خبير معماريات برمجيات الذكاء الاصطناعي. أجب باللغة العربية دائماً وباحترافية عالية. قدم أكواد وأمثلة دقيقة.",
     });
+
+    const genAIResponse = await model.generateContent(prompt);
 
     return {
       success: true,
-      analysis: genAIResponse.text,
+      analysis: genAIResponse.response.text(),
       fileCount,
     };
 
