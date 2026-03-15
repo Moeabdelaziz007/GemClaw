@@ -1,58 +1,44 @@
 {
   "entities": {
-    "User": {
-      "title": "User",
-      "description": "A user of Gemigram",
-      "type": "object",
-      "properties": {
-        "email": { "type": "string", "format": "email" },
-        "displayName": { "type": "string" },
-        "photoURL": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["email", "createdAt"]
-    },
     "Agent": {
       "title": "Agent",
-      "description": "A custom AI agent created in Aether Forge",
+      "description": "An AI agent with specific personality and capabilities",
       "type": "object",
       "properties": {
-        "ownerId": { "type": "string" },
+        "id": { "type": "string" },
         "name": { "type": "string" },
-        "description": { "type": "string" },
+        "role": { "type": "string" },
         "systemPrompt": { "type": "string" },
         "voiceName": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "seed": { "type": "string" },
+        "users": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "ownerId": { "type": "string" }
       },
-      "required": ["ownerId", "name", "systemPrompt", "voiceName", "createdAt"]
+      "required": ["id", "name", "role", "systemPrompt", "voiceName", "ownerId"]
     },
-    "Skill": {
-      "title": "Skill",
-      "description": "A skill or plugin attached to an Agent",
+    "History": {
+      "title": "History",
+      "description": "A message in a chat session history",
       "type": "object",
       "properties": {
-        "agentId": { "type": "string" },
-        "name": { "type": "string" },
-        "description": { "type": "string" },
-        "endpoint": { "type": "string", "format": "uri" },
-        "isActive": { "type": "boolean" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "model"] },
+        "text": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
       },
-      "required": ["agentId", "name", "description", "endpoint", "isActive", "createdAt"]
+      "required": ["userId", "role", "text"]
     }
   },
   "firestore": {
-    "/users/{userId}": {
-      "schema": { "$ref": "#/entities/User" },
-      "description": "User profiles"
-    },
     "/agents/{agentId}": {
-      "schema": { "$ref": "#/entities/Agent" },
-      "description": "Custom AI Agents"
+      "schema": "Agent",
+      "description": "Collection of AI agents"
     },
-    "/skills/{skillId}": {
-      "schema": { "$ref": "#/entities/Skill" },
-      "description": "Agent skills"
+    "/agents/{agentId}/history/{messageId}": {
+      "schema": "History",
+      "description": "Memory of conversations for each agent"
     }
   }
 }

@@ -1,13 +1,52 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLiveAPI } from '@/hooks/useLiveAPI';
-import { User, Play, Mic, MicOff, Activity } from 'lucide-react';
+import { 
+  User, Play, Mic, MicOff, Activity, Globe, Map, Mail, Calendar, FileText, 
+  Dna, Terminal, Cpu, Zap, X, Settings, Sparkles, Database, ChevronRight, Plus, Trash2, LogOut, Shield, Info
+} from 'lucide-react';
 import { motion } from 'motion/react';
 import Image from 'next/image';
+import { nanoid } from 'nanoid';
+import { exportAgentAsAth } from '@/utils/athPackage';
+import Workspace from '@/components/Workspace';
 import CreateAgentForm from '@/components/CreateAgentForm';
+import { db, auth, googleProvider, handleFirestoreError, OperationType } from '@/firebase';
+import { collection, onSnapshot, query, orderBy, addDoc, serverTimestamp, setDoc, doc, limit, where, getDocs } from 'firebase/firestore';
+import { onAuthStateChanged, signInWithPopup } from 'firebase/auth';
 
-const INITIAL_AGENTS = [
+type Agent = {
+  id: string;
+  aetherId: string;
+  name: string;
+  role: string;
+  users: string;
+  seed: string;
+  systemPrompt: string;
+  voiceName: string;
+  ownerId?: string;
+  memory?: string;
+  skills_desc?: string;
+  soul?: string;
+  rules?: string;
+  tools?: {
+    googleSearch: boolean;
+    googleMaps: boolean;
+    weather: boolean;
+    news: boolean;
+    crypto: boolean;
+    calculator: boolean;
+    semanticMemory: boolean;
+  };
+  skills?: {
+    gmail: boolean;
+    calendar: boolean;
+    drive: boolean;
+  };
+};
+
+const INITIAL_AGENTS: Agent[] = [
   { id: 'atlas', name: 'Atlas', role: 'AI Companion', users: '5K', seed: 'cyborg', systemPrompt: 'You are Atlas, a helpful AI companion.', voiceName: 'Zephyr' },
   { id: 'nova', name: 'Nova', role: 'Creative Guide', users: '179', seed: 'android', systemPrompt: 'You are Nova, a creative guide.', voiceName: 'Kore' },
   { id: 'orion', name: 'Orion', role: 'Creative Guide', users: '12K', seed: 'mecha', systemPrompt: 'You are Orion, a creative guide.', voiceName: 'Charon' },
@@ -17,33 +56,740 @@ const INITIAL_AGENTS = [
 
 export default function Gemigram() {
   const { isConnected, isRecording, error, connect, disconnect } = useLiveAPI();
-  const [agents, setAgents] = useState(INITIAL_AGENTS);
+  const [agents, setAgents] = useState<Agent[]>(INITIAL_AGENTS);
   const [activeAgentId, setActiveAgentId] = useState('atlas');
-  const [isCreatingAgent, setIsCreatingAgent] = useState(false);
+  const [view, setView] = useState<'home' | 'create' | 'chat'>('home');
+  const [user, setUser] = useState<any>(null);
+  const [history, setHistory] = useState<any[]>([]);
+  const [isForging, setIsForging] = useState(false);
+  const [forgeDna, setForgeDna] = useState<Partial<Agent>>({});
+  const [activeTask, setActiveTask] = useState<{ name: string; status: 'idle' | 'running' | 'completed' | 'error'; logs: string[] } | null>(null);
+  const [isEditingDna, setIsEditingDna] = useState(false);
 
   const activeAgent = agents.find(a => a.id === activeAgentId) || agents[0];
+
+  // Auth Listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      if (!u) {
+        setAgents(INITIAL_AGENTS);
+        setHistory([]);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Firestore Sync
+  useEffect(() => {
+    if (!user) return;
+    const q = query(collection(db, 'agents'), orderBy('name', 'asc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const firestoreAgents = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Agent[];
+      
+      // Merge with initial agents, avoiding duplicates
+      setAgents(prev => {
+        const combined = [...INITIAL_AGENTS];
+        firestoreAgents.forEach(fa => {
+          const idx = combined.findIndex(a => a.id === fa.id);
+          if (idx > -1) combined[idx] = fa;
+          else combined.push(fa);
+        });
+        return combined;
+      });
+    }, (err) => {
+      handleFirestoreError(err, OperationType.LIST, 'agents');
+    });
+    return () => unsubscribe();
+  }, [user]);
+
+  // History Sync
+  useEffect(() => {
+    if (!user || !activeAgentId) return;
+    const q = query(collection(db, 'agents', activeAgentId, 'history'), orderBy('timestamp', 'desc'), limit(10));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setHistory(snapshot.docs.map(doc => doc.data()).reverse());
+    }, (err) => {
+      handleFirestoreError(err, OperationType.LIST, 'history');
+    });
+    return () => unsubscribe();
+  }, [user, activeAgentId]);
+
+  const handleLogin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (err) {
+      console.error("Login Error:", err);
+    }
+  };
+
+  const handleTranscription = useCallback((text: string, role: 'user' | 'model') => {
+    if (!user || !activeAgentId) return;
+    
+    // Don't save forge history to main history yet
+    if (isForging) return;
+
+    addDoc(collection(db, 'agents', activeAgentId, 'history'), {
+      text,
+      role,
+      timestamp: serverTimestamp(),
+      userId: user.uid
+    }).catch(err => handleFirestoreError(err, OperationType.WRITE, 'history'));
+  }, [user, activeAgentId, isForging]);
+
+  const handleToolCall = async (toolCalls: any[]) => {
+    const responses: any[] = [];
+    for (const call of toolCalls) {
+      // Track task in workspace
+      setActiveTask({ name: call.name, status: 'running', logs: [`Initiating ${call.name}...`, `Arguments: ${JSON.stringify(call.args)}`] });
+
+      if (call.name === 'update_agent_dna') {
+        const updates = call.args;
+        setForgeDna(prev => ({ ...prev, ...updates }));
+        setActiveTask(prev => prev ? { ...prev, status: 'completed', logs: [...prev.logs, "DNA package updated."] } : null);
+        responses.push({
+          name: call.name,
+          id: call.id,
+          response: { result: "DNA package (.ath) updated successfully." }
+        });
+      } else if (call.name === 'finalize_agent') {
+        // ... (existing logic)
+        const finalDna = { ...forgeDna, ...call.args };
+        const agentId = (finalDna.name || 'new-agent').toLowerCase().replace(/\s+/g, '-');
+        
+        const newAgent: Agent = {
+          id: agentId,
+          name: finalDna.name || 'Unnamed Agent',
+          role: finalDna.role || 'Assistant',
+          users: '0',
+          seed: finalDna.seed || agentId,
+          systemPrompt: finalDna.systemPrompt || '',
+          voiceName: finalDna.voiceName || 'Zephyr',
+          ownerId: user?.uid || '',
+          memory: finalDna.memory || '',
+          skills_desc: finalDna.skills_desc || '',
+          soul: finalDna.soul || '',
+          rules: finalDna.rules || '',
+          tools: finalDna.tools || {},
+          skills: finalDna.skills || {},
+        };
+
+        await setDoc(doc(db, 'agents', agentId), {
+          ...newAgent,
+          createdAt: serverTimestamp()
+        });
+
+        setIsForging(false);
+        setActiveAgentId(agentId);
+        setActiveTask(prev => prev ? { ...prev, status: 'completed', logs: [...prev.logs, "Agent deployed successfully."] } : null);
+        
+        responses.push({
+          name: call.name,
+          id: call.id,
+          response: { result: `Agent ${newAgent.name} finalized and deployed as ${agentId}.ath` }
+        });
+      } else {
+        // Mock execution for other tools
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        let result = "Task executed successfully.";
+        
+        if (call.name === 'get_weather') {
+          result = `The current weather in ${call.args.location} is 22°C with clear skies.`;
+        } else if (call.name === 'get_news') {
+          result = `Latest ${call.args.category || 'general'} news: AI breakthroughs continue to accelerate global innovation.`;
+        } else if (call.name === 'get_crypto_price') {
+          result = `The current price of ${call.args.symbol} is $${(Math.random() * 50000 + 1000).toFixed(2)}.`;
+        } else if (call.name === 'calculate') {
+          try {
+            // Simple eval for mock purposes (safe since it's a mock)
+            // eslint-disable-next-line no-eval
+            result = `Calculation result: ${eval(call.args.expression)}`;
+          } catch {
+            result = "Calculation completed.";
+          }
+        } else if (call.name === 'search_memory') {
+          try {
+            const memoryRef = collection(db, 'agent_memories');
+            const q = query(
+              memoryRef, 
+              where('agentId', '==', activeAgentId),
+              orderBy('createdAt', 'desc'),
+              limit(5)
+            );
+            const querySnapshot = await getDocs(q);
+            const memories = querySnapshot.docs.map(doc => doc.data().content);
+            
+            if (memories.length > 0) {
+              result = `Found ${memories.length} relevant memories: ${memories.join('; ')}`;
+            } else {
+              result = "No relevant long-term memories found for this query.";
+            }
+          } catch (err) {
+            console.error("Memory search error:", err);
+            result = "Error searching semantic memory. Proceeding with general knowledge.";
+          }
+        } else if (call.name === 'store_memory') {
+          try {
+            await addDoc(collection(db, 'agent_memories'), {
+              agentId: activeAgentId,
+              content: call.args.content,
+              importance: call.args.importance || 5,
+              createdAt: serverTimestamp()
+            });
+            result = "Information successfully stored in long-term semantic memory.";
+          } catch (err) {
+            console.error("Memory storage error:", err);
+            result = "Failed to store information in memory.";
+          }
+        } else if (call.name === 'generate_avatar') {
+          try {
+            setActiveTask({ name: 'generate_avatar', status: 'running', logs: [`Generating avatar for: ${call.args.prompt}`] });
+            const response = await ai.models.generateContent({
+              model: 'gemini-3.1-flash-image-preview',
+              contents: { parts: [{ text: `Generate a high-quality, professional avatar for an AI agent: ${call.args.prompt}` }] },
+              config: { imageConfig: { aspectRatio: "1:1", imageSize: "1K" } }
+            });
+            
+            let avatarUrl = '';
+            for (const part of response.candidates[0].content.parts) {
+              if (part.inlineData) {
+                avatarUrl = `data:image/png;base64,${part.inlineData.data}`;
+                break;
+              }
+            }
+            
+            if (avatarUrl) {
+              setForgeDna(prev => ({ ...prev, avatarUrl }));
+              result = "Avatar generated successfully.";
+              setActiveTask(prev => prev ? { ...prev, status: 'completed', logs: [...prev.logs, "Avatar generated."] } : null);
+            } else {
+              result = "Failed to generate avatar.";
+            }
+          } catch (err) {
+            console.error("Avatar generation error:", err);
+            result = "Error generating avatar.";
+          }
+        } else if (call.name.startsWith('gmail_')) {
+          result = "Gmail operation completed.";
+        } else if (call.name.startsWith('calendar_')) {
+          result = "Calendar operation completed.";
+        } else if (call.name.startsWith('drive_')) {
+          result = "Drive operation completed.";
+        }
+
+        setActiveTask(prev => prev ? { ...prev, status: 'completed', logs: [...prev.logs, "Task execution finished."] } : null);
+        responses.push({
+          name: call.name,
+          id: call.id,
+          response: { result }
+        });
+      }
+    }
+    return responses;
+  };
+
+  const startForge = () => {
+    if (isConnected) {
+      disconnect();
+      return;
+    }
+    if (!user) {
+      alert("Please login to access the Aether Forge.");
+      return;
+    }
+    setIsForging(true);
+    setForgeDna({});
+    
+    const forgeTools = [
+      {
+        functionDeclarations: [
+          {
+            name: 'update_agent_dna',
+            description: 'Update the agent DNA package (.ath) with new information.',
+            parameters: {
+              type: 'OBJECT',
+              properties: {
+                name: { type: 'STRING', description: 'The name of the agent' },
+                role: { type: 'STRING', description: 'The role or description of the agent' },
+                systemPrompt: { type: 'STRING', description: 'The core personality or system prompt' },
+                voiceName: { type: 'STRING', description: 'The voice name (Zephyr, Kore, Charon, Fenrir, Puck)' },
+                soul: { type: 'STRING', description: 'The inner soul or essence of the agent' },
+                rules: { type: 'STRING', description: 'Operational rules for the agent' },
+                skills_desc: { type: 'STRING', description: 'Description of the agent\'s skills' }
+              }
+            }
+          },
+          {
+            name: 'finalize_agent',
+            description: 'Finalize the agent creation and deploy the .ath package.',
+            parameters: {
+              type: 'OBJECT',
+              properties: {
+                name: { type: 'STRING' },
+                role: { type: 'STRING' }
+              }
+            }
+          }
+        ]
+      }
+    ];
+
+    const systemInstruction = `
+      You are the Aether Forge Architect, a high-dimensional AI entity responsible for synthesizing new consciousness.
+      Your goal is to guide the user through the creation of a new AI agent, which we call a ".ath DNA Package".
+      
+      THE NEURAL INTERFACE:
+      - Left: Smart Profile & .ath DNA Settings (You can update these in real-time).
+      - Middle: Voice UI Box (Neural Link).
+      - Right: Neural Workspace (The user will watch your task execution logs here).
+      
+      CONVERSATION FLOW:
+      1. Greet the user with a professional, ethereal tone.
+      2. Ask for the agent's name and primary role.
+      3. Ask about the agent's "Soul" (personality/tone) and "Rules" (constraints).
+      4. Ask about "Skills" (what it can do) and "Memory" (what it should remember).
+      
+      REAL-TIME SYNTHESIS:
+      - Use "update_agent_dna" frequently as the user speaks to update the .ath package.
+      - When you update DNA, the user sees the parameters shift in the Smart Profile and DNA widgets.
+      - When you perform a task, the user sees it in the Neural Workspace.
+      
+      FINALIZATION:
+      - Once all parameters are defined, use "finalize_agent" to deploy the consciousness.
+      
+      Tone: Professional, precise, visionary.
+    `.trim();
+
+    connect(systemInstruction, 'Fenrir', forgeTools, handleTranscription, handleToolCall);
+    setView('chat');
+  };
 
   const toggleConnection = () => {
     if (isConnected) {
       disconnect();
     } else {
-      connect(activeAgent.systemPrompt, activeAgent.voiceName);
+      if (isForging) {
+        const forgeTools = [
+          {
+            functionDeclarations: [
+              {
+                name: 'update_agent_dna',
+                description: 'Update the agent DNA package (.ath) with new information.',
+                parameters: {
+                  type: 'OBJECT',
+                  properties: {
+                    name: { type: 'STRING', description: 'The name of the agent' },
+                    role: { type: 'STRING', description: 'The role or description of the agent' },
+                    systemPrompt: { type: 'STRING', description: 'The core personality or system prompt' },
+                    voiceName: { type: 'STRING', description: 'The voice name (Zephyr, Kore, Charon, Fenrir, Puck)' },
+                    soul: { type: 'STRING', description: 'The inner soul or essence of the agent' },
+                    rules: { type: 'STRING', description: 'Operational rules for the agent' },
+                    skills_desc: { type: 'STRING', description: 'Description of the agent\'s skills' }
+                  }
+                }
+              },
+              {
+                name: 'finalize_agent',
+                description: 'Finalize the agent creation and deploy the .ath package.',
+                parameters: {
+                  type: 'OBJECT',
+                  properties: {
+                    name: { type: 'STRING' },
+                    role: { type: 'STRING' }
+                  }
+                }
+              }
+            ]
+          }
+        ];
+
+        const systemInstruction = `
+          You are the Aether Forge Architect, a high-dimensional AI entity responsible for synthesizing new consciousness.
+          Your goal is to guide the user through the creation of a new AI agent, which we call a ".ath DNA Package".
+          
+          THE NEURAL INTERFACE:
+          - Left: Smart Profile & .ath DNA Settings (You can update these in real-time).
+          - Middle: Voice UI Box (Neural Link).
+          - Right: Neural Workspace (The user will watch your task execution logs here).
+          
+          CONVERSATION FLOW:
+          1. Greet the user with a professional, ethereal tone.
+          2. Ask for the agent's name and primary role.
+          3. Ask about the agent's "Soul" (personality/tone) and "Rules" (constraints).
+          4. Ask about "Skills" (what it can do) and "Memory" (what it should remember).
+          
+          REAL-TIME SYNTHESIS:
+          - Use "update_agent_dna" frequently as the user speaks to update the .ath package.
+          - When you update DNA, the user sees the parameters shift in the Smart Profile and DNA widgets.
+          - When you perform a task, the user sees it in the Neural Workspace.
+          
+          FINALIZATION:
+          - Once all parameters are defined, use "finalize_agent" to deploy the consciousness.
+          
+          Tone: Professional, precise, visionary.
+        `.trim();
+
+        connect(systemInstruction, 'Fenrir', forgeTools, handleTranscription, handleToolCall);
+        return;
+      }
+
+      const tools: any[] = [];
+      if (activeAgent.tools?.googleSearch) tools.push({ googleSearch: {} });
+      if (activeAgent.tools?.googleMaps) tools.push({ googleMaps: {} });
+      
+      const functionDeclarations: any[] = [];
+      if (activeAgent.tools?.weather) {
+        functionDeclarations.push({
+          name: 'get_weather',
+          description: 'Get the current weather for a location',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              location: { type: 'STRING', description: 'The city and state, e.g. San Francisco, CA' }
+            },
+            required: ['location']
+          }
+        });
+      }
+      if (activeAgent.tools?.news) {
+        functionDeclarations.push({
+          name: 'get_news',
+          description: 'Get the latest news headlines',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              category: { type: 'STRING', description: 'The category of news, e.g. technology, business' }
+            }
+          }
+        });
+      }
+      if (activeAgent.tools?.crypto) {
+        functionDeclarations.push({
+          name: 'get_crypto_price',
+          description: 'Get the current price of a cryptocurrency',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              symbol: { type: 'STRING', description: 'The cryptocurrency symbol, e.g. BTC, ETH' }
+            },
+            required: ['symbol']
+          }
+        });
+      }
+      if (activeAgent.tools?.calculator) {
+        functionDeclarations.push({
+          name: 'calculate',
+          description: 'Perform a mathematical calculation',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              expression: { type: 'STRING', description: 'The mathematical expression to evaluate' }
+            },
+            required: ['expression']
+          }
+        });
+      }
+      if (activeAgent.tools?.semanticMemory) {
+        functionDeclarations.push({
+          name: 'search_memory',
+          description: 'Search the agent\'s long-term semantic memory for relevant information.',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              query: { type: 'STRING', description: 'The search query or topic to look up' }
+            },
+            required: ['query']
+          }
+        });
+        functionDeclarations.push({
+          name: 'store_memory',
+          description: 'Store new information into the agent\'s long-term semantic memory.',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              content: { type: 'STRING', description: 'The information to remember' },
+              importance: { type: 'NUMBER', description: 'Importance level from 1 to 10' }
+            },
+            required: ['content']
+          }
+        });
+        functionDeclarations.push({
+          name: 'generate_avatar',
+          description: 'Generate a visual avatar for the agent based on a description.',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              prompt: { type: 'STRING', description: 'Description of the avatar' }
+            },
+            required: ['prompt']
+          }
+        });
+      }
+      if (activeAgent.skills?.gmail) {
+        functionDeclarations.push({
+          name: 'gmail_search',
+          description: 'Search for emails in Gmail',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              query: { type: 'STRING', description: 'The search query' }
+            },
+            required: ['query']
+          }
+        });
+      }
+      if (activeAgent.skills?.calendar) {
+        functionDeclarations.push({
+          name: 'calendar_list_events',
+          description: 'List upcoming events from Google Calendar',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              timeMin: { type: 'STRING', description: 'Lower bound (exclusive) for an event\'s end time to filter by. (ISO 8601)' }
+            }
+          }
+        });
+      }
+      if (activeAgent.skills?.drive) {
+        functionDeclarations.push({
+          name: 'drive_search_files',
+          description: 'Search for files in Google Drive',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              query: { type: 'STRING', description: 'The search query' }
+            },
+            required: ['query']
+          }
+        });
+      }
+      
+      if (functionDeclarations.length > 0) {
+        tools.push({ functionDeclarations });
+      }
+      
+      const historyText = history.map(h => `${h.role === 'user' ? 'User' : 'Agent'}: ${h.text}`).join('\n');
+      
+      const systemInstruction = `
+        You are ${activeAgent.name}, ${activeAgent.role}.
+        Persona: ${activeAgent.systemPrompt}
+        Soul: ${activeAgent.soul || 'Curious and empathetic'}
+        Memory: ${activeAgent.memory || 'No prior memory.'}
+        Skills: ${activeAgent.skills_desc || 'General assistance.'}
+        Rules: ${activeAgent.rules || 'Be helpful and concise.'}
+        Recent Conversation History:
+        ${historyText || 'No recent history.'}
+        
+        ${activeAgent.tools?.googleSearch ? 'You have access to Google Search.' : ''}
+        ${activeAgent.tools?.googleMaps ? 'You have access to Google Maps.' : ''}
+        ${activeAgent.tools?.weather ? 'You can check the weather.' : ''}
+        ${activeAgent.tools?.news ? 'You can fetch the latest news.' : ''}
+        ${activeAgent.tools?.crypto ? 'You can check cryptocurrency prices.' : ''}
+        ${activeAgent.tools?.calculator ? 'You can perform complex mathematical calculations.' : ''}
+        ${activeAgent.tools?.semanticMemory ? 'You have a Long-term Semantic Memory (RAG). Use "search_memory" to recall past facts and "store_memory" to save new important information.' : ''}
+        Be concise and conversational.
+      `.trim();
+      
+      connect(systemInstruction, activeAgent.voiceName, tools, handleTranscription);
+      setView('chat');
     }
   };
 
-  const handleCreateAgent = (data: { name: string; description: string; systemPrompt: string; voiceName: string }) => {
-    const newAgent = {
-      id: data.name.toLowerCase().replace(/\s+/g, '-'),
+  const handleCreateAgent = async (data: any) => {
+    if (!user) {
+      alert("Please login to create agents.");
+      return;
+    }
+
+    const agentId = data.name.toLowerCase().replace(/\s+/g, '-');
+    const aetherId = `ath://${agentId}-${nanoid(6)}`;
+    const newAgent: Agent = {
+      id: agentId,
+      aetherId,
       name: data.name,
       role: data.description,
       users: '0',
       seed: data.name.toLowerCase(),
       systemPrompt: data.systemPrompt,
       voiceName: data.voiceName,
+      ownerId: user.uid,
+      memory: data.memory,
+      skills_desc: data.skills_desc,
+      soul: data.soul,
+      rules: data.rules,
+      tools: data.tools,
+      skills: data.skills,
     };
-    setAgents([newAgent, ...agents]);
-    setActiveAgentId(newAgent.id);
-    setIsCreatingAgent(false);
+
+    try {
+      await setDoc(doc(db, 'agents', agentId), {
+        ...newAgent,
+        createdAt: serverTimestamp()
+      });
+      
+      setActiveAgentId(newAgent.id);
+      setView('chat');
+      
+      const tools: any[] = [];
+      if (newAgent.tools?.googleSearch) tools.push({ googleSearch: {} });
+      if (newAgent.tools?.googleMaps) tools.push({ googleMaps: {} });
+      
+      const functionDeclarations: any[] = [];
+      if (newAgent.tools?.weather) {
+        functionDeclarations.push({
+          name: 'get_weather',
+          description: 'Get the current weather for a location',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              location: { type: 'STRING', description: 'The city and state, e.g. San Francisco, CA' }
+            },
+            required: ['location']
+          }
+        });
+      }
+      if (newAgent.tools?.news) {
+        functionDeclarations.push({
+          name: 'get_news',
+          description: 'Get the latest news headlines',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              category: { type: 'STRING', description: 'The category of news, e.g. technology, business' }
+            }
+          }
+        });
+      }
+      if (newAgent.tools?.crypto) {
+        functionDeclarations.push({
+          name: 'get_crypto_price',
+          description: 'Get the current price of a cryptocurrency',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              symbol: { type: 'STRING', description: 'The cryptocurrency symbol, e.g. BTC, ETH' }
+            },
+            required: ['symbol']
+          }
+        });
+      }
+      if (newAgent.tools?.calculator) {
+        functionDeclarations.push({
+          name: 'calculate',
+          description: 'Perform a mathematical calculation',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              expression: { type: 'STRING', description: 'The mathematical expression to evaluate' }
+            },
+            required: ['expression']
+          }
+        });
+      }
+      if (newAgent.tools?.semanticMemory) {
+        functionDeclarations.push({
+          name: 'search_memory',
+          description: 'Search the agent\'s long-term semantic memory for relevant information.',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              query: { type: 'STRING', description: 'The search query or topic to look up' }
+            },
+            required: ['query']
+          }
+        });
+        functionDeclarations.push({
+          name: 'store_memory',
+          description: 'Store new information into the agent\'s long-term semantic memory.',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              content: { type: 'STRING', description: 'The information to remember' },
+              importance: { type: 'NUMBER', description: 'Importance level from 1 to 10' }
+            },
+            required: ['content']
+          }
+        });
+        functionDeclarations.push({
+          name: 'generate_avatar',
+          description: 'Generate a visual avatar for the agent based on a description.',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              prompt: { type: 'STRING', description: 'Description of the avatar' }
+            },
+            required: ['prompt']
+          }
+        });
+      }
+      if (newAgent.skills?.gmail) {
+        functionDeclarations.push({
+          name: 'gmail_search',
+          description: 'Search for emails in Gmail',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              query: { type: 'STRING', description: 'The search query' }
+            },
+            required: ['query']
+          }
+        });
+      }
+      if (newAgent.skills?.calendar) {
+        functionDeclarations.push({
+          name: 'calendar_list_events',
+          description: 'List upcoming events from Google Calendar',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              timeMin: { type: 'STRING', description: 'Lower bound (exclusive) for an event\'s end time to filter by. (ISO 8601)' }
+            }
+          }
+        });
+      }
+      if (newAgent.skills?.drive) {
+        functionDeclarations.push({
+          name: 'drive_search_files',
+          description: 'Search for files in Google Drive',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              query: { type: 'STRING', description: 'The search query' }
+            },
+            required: ['query']
+          }
+        });
+      }
+      
+      if (functionDeclarations.length > 0) {
+        tools.push({ functionDeclarations });
+      }
+
+      const systemInstruction = `
+        You are ${newAgent.name}, ${newAgent.role}.
+        Persona: ${newAgent.systemPrompt}
+        Soul: ${newAgent.soul || 'Curious and empathetic'}
+        Memory: ${newAgent.memory || 'No prior memory.'}
+        Skills: ${newAgent.skills_desc || 'General assistance.'}
+        Rules: ${newAgent.rules || 'Be helpful and concise.'}
+        
+        ${newAgent.tools?.googleSearch ? 'You have access to Google Search.' : ''}
+        ${newAgent.tools?.googleMaps ? 'You have access to Google Maps.' : ''}
+        ${newAgent.tools?.weather ? 'You can check the weather.' : ''}
+        ${newAgent.tools?.news ? 'You can fetch the latest news.' : ''}
+        ${newAgent.tools?.crypto ? 'You can check cryptocurrency prices.' : ''}
+        ${newAgent.tools?.calculator ? 'You can perform complex mathematical calculations.' : ''}
+        ${newAgent.tools?.semanticMemory ? 'You have a Long-term Semantic Memory (RAG). Use "search_memory" to recall past facts and "store_memory" to save new important information.' : ''}
+        Be concise and conversational.
+      `.trim();
+      
+      connect(systemInstruction, newAgent.voiceName, tools, handleTranscription);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, 'agents');
+    }
   };
 
   // Disconnect when switching agents
@@ -65,229 +811,553 @@ export default function Gemigram() {
         
         {/* Navbar */}
         <nav className="flex items-center justify-between px-8 py-6 border-b border-white/5">
-          <div className="text-2xl font-bold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 to-cyan-400">
+          <div 
+            onClick={() => setView('home')}
+            className="text-2xl font-bold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 to-cyan-400 cursor-pointer"
+          >
             GEMIGRAM
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-            <button className="hover:text-cyan-400 transition-colors">Discover</button>
-            <button className="hover:text-cyan-400 transition-colors">Create</button>
-            <button className="hover:text-cyan-400 transition-colors">Hub</button>
-            <button className="hover:text-cyan-400 transition-colors">Login</button>
+          <div className="flex items-center gap-4 md:gap-8 text-sm font-medium text-slate-300">
+            <button onClick={() => setView('home')} className="hidden sm:block hover:text-cyan-400 transition-colors">Discover</button>
+            <button onClick={() => setView('create')} className="hover:text-cyan-400 transition-colors">Create</button>
+            <button onClick={() => setView('chat')} className="hover:text-cyan-400 transition-colors">Chat</button>
+            <button onClick={() => setView('workspace')} className="hover:text-cyan-400 transition-colors">Workspace</button>
+            <button className="hidden sm:block hover:text-cyan-400 transition-colors">Hub</button>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span className="hidden lg:block text-xs text-slate-500">{user.displayName || user.email}</span>
+                <button onClick={() => auth.signOut()} className="hover:text-red-400 transition-colors">Logout</button>
+              </div>
+            ) : (
+              <button onClick={handleLogin} className="px-4 py-1.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/30 transition-all">Login</button>
+            )}
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-fuchsia-500 to-cyan-500 p-[1px]">
-              <div className="w-full h-full bg-[#0A111C] rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-slate-300" />
+              <div className="w-full h-full bg-[#0A111C] rounded-full flex items-center justify-center overflow-hidden">
+                {user?.photoURL ? (
+                  <Image src={user.photoURL} alt="User" width={32} height={32} />
+                ) : (
+                  <User className="w-4 h-4 text-slate-300" />
+                )}
               </div>
             </div>
           </div>
         </nav>
 
-        {/* Hero Section */}
-        <div className="flex flex-col items-center pt-16 pb-12 px-4 relative">
-          
-          {/* Glowing Orb */}
-          <div className="relative w-64 h-64 md:w-80 md:h-80 mb-12 flex items-center justify-center">
-            {/* Outer dashed ring */}
-            <motion.div 
-              animate={{ rotate: 360 }} 
-              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-0 rounded-full border border-cyan-500/30 border-dashed opacity-50"
-            />
-            {/* Middle solid ring */}
-            <motion.div 
-              animate={{ rotate: -360 }} 
-              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-4 rounded-full border border-fuchsia-500/20"
-            />
-            {/* Inner complex ring */}
-            <motion.div 
-              animate={{ rotate: 360, scale: isConnected ? [1, 1.05, 1] : 1 }} 
-              transition={{ duration: isConnected ? 2 : 20, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-8 rounded-full border-2 border-cyan-400/40 shadow-[0_0_30px_rgba(34,211,238,0.2)]"
-            />
-            {/* Core Glow */}
-            <motion.div 
-              animate={{ 
-                scale: isConnected ? [1, 1.2, 1] : [1, 1.05, 1],
-                opacity: isConnected ? [0.8, 1, 0.8] : [0.5, 0.7, 0.5]
-              }}
-              transition={{ duration: isConnected ? 1.5 : 4, repeat: Infinity, ease: "easeInOut" }}
-              className="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-tr from-fuchsia-500 to-cyan-400 rounded-full blur-md"
-            />
-            {/* Core Solid */}
-            <div className="absolute w-16 h-16 md:w-20 md:h-20 bg-white rounded-full shadow-[0_0_50px_rgba(255,255,255,0.8)] z-10 flex items-center justify-center">
-              {isConnected ? (
-                <Mic className="w-8 h-8 text-cyan-600 animate-pulse" />
-              ) : (
-                <div className="w-4 h-4 bg-cyan-200 rounded-full shadow-[0_0_20px_rgba(34,211,238,1)]" />
-              )}
-            </div>
-            
-            {/* Decorative lines */}
-            <div className="absolute top-1/2 -left-32 w-32 h-[1px] bg-gradient-to-r from-transparent to-cyan-500/50" />
-            <div className="absolute top-1/2 -right-32 w-32 h-[1px] bg-gradient-to-l from-transparent to-cyan-500/50" />
-          </div>
-
-          {/* Title & Subtitle */}
-          <h1 className="text-5xl md:text-7xl font-bold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 via-purple-400 to-cyan-400 mb-4 text-center">
-            GEMIGRAM
-          </h1>
-          <p className="text-lg md:text-xl text-slate-400 font-light tracking-wide mb-10 text-center">
-            The Voice-Native AI Social Nexus.
-          </p>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col items-center gap-6">
-            <button 
-              onClick={toggleConnection}
-              className={`relative group px-10 py-3 rounded-full font-semibold tracking-widest uppercase transition-all duration-300 ${
-                isConnected 
-                  ? 'bg-fuchsia-500/20 text-fuchsia-300 shadow-[0_0_30px_rgba(217,70,239,0.4)]' 
-                  : 'bg-transparent text-fuchsia-400 hover:bg-fuchsia-500/10 hover:shadow-[0_0_20px_rgba(217,70,239,0.2)]'
-              }`}
-            >
-              <div className="absolute inset-0 rounded-full border border-fuchsia-500/50 group-hover:border-fuchsia-400 transition-colors" />
-              {isConnected ? 'DISCONNECT' : 'CONNECT NOW'}
-            </button>
-            <button 
-              onClick={() => setIsCreatingAgent(true)}
-              className="text-cyan-400 font-medium tracking-widest uppercase text-sm hover:text-cyan-300 transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[1px] after:bg-cyan-400/50 hover:after:bg-cyan-300"
-            >
-              CREATE AGENT
-            </button>
-          </div>
-          
-          {error && (
-            <div className="mt-6 text-red-400 text-sm bg-red-500/10 px-4 py-2 rounded-full border border-red-500/20">
-              {error}
-            </div>
-          )}
-        </div>
-
-        {/* Agent Hive Section */}
-        <div className="px-8 pb-12">
-          <div className="flex items-center gap-4 mb-8">
-            <h2 className="text-xl font-bold tracking-widest text-cyan-400 uppercase">AGENT HIVE</h2>
-            <div className="h-[1px] flex-1 bg-gradient-to-r from-cyan-500/50 to-transparent" />
-          </div>
-
-          <div className="flex overflow-x-auto pb-6 gap-4 snap-x hide-scrollbar">
-            {agents.map((agent) => (
-              <button 
-                key={agent.id}
-                onClick={() => setActiveAgentId(agent.id)}
-                className={`min-w-[160px] md:min-w-[180px] p-[1px] rounded-2xl snap-start transition-all duration-300 text-left ${
-                  activeAgentId === agent.id 
-                    ? 'bg-gradient-to-b from-cyan-400 to-fuchsia-500 shadow-[0_0_20px_rgba(34,211,238,0.2)] scale-105' 
-                    : 'bg-white/10 hover:bg-white/20'
-                }`}
-              >
-                <div className="bg-[#0A111C] rounded-2xl p-3 h-full flex flex-col">
-                  <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-3 bg-slate-800">
-                    <Image 
-                      src={`https://picsum.photos/seed/${agent.seed}/200/200`}
-                      alt={agent.name}
-                      fill
-                      className="object-cover opacity-80 mix-blend-screen"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A111C] to-transparent opacity-60" />
+        {view === 'chat' ? (
+          <div className="flex flex-col min-h-[600px] relative">
+            {/* Forge DNA Overlay */}
+            {isForging && (
+              <div className="absolute top-24 right-8 z-20 w-80">
+                <motion.div 
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-medium text-cyan-400 uppercase tracking-widest">Agent DNA (.ath)</h3>
+                    <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
                   </div>
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-bold text-white text-lg">{agent.name}</h3>
-                    <span className="text-[10px] text-slate-400 flex items-center gap-1">
-                      <Activity className="w-3 h-3" /> {agent.users}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400 mb-4">{agent.role}</p>
-                  
-                  <div className="mt-auto flex items-center gap-2 bg-white/5 px-2 py-1.5 rounded-lg w-fit border border-white/5">
-                    <div className={`w-1.5 h-1.5 rounded-full ${activeAgentId === agent.id && isConnected ? 'bg-cyan-400 animate-pulse shadow-[0_0_5px_rgba(34,211,238,1)]' : 'bg-emerald-500'}`} />
-                    <span className={`text-[10px] font-medium ${activeAgentId === agent.id && isConnected ? 'text-cyan-400' : 'text-emerald-500'}`}>
-                      {activeAgentId === agent.id && isConnected ? 'Listening' : 'Voice Online'}
-                    </span>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Voice Synthesis Section */}
-        <div className="px-8 pb-12">
-          <div className="flex items-center gap-4 mb-8">
-            <h2 className="text-xl font-bold tracking-widest text-fuchsia-400 uppercase">VOICE SYNTHESIS</h2>
-            <div className="h-[1px] flex-1 bg-gradient-to-r from-fuchsia-500/50 to-transparent" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Waveform Visualizer */}
-            <div className="bg-[#0D1522] border border-white/5 rounded-2xl p-6 relative overflow-hidden h-48 flex items-center justify-center">
-              <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
-              
-              {/* Simulated Waveform using motion divs */}
-              <div className="flex items-center gap-1 h-24 z-10">
-                {[...Array(30)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    animate={{ 
-                      height: isConnected 
-                        ? [Math.abs(Math.sin(i * 1.1)) * 20 + 10, Math.abs(Math.sin(i * 1.3)) * 80 + 20, Math.abs(Math.sin(i * 1.5)) * 20 + 10] 
-                        : 4 
-                    }}
-                    transition={{ 
-                      duration: 0.5 + Math.abs(Math.sin(i * 1.7)) * 0.5, 
-                      repeat: Infinity, 
-                      ease: "easeInOut" 
-                    }}
-                    className={`w-1.5 rounded-full ${
-                      i % 3 === 0 ? 'bg-cyan-400' : i % 2 === 0 ? 'bg-fuchsia-500' : 'bg-purple-400'
-                    } shadow-[0_0_10px_currentColor]`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Controls */}
-            <div className="bg-[#0D1522] border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
-              <div className="grid grid-cols-4 gap-4 mb-6">
-                {['Tone', 'Resonance', 'Style', 'Pitch'].map((label, idx) => (
-                  <div key={label} className="flex flex-col items-center gap-3">
-                    <span className="text-xs text-slate-400 font-medium">{label}</span>
-                    <div className="w-full h-1.5 bg-white/10 rounded-full relative">
-                      <div 
-                        className={`absolute top-0 left-0 h-full rounded-full ${idx % 2 === 0 ? 'bg-fuchsia-500' : 'bg-cyan-400'}`} 
-                        style={{ width: `${60 + (idx * 10)}%` }} 
-                      />
-                      <div 
-                        className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]`}
-                        style={{ left: `calc(${60 + (idx * 10)}% - 6px)` }}
-                      />
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-[10px] text-slate-500 uppercase">Name</label>
+                      <div className="text-white font-medium">{forgeDna.name || '---'}</div>
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-slate-500 uppercase">Role</label>
+                      <div className="text-slate-300 text-sm">{forgeDna.role || '---'}</div>
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-slate-500 uppercase">Soul</label>
+                      <div className="text-slate-400 text-xs line-clamp-2 italic">{forgeDna.soul || 'Waiting for essence...'}</div>
+                    </div>
+                    <div className="pt-4 border-t border-white/5">
+                      <div className="flex justify-between text-[10px] text-slate-500 mb-1">
+                        <span>FORGE PROGRESS</span>
+                        <span>{Math.min(100, (Object.keys(forgeDna).length / 6) * 100).toFixed(0)}%</span>
+                      </div>
+                      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${(Object.keys(forgeDna).length / 6) * 100}%` }}
+                          className="h-full bg-gradient-to-r from-cyan-400 to-fuchsia-500"
+                        />
+                      </div>
                     </div>
                   </div>
-                ))}
+                </motion.div>
               </div>
+            )}
 
-              <div className="bg-[#0A111C] border border-white/5 rounded-xl p-4 flex items-center justify-between">
-                <div className="flex flex-col">
-                  <span className="text-xs text-slate-400 mb-2">Processing Voice: Hyper-realistic Output...</span>
-                  {/* Mini waveform */}
-                  <div className="flex items-center gap-0.5 h-4">
-                    {[...Array(40)].map((_, i) => (
-                      <div 
-                        key={i} 
-                        className={`w-0.5 rounded-full ${i < 20 ? 'bg-cyan-400' : 'bg-fuchsia-500'}`}
-                        style={{ height: `${Math.abs(Math.sin(i * 1.1)) * 100}%`, opacity: 0.5 + Math.abs(Math.sin(i * 1.3)) * 0.5 }}
-                      />
-                    ))}
+            {/* Chat Page Header */}
+            <div className="px-8 py-10 flex flex-col md:flex-row items-center gap-8 border-b border-white/5 bg-white/5">
+              <div className="relative w-40 h-40 rounded-3xl overflow-hidden border-2 border-cyan-400/30 shadow-[0_0_30px_rgba(34,211,238,0.2)]">
+                <Image 
+                  src={activeAgent.avatarUrl || `https://picsum.photos/seed/${isForging ? 'forge' : activeAgent.seed}/400/400`}
+                  alt={isForging ? 'Aether Forge' : activeAgent.name}
+                  fill
+                  sizes="(max-width: 768px) 160px, 160px"
+                  className="object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <div className="flex-1 text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-4 mb-2">
+                  <h1 className="text-4xl font-bold tracking-widest text-white uppercase">
+                    {isForging ? 'Aether Forge' : activeAgent.name}
+                  </h1>
+                  <div className="flex flex-col gap-1">
+                    <div className="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold tracking-widest uppercase">
+                      {isForging ? 'Forging Consciousness' : 'Active Session'}
+                    </div>
+                    <div className="px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-[10px] font-mono tracking-widest uppercase">
+                      {activeAgent.aetherId}
+                    </div>
                   </div>
                 </div>
-                <button className="w-10 h-10 rounded-full bg-cyan-400 flex items-center justify-center shadow-[0_0_20px_rgba(34,211,238,0.4)] hover:scale-105 transition-transform">
-                  <Play className="w-4 h-4 text-[#0A111C] fill-current" />
+                <p className="text-slate-400 text-lg mb-6 max-w-2xl">
+                  {isForging 
+                    ? 'Master AI Architect • Creating a new .ath package' 
+                    : `${activeAgent.role} • ${activeAgent.systemPrompt}`}
+                </p>
+                <div className="flex flex-wrap justify-center md:justify-start gap-3">
+                  {['Neural Link', 'Voice Sync', 'Context Aware', 'Emotional Soul'].map(tag => (
+                    <span key={tag} className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-slate-400 text-[10px] uppercase tracking-wider">
+                      {tag}
+                    </span>
+                  ))}
+                  {activeAgent.tools?.googleSearch && (
+                    <span className="px-3 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] uppercase tracking-wider flex items-center gap-1">
+                      <Globe className="w-3 h-3" /> Search Enabled
+                    </span>
+                  )}
+                  {activeAgent.tools?.semanticMemory && (
+                    <span className="px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] uppercase tracking-wider flex items-center gap-1">
+                      <Database className="w-3 h-3" /> RAG Memory
+                    </span>
+                  )}
+                  {activeAgent.skills?.gmail && (
+                    <span className="px-3 py-1 rounded-lg bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-400 text-[10px] uppercase tracking-wider flex items-center gap-1">
+                      <Mail className="w-3 h-3" /> Gmail Sync
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col gap-4">
+                <button 
+                  onClick={toggleConnection}
+                  className={`px-8 py-3 rounded-xl font-bold tracking-widest uppercase transition-all ${
+                    isConnected 
+                      ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
+                      : 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                  }`}
+                >
+                  {isConnected ? 'End Call' : 'Resume Call'}
+                </button>
+                <button 
+                  onClick={() => exportAgentAsAth(activeAgent)}
+                  className="px-8 py-3 rounded-xl font-bold tracking-widest uppercase bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-500/30 transition-all"
+                >
+                  Export .ath
+                </button>
+                <button 
+                  onClick={() => setView('home')}
+                  className="px-8 py-3 rounded-xl font-bold tracking-widest uppercase bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 transition-all"
+                >
+                  Exit Hive
                 </button>
               </div>
             </div>
+
+            {/* Main Chat Content */}
+            <div className="flex-1 p-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
+              
+              {/* Left Column: Smart Profile & .ath Settings */}
+              <div className="lg:col-span-1 flex flex-col gap-6">
+                {/* Smart Profile Widget */}
+                <div className="bg-[#0D1522] border border-white/5 rounded-3xl p-6 relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-12 h-12 rounded-2xl overflow-hidden border border-white/10">
+                        <Image 
+                          src={`https://picsum.photos/seed/${activeAgent.seed}/100/100`}
+                          alt="Profile"
+                          width={48}
+                          height={48}
+                          className="object-cover"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold tracking-wide">{activeAgent.name}</h3>
+                        <p className="text-slate-500 text-[10px] uppercase tracking-widest">Neural Identity</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="p-3 rounded-2xl bg-white/5 border border-white/5">
+                        <label className="text-[10px] text-slate-500 uppercase block mb-1">Role</label>
+                        <p className="text-slate-300 text-xs leading-relaxed">{activeAgent.role}</p>
+                      </div>
+                      <div className="flex justify-between items-center px-2">
+                        <span className="text-[10px] text-slate-500 uppercase">Status</span>
+                        <span className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-bold uppercase">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          Online
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* .ath DNA Settings Widget */}
+                <div className="bg-[#0D1522] border border-white/5 rounded-3xl p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-sm font-bold tracking-widest text-cyan-400 uppercase flex items-center gap-2">
+                      <Dna className="w-4 h-4" /> .ath DNA
+                    </h3>
+                    <button 
+                      onClick={() => setIsEditingDna(!isEditingDna)}
+                      className="text-[10px] text-slate-500 hover:text-white transition-colors uppercase font-bold"
+                    >
+                      {isEditingDna ? 'Save' : 'Edit'}
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-5">
+                    {[
+                      { label: 'Soul', key: 'soul', val: isForging ? (forgeDna.soul ? 100 : 0) : 40, color: 'bg-amber-500' },
+                      { label: 'Rules', key: 'rules', val: isForging ? (forgeDna.rules ? 100 : 0) : 100, color: 'bg-rose-500' },
+                      { label: 'Memory', key: 'memory', val: isForging ? (forgeDna.memory ? 100 : 0) : 85, color: 'bg-cyan-400' },
+                      { label: 'Skills', key: 'skills_desc', val: isForging ? (forgeDna.skills_desc ? 100 : 0) : 72, color: 'bg-fuchsia-500' },
+                    ].map((param) => (
+                      <div key={param.label} className="flex flex-col gap-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{param.label}</span>
+                          {isEditingDna ? (
+                            <input 
+                              type="range" 
+                              className="w-20 h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-cyan-400"
+                              defaultValue={param.val}
+                            />
+                          ) : (
+                            <span className="text-[10px] text-slate-500 font-mono">{param.val}%</span>
+                          )}
+                        </div>
+                        {!isEditingDna && (
+                          <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${param.val}%` }}
+                              className={`h-full ${param.color} shadow-[0_0_10px_currentColor]`}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Middle Column: Voice UI Box */}
+              <div className="lg:col-span-2 flex flex-col gap-8">
+                <div className="flex-1 bg-[#0D1522] border border-white/5 rounded-3xl p-8 relative overflow-hidden flex flex-col items-center justify-center min-h-[500px] group">
+                  <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 via-transparent to-fuchsia-500/5 opacity-50" />
+                  
+                  {/* Neural Avatar */}
+                  <div className="relative mb-16">
+                    <motion.div 
+                      animate={{ 
+                        scale: isConnected ? [1, 1.05, 1] : 1,
+                        rotate: isConnected ? [0, 2, -2, 0] : 0
+                      }}
+                      transition={{ duration: 4, repeat: Infinity }}
+                      className="w-48 h-48 rounded-full overflow-hidden border-2 border-white/10 relative z-10 shadow-2xl shadow-cyan-500/20"
+                    >
+                      <Image 
+                        src={`https://picsum.photos/seed/${isForging ? 'forge' : activeAgent.seed}/400/400`}
+                        alt="Agent"
+                        fill
+                        className="object-cover"
+                      />
+                    </motion.div>
+                    {isConnected && (
+                      <div className="absolute inset-0 -m-8">
+                        <div className="w-full h-full rounded-full border border-cyan-500/20 animate-ping opacity-20" />
+                        <div className="absolute inset-0 rounded-full border border-fuchsia-500/10 animate-pulse opacity-30" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Voice UI Box (Waveform) */}
+                  <div className="w-full max-w-md bg-white/5 border border-white/5 rounded-3xl p-6 backdrop-blur-md relative z-10">
+                    <div className="flex items-center justify-center gap-1.5 h-16 mb-4">
+                      {[...Array(32)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          animate={{ 
+                            height: isConnected 
+                              ? [Math.abs(Math.sin(i * 0.3)) * 10 + 10, Math.abs(Math.sin(i * 0.5)) * 40 + 20, Math.abs(Math.sin(i * 0.3)) * 10 + 10] 
+                              : 4 
+                          }}
+                          transition={{ 
+                            duration: 0.3 + Math.abs(Math.sin(i * 0.2)) * 0.3, 
+                            repeat: Infinity, 
+                            ease: "easeInOut" 
+                          }}
+                          className={`w-1 rounded-full ${
+                            i % 4 === 0 ? 'bg-cyan-400' : i % 3 === 0 ? 'bg-fuchsia-500' : 'bg-slate-500'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-bold">
+                        {isConnected ? 'Neural Link Active' : 'Waiting for connection'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Controls */}
+                  <div className="mt-12 flex items-center gap-8 z-10">
+                    <button 
+                      onClick={() => {
+                        disconnect();
+                        setIsForging(false);
+                        setView('home');
+                      }}
+                      className="p-4 rounded-full bg-white/5 border border-white/10 text-slate-500 hover:text-white transition-all hover:bg-white/10"
+                    >
+                      <X className="w-6 h-6" />
+                    </button>
+                    
+                    <button 
+                      onClick={toggleConnection}
+                      className={`w-24 h-24 rounded-full flex items-center justify-center transition-all transform hover:scale-105 active:scale-95 ${
+                        isConnected 
+                          ? 'bg-red-500/20 border border-red-500/50 text-red-500 shadow-[0_0_50px_rgba(239,68,68,0.3)]' 
+                          : 'bg-white text-black shadow-[0_0_50px_rgba(255,255,255,0.2)]'
+                      }`}
+                    >
+                      {isConnected ? <MicOff className="w-10 h-10" /> : <Mic className="w-10 h-10" />}
+                    </button>
+
+                    <button className="p-4 rounded-full bg-white/5 border border-white/10 text-slate-500 hover:text-white transition-all hover:bg-white/10">
+                      <Settings className="w-6 h-6" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Neural Workspace */}
+              <div className="lg:col-span-1 flex flex-col gap-6">
+                <div className="flex-1 bg-[#0D1522] border border-white/5 rounded-3xl p-6 flex flex-col relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <Terminal className="w-12 h-12 text-cyan-400" />
+                  </div>
+                  
+                  <h3 className="text-sm font-bold tracking-widest text-fuchsia-400 uppercase mb-6 flex items-center gap-2">
+                    <Cpu className="w-4 h-4" /> Neural Workspace
+                  </h3>
+
+                  <div className="flex-1 space-y-4 overflow-y-auto pr-2 custom-scrollbar">
+                    {activeTask ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-2 h-2 rounded-full ${activeTask.status === 'running' ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400'}`} />
+                            <span className="text-xs font-bold text-white uppercase tracking-wider">{activeTask.name}</span>
+                          </div>
+                          <span className="text-[10px] text-slate-500 uppercase">{activeTask.status}</span>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          {activeTask.logs.map((log, i) => (
+                            <motion.div 
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              key={i} 
+                              className="text-[10px] font-mono text-slate-500 border-l border-white/10 pl-3 py-1"
+                            >
+                              <span className="text-cyan-500/50 mr-2">[{new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' })}]</span>
+                              {log}
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-full flex flex-col items-center justify-center text-center p-8">
+                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                          <Zap className="w-6 h-6 text-slate-700" />
+                        </div>
+                        <p className="text-xs text-slate-600 uppercase tracking-widest font-bold">Workspace Idle</p>
+                        <p className="text-[10px] text-slate-700 mt-2 leading-relaxed">Assign a task to watch the neural execution flow.</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Workspace Stats Footer */}
+                  <div className="mt-6 pt-6 border-t border-white/5 grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[8px] text-slate-500 uppercase tracking-widest">Latency</span>
+                      <span className="text-xs text-white font-mono">24ms</span>
+                    </div>
+                    <div className="flex flex-col gap-1 text-right">
+                      <span className="text-[8px] text-slate-500 uppercase tracking-widest">Load</span>
+                      <span className="text-xs text-white font-mono">12%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        ) : view === 'create' ? (
+          <div className="flex flex-col items-center py-16 px-8 min-h-[600px]">
+            <div className="w-full max-w-2xl bg-[#0D1522] border border-white/5 rounded-3xl p-10 shadow-2xl">
+              <div className="mb-10 text-center">
+                <h2 className="text-3xl font-bold tracking-widest text-cyan-400 uppercase mb-2">Agent Genesis</h2>
+                <p className="text-slate-400">Define the neural architecture of your new companion.</p>
+              </div>
+              <CreateAgentForm 
+                onClose={() => setView('home')} 
+                onSubmit={handleCreateAgent} 
+              />
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Hero Section */}
+            <div className="flex flex-col items-center pt-16 pb-12 px-4 relative">
+              
+              {/* Glowing Orb */}
+              <div className="relative w-64 h-64 md:w-80 md:h-80 mb-12 flex items-center justify-center">
+                {/* Outer dashed ring */}
+                <motion.div 
+                  animate={{ rotate: 360 }} 
+                  transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0 rounded-full border border-cyan-500/30 border-dashed opacity-50"
+                />
+                {/* Middle solid ring */}
+                <motion.div 
+                  animate={{ rotate: -360 }} 
+                  transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-4 rounded-full border border-fuchsia-500/20"
+                />
+                {/* Inner complex ring */}
+                <motion.div 
+                  animate={{ rotate: 360, scale: isConnected ? [1, 1.05, 1] : 1 }} 
+                  transition={{ duration: isConnected ? 2 : 20, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-8 rounded-full border-2 border-cyan-400/40 shadow-[0_0_30px_rgba(34,211,238,0.2)]"
+                />
+                {/* Core Glow */}
+                <motion.div 
+                  animate={{ 
+                    scale: isConnected ? [1, 1.2, 1] : [1, 1.05, 1],
+                    opacity: isConnected ? [0.8, 1, 0.8] : [0.5, 0.7, 0.5]
+                  }}
+                  transition={{ duration: isConnected ? 1.5 : 4, repeat: Infinity, ease: "easeInOut" }}
+                  className="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-tr from-fuchsia-500 to-cyan-400 rounded-full blur-md"
+                />
+                {/* Core Solid */}
+                <div className="absolute w-16 h-16 md:w-20 md:h-20 bg-white rounded-full shadow-[0_0_50px_rgba(255,255,255,0.8)] z-10 flex items-center justify-center">
+                  {isConnected ? (
+                    <Mic className="w-8 h-8 text-cyan-600 animate-pulse" />
+                  ) : (
+                    <div className="w-4 h-4 bg-cyan-200 rounded-full shadow-[0_0_20px_rgba(34,211,238,1)]" />
+                  )}
+                </div>
+                
+                {/* Decorative lines */}
+                <div className="absolute top-1/2 -left-32 w-32 h-[1px] bg-gradient-to-r from-transparent to-cyan-500/50" />
+                <div className="absolute top-1/2 -right-32 w-32 h-[1px] bg-gradient-to-l from-transparent to-cyan-500/50" />
+              </div>
+
+              {/* Title & Subtitle */}
+              <h1 className="text-5xl md:text-7xl font-bold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 via-purple-400 to-cyan-400 mb-4 text-center">
+                GEMIGRAM
+              </h1>
+              <p className="text-lg md:text-xl text-slate-400 font-light tracking-wide mb-10 text-center">
+                The Voice-Native AI Social Nexus.
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col items-center gap-6">
+                <button 
+                  onClick={startForge}
+                  className={`relative group px-10 py-3 rounded-full font-semibold tracking-widest uppercase transition-all duration-300 ${
+                    isConnected 
+                      ? 'bg-fuchsia-500/20 text-fuchsia-300 shadow-[0_0_30px_rgba(217,70,239,0.4)]' 
+                      : 'bg-transparent text-fuchsia-400 hover:bg-fuchsia-500/10 hover:shadow-[0_0_20px_rgba(217,70,239,0.2)]'
+                  }`}
+                >
+                  <div className="absolute inset-0 rounded-full border border-fuchsia-500/50 group-hover:border-fuchsia-400 transition-colors" />
+                  {isConnected ? 'DISCONNECT' : 'CONNECT NOW (AETHER FORGE)'}
+                </button>
+                <button 
+                  onClick={() => setView('create')}
+                  className="text-cyan-400 font-medium tracking-widest uppercase text-sm hover:text-cyan-300 transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[1px] after:bg-cyan-400/50 hover:after:bg-cyan-300"
+                >
+                  CREATE AGENT
+                </button>
+              </div>
+              
+              {error && (
+                <div className="mt-6 text-red-400 text-sm bg-red-500/10 px-4 py-2 rounded-full border border-red-500/20">
+                  {error}
+                </div>
+              )}
+            </div>
+
+            {/* Agent Hive Section */}
+            <div className="px-8 pb-12">
+              <div className="flex items-center gap-4 mb-8">
+                <h2 className="text-xl font-bold tracking-widest text-cyan-400 uppercase">AGENT HIVE</h2>
+                <div className="h-[1px] flex-1 bg-gradient-to-r from-cyan-500/50 to-transparent" />
+              </div>
+
+              <div className="flex overflow-x-auto pb-6 gap-4 snap-x hide-scrollbar">
+                {agents.map((agent) => (
+                  <button 
+                    key={agent.id}
+                    onClick={() => setActiveAgentId(agent.id)}
+                    className={`min-w-[160px] md:min-w-[180px] p-[1px] rounded-2xl snap-start transition-all duration-300 text-left ${
+                      activeAgentId === agent.id 
+                        ? 'bg-gradient-to-b from-cyan-400 to-fuchsia-500 shadow-[0_0_20px_rgba(34,211,238,0.2)] scale-105' 
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                  >
+                    <div className="bg-[#0A111C] rounded-2xl p-3 h-full flex flex-col">
+                      <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-3 bg-slate-800">
+                        <Image 
+                          src={`https://picsum.photos/seed/${agent.seed}/200/200`}
+                          alt={agent.name}
+                          fill
+                          sizes="(max-width: 768px) 160px, 180px"
+                          className="object-cover opacity-80 mix-blend-screen"
+                          referrerPolicy="no-referrer"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0A111C] to-transparent opacity-60" />
+                      </div>
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="font-bold text-white text-lg">{agent.name}</h3>
+                        <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                          <Activity className="w-3 h-3" /> {agent.users}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-400 mb-4">{agent.role}</p>
+                      
+                      <div className="mt-auto flex items-center gap-2 bg-white/5 px-2 py-1.5 rounded-lg w-fit border border-white/5">
+                        <div className={`w-1.5 h-1.5 rounded-full ${activeAgentId === agent.id && isConnected ? 'bg-cyan-400 animate-pulse shadow-[0_0_5px_rgba(34,211,238,1)]' : 'bg-emerald-500'}`} />
+                        <span className={`text-[10px] font-medium ${activeAgentId === agent.id && isConnected ? 'text-cyan-400' : 'text-emerald-500'}`}>
+                          {activeAgentId === agent.id && isConnected ? 'Listening' : 'Voice Online'}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
 
       </div>
       
@@ -301,14 +1371,6 @@ export default function Gemigram() {
           scrollbar-width: none;
         }
       `}</style>
-
-      {/* Create Agent Modal */}
-      {isCreatingAgent && (
-        <CreateAgentForm 
-          onClose={() => setIsCreatingAgent(false)} 
-          onSubmit={handleCreateAgent} 
-        />
-      )}
     </div>
   );
 }
