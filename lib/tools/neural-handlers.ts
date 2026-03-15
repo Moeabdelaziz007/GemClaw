@@ -8,13 +8,14 @@
 
 import { db, auth } from '../../firebase';
 import { collection, addDoc, query, where, getDocs, orderBy, limit, Timestamp } from 'firebase/firestore';
+import { ToolResult } from '../types/live-api';
 
-export async function handleNeuralTool(name: string, args: any) {
+export async function handleNeuralTool(name: string, args: Record<string, any>): Promise<ToolResult> {
   console.log(`[NeuralHandler] Executing: ${name}`, args);
 
   const FUNCTION_URL = "https://executeagenttool-v7vofv7mxa-uc.a.run.app"; // Pattern based URL, will verify after deploy
 
-  let result: any = { status: "success" };
+  let result: ToolResult = { status: "success" };
 
   if (name === 'listProjects') {
     const token = args.accessToken;

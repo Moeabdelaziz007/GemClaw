@@ -3,37 +3,40 @@
 import { motion } from 'framer-motion';
 import { Code2, Cloud, Bitcoin, Sparkles } from 'lucide-react';
 import { EphemeralWidget } from './ui/EphemeralWidget';
+import { ToolResult, WeatherResult, CryptoResult } from '../lib/types/live-api';
 
-export function WidgetRenderer({ data }: { data: any }) {
+export function WidgetRenderer({ data }: { data: ToolResult }) {
   if (!data) return null;
 
-  if (data.temperature !== undefined) {
+  if ((data as WeatherResult).temperature !== undefined) {
+    const weatherData = data as WeatherResult;
     return (
       <EphemeralWidget className="w-full h-full flex flex-col items-center justify-center">
         <div className="w-16 h-16 rounded-full bg-cyan-500/20 flex items-center justify-center mb-6">
           <Cloud className="w-8 h-8 text-cyan-400" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">{data.location}</h2>
-        <div className="text-6xl font-light text-cyan-400 mb-4">{data.temperature}°C</div>
+        <h2 className="text-2xl font-bold text-white mb-2">{weatherData.location}</h2>
+        <div className="text-6xl font-light text-cyan-400 mb-4">{weatherData.temperature}°C</div>
         <div className="flex items-center gap-4 text-slate-400">
-          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10">{data.condition}</span>
-          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10">Humidity: {data.humidity}</span>
+          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10">{weatherData.condition}</span>
+          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10">Humidity: {weatherData.humidity}</span>
         </div>
       </EphemeralWidget>
     );
   }
 
-  if (data.symbol !== undefined) {
-    const isPositive = !data.change24h.startsWith('-');
+  if ((data as CryptoResult).symbol !== undefined) {
+    const cryptoData = data as CryptoResult;
+    const isPositive = !cryptoData.change24h.startsWith('-');
     return (
       <EphemeralWidget className="w-full h-full flex flex-col items-center justify-center">
         <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center mb-6">
           <Bitcoin className="w-8 h-8 text-amber-400" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">{data.symbol}</h2>
-        <div className="text-5xl font-light text-amber-400 mb-4">{data.price}</div>
+        <h2 className="text-2xl font-bold text-white mb-2">{cryptoData.symbol}</h2>
+        <div className="text-5xl font-light text-amber-400 mb-4">{cryptoData.price}</div>
         <div className={`flex items-center gap-2 font-medium ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
-          {isPositive ? '+' : ''}{data.change24h} (24h)
+          {isPositive ? '+' : ''}{cryptoData.change24h} (24h)
         </div>
       </EphemeralWidget>
     );

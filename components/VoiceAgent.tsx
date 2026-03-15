@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useLiveAPI } from '../hooks/useLiveAPI';
 import { useAetherStore } from '../lib/store/useAetherStore';
 import { WidgetRenderer } from './WidgetRenderer';
+import { ToolResult, Tool, FunctionDeclaration } from '../lib/types/live-api';
 import { Mic, MicOff, Zap, Activity, Settings, Maximize2, User, Terminal, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
@@ -16,7 +17,7 @@ type VoiceAgentProps = {
 
 export function VoiceAgent({ activeAgent, googleAccessToken }: VoiceAgentProps) {
   const [apiKey] = useState(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
-  const [activeWidget, setActiveWidget] = useState<any>(null);
+  const [activeWidget, setActiveWidget] = useState<ToolResult | null>(null);
   const [isThinking, setIsThinking] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
   const transcript = useAetherStore(state => state.transcript);
@@ -51,8 +52,8 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: VoiceAgentProps) 
       disconnect();
       stopRecording();
     } else {
-      const tools: any[] = [];
-      const functionDeclarations = [];
+      const tools: Tool[] = [];
+      const functionDeclarations: FunctionDeclaration[] = [];
 
       if (activeAgent?.tools?.googleSearch) {
         tools.push({ googleSearch: {} });
