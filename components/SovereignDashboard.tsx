@@ -19,8 +19,25 @@ interface SovereignDashboardProps {
 export default function SovereignDashboard({ user, agents, onStartForge, onSelectAgent }: SovereignDashboardProps) {
   const [pulse, setPulse] = useState(72);
   const [neuralLoad, setNeuralLoad] = useState(24);
+  const [bridgeStatus, setBridgeStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
+  const [showWizard, setShowWizard] = useState(false);
 
   useEffect(() => {
+    const checkBridge = async () => {
+      try {
+        const res = await fetch('http://localhost:9999/status');
+        if (res.ok) {
+          setBridgeStatus('connected');
+        } else {
+          setBridgeStatus('disconnected');
+          // Removed automatic showWizard overlay to enable zero-friction cloud-native mode
+        }
+      } catch (e) {
+        setBridgeStatus('disconnected');
+      }
+    };
+    checkBridge();
+
     const interval = setInterval(() => {
       setPulse(prev => Math.max(60, Math.min(95, prev + (Math.random() * 10 - 5))));
       setNeuralLoad(prev => Math.max(10, Math.min(80, prev + (Math.random() * 6 - 3))));
@@ -32,13 +49,13 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
     { label: 'Performance', value: '98%', icon: Zap, color: 'text-aether-neon' },
     { label: 'Storage', value: '1.2 PB', icon: Database, color: 'text-fuchsia-400' },
     { label: 'Threads', value: '512', icon: Cpu, color: 'text-amber-400' },
-    { label: 'Connections', value: '8', icon: Network, color: 'text-emerald-400' },
+    { label: 'Neural Sync', value: 'Active', icon: Network, color: 'text-emerald-400' },
   ];
 
   const systems = [
-    { name: 'Gemini 2.0 Omni', status: 'Operational', latency: '12ms', health: 98 },
+    { name: 'Gemini 2.1 Omni', status: 'Operational', latency: '12ms', health: 98 },
     { name: 'Firebase Substrate', status: 'Active', latency: '8ms', health: 100 },
-    { name: 'GWS Workspace Bridge', status: 'Secure', latency: '24ms', health: 95 },
+    { name: 'Gemigram Neural Workspace', status: bridgeStatus === 'connected' ? 'Secure' : 'Cloud Direct', latency: bridgeStatus === 'connected' ? '24ms' : '150ms', health: bridgeStatus === 'connected' ? 95 : 100 },
   ];
 
   return (
@@ -50,10 +67,10 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
             <div className="w-8 md:w-10 h-8 md:h-10 rounded-lg md:rounded-xl bg-aether-neon/20 flex items-center justify-center border border-aether-neon/30 flex-shrink-0">
               <Activity className="w-4 md:w-5 h-4 md:h-5 text-aether-neon animate-pulse" />
             </div>
-            <h1 className="text-2xl md:text-3xl font-black uppercase tracking-[0.2em] text-white">Dashboard</h1>
+            <h1 className="text-2xl md:text-3xl font-black uppercase tracking-[0.2em] text-white">Gemigram Dashboard</h1>
           </div>
           <p className="text-white/40 font-mono text-xs md:text-[10px] uppercase tracking-widest pl-1 hidden sm:block">
-            Node: {user?.uid?.slice(0, 8) || 'GUEST-01'} • Status: Active
+            Neural Link: {bridgeStatus === 'connected' ? 'Local Spine' : 'Cloud Direct'} • Status: Active
           </p>
         </div>
 
@@ -231,6 +248,69 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
           </div>
         </div>
       </div>
+      {/* Sovereign Setup Wizard Overlay */}
+      {showWizard && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute inset-0 bg-aether-black/90 backdrop-blur-xl"
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="relative w-full max-w-2xl quantum-glass border border-aether-neon/30 p-8 md:p-12 rounded-[40px] shadow-2xl shadow-aether-neon/20 overflow-hidden"
+          >
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-aether-neon/10 blur-[80px] rounded-full" />
+            
+            <div className="relative z-10 space-y-8">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-aether-neon/20 flex items-center justify-center border border-aether-neon/40">
+                  <Activity className="w-8 h-8 text-aether-neon animate-pulse" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-black uppercase tracking-tighter text-white">Sovereign Initialization</h2>
+                  <p className="text-aether-neon text-xs font-mono uppercase tracking-widest mt-1">Status: Bridge Disconnected</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-white/70 text-lg leading-relaxed font-medium">
+                  Welcome to the Sovereign Intelligence Layer. To operate at <span className="text-aether-neon font-bold">$0 cost</span> and maintain data privacy, we need to ignite your <span className="text-white font-bold">Local Neural Spine</span>.
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                  <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+                    <Zap className="w-6 h-6 text-aether-neon" />
+                    <h4 className="font-bold text-white text-sm">One-Click Ignition</h4>
+                    <p className="text-xs text-white/40 leading-relaxed">Simply click the <b>AetherOS.command</b> file in your project folder to start the bridge.</p>
+                  </div>
+                  <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+                    <ShieldCheck className="w-6 h-6 text-emerald-400" />
+                    <h4 className="font-bold text-white text-sm">Secure & Private</h4>
+                    <p className="text-xs text-white/40 leading-relaxed">All Workspace commands are executed locally on your machine. No data leaks to the cloud.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-4 pt-6">
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="w-full sm:w-auto px-10 py-4 rounded-xl bg-aether-neon text-black font-black text-xs uppercase tracking-widest hover:bg-white transition-all shadow-lg shadow-aether-neon/30"
+                >
+                  Confirm Ignition
+                </button>
+                <button 
+                  onClick={() => setShowWizard(false)}
+                  className="w-full sm:w-auto px-10 py-4 rounded-xl bg-white/5 border border-white/10 text-white/40 font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all"
+                >
+                  Continue in Demo Mode
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

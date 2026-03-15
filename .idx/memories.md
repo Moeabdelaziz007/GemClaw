@@ -3,35 +3,40 @@
 ## Project Vision: Gemigram AIOS
 Gemigram is a Sovereign Intelligence Orchestration System designed to win the Gemini Live Agent Challenge 2026. It focuses on "Universal Discovery" (orchestrating all user GCP/Firebase projects) and "Sovereign Deployment" (standalone PWA with agent-specific shortcuts).
 
-### v0 Integration Stabilization (2026-03-15)
-- **Status:** 36 Errors Rectified / Branch `aetheros-uiux` stabilized.
-- **Key Changes:**
-  - Migrated `repo-analyzer.ts` to `@google/genai` (Native Gemini 2.0 SDK).
-  - Purified `SovereignDashboard.tsx` (Removed `Math.random()` render violations).
-  - Explicit typing added to `next.config.ts` Webpack configuration.
-- **Architecture Notes:** All neural handlers now favor the unified Google Gen AI SDK.
+## Project Vision
+AetherOS is a voice-native, sovereign AI operating system. It prioritizes local execution via the Local-Spine architecture to bypass cloud billing limits and ensure total privacy.
 
-## System State (March 15, 2026)
-- **Status**: Phase 3 (Zero-UI & Intelligence Ingestion) Complete.
-- **Milestones**:
-  - [x] V0 PR Errors Suppressed & SDK Corrected.
-  - [x] Deployment to Firebase Hosting Successful.
-  - [x] `.ath` Ingestion logic implemented (`utils/athPackage.ts`).
-  - [x] `AetherVoiceOrchestrator` implemented for autonomous tool routing.
-  - [x] Deterministic State IDs enabled for session stability.
+## Project State: Phase 11 Initiated
+- [x] Phase 10: Gemigram Identity & HUD Overhaul (Premium UI/UX)
+- [x] Phase 11: Neural Voice Lab (Voice Cloning & TTS)
+- [/] Phase 14: Rust Voice Engine (Zero-Latency WASM)
+
+### Major Milestones
+- [x] Sovereign Neural Spine Bridge implemented (`scripts/aether-local-bridge.ts`).
+- [x] Zero-Terminal Launcher (`AetherOS.command`) deployed.
+- [x] Neural Handlers updated to prioritize Local-Sovereignty.
+- [x] Hybrid Billing Bypass strategy verified.
 
 ## Architectural Vision
-AetherOS is a hybrid Sovereign AIOS.
-1. **Core Logic**: Next.js 15 + Zustand (Neural Store).
-2. **Memory Service**: Python WAL (Write-Ahead-Log).
-3. **Execution Layer**: Firebase Functions (GWS Native APIs pending).
-4. **Orchestration**: Aether (Voice-First Engine).
+
+1.  **Core Logic**: Next.js 15 + Zustand (Neural Store).
+2.  **GWS Integration**: Optimized for production via `@googleworkspace/cli`.
+3.  **Primary Execution Engine**: Local-Spine Architecture ($0 Cloud Cost).
+    -   The system identifies billing restrictions and routes all logic to `scripts/aether-local-bridge.ts`.
+4.  **Persona Protocol**: `.ath` packages now include local-only skill mapping.
+5.  **Memory Service**: Python WAL (Write-Ahead-Log).
+
+## Deployment Protocol
+- Frontend: Firebase Hosting (Production).
+- Execution: Local Neural Spine (Client-side).
+7.  **Orchestration**: Aether (Voice-First Engine).
 
 ## Architecture State
 - **Core**: Next.js 15, TailwindCSS, Framer Motion.
 - **State**: Project-aware `useAetherStore` (Zustand) managing project discovery and agent manifesting.
-- **Identity**: Gemigram // Aether (The Forge Intelligence).
-- **PWA**: Configured for `standalone` mode with dynamic `apple-touch-icon` and `favicon` updates based on the active agent.
+- **Identity**: Gemigram // Sovereign Intelligence Orchestration.
+- **Visuals**: HUD-Industrial Sci-Fi, Dark Carbon Fiber, Neon Accents.
+- **PWA**: Sovereign standalone mode with dynamic agent manifesting.
 
 - **UI Strategy**: Leveraging v0 for rapid elite UI/UX prototyping while maintaining AetherOS design tokens.
 
@@ -39,5 +44,12 @@ AetherOS is a hybrid Sovereign AIOS.
 - **2024-05-18**: Implemented Universal Discovery (GCP Resource Manager API integration).
 - **2024-05-18**: Implemented Sovereign Gatekeeping Flow (Gate -> Dashboard -> Agent).
 - **2024-05-18**: Optimised `manifest.json` and implemented dynamic shortcut injection for standalone PWA mode.
-- **2026-03-15**: Resolved `EPERM` build issues via temporary workspace relocation. Deployed latest V2 UI to Firebase Hosting.
-- **2026-03-15**: Established v0 Synergy Protocol for high-end UI/UX evolution. Created `v0_integration_guide.md`.
+- **2026-03-15**: Evolved to **Cloud-Native / Mobile-First** architecture. Implemented stateless GWS client-side spine and Jina-powered "Neural Link" for $0 cost browsing, eliminating local bridge requirements for mobile users.
+
+## Architectural Vision (V7 Evolution)
+1. **Core Logic**: Next.js 15 + Stateless Neural Handlers.
+2. **GWS Integration**: Client-side execution via `workspace-client.ts` (Zero technical debt).
+3. **Execution Engine**: Hybrid Dual-Engine (Client-first, Local/Cloud fallback).
+4. **Web Navigation**: Stateless Jina Reader Protocol ($0 Cloud Cost).
+5. **Billing**: 100% Free-Tier compliant (Firebase Hosting + Spark Functions).
+6. **Audio Engine**: Rust-WASM Jitter Compensation & Jina-Sync protocol.

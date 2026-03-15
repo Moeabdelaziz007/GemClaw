@@ -5,26 +5,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Brain, Cpu, Activity, ShieldCheck, Radio } from 'lucide-react';
 
 interface DigitalEntityProps {
-  state: 'Disconnected' | 'Listening' | 'Thinking' | 'Speaking';
+  state: 'Disconnected' | 'Listening' | 'Thinking' | 'Speaking' | 'Executing';
   volume: number;
   agentName: string;
+  linkType?: 'stateless' | 'bridge' | 'hibernating';
 }
 
-export function DigitalEntity({ state, volume, agentName }: DigitalEntityProps) {
+export function DigitalEntity({ state, volume, agentName, linkType = 'stateless' }: DigitalEntityProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // States: 
-  // Disconnected: Dim, static
-  // Listening: Receptive, eyes pulse cyan, ring breathes
-  // Thinking: Processing, eyes spiral, core pulses purple rapidly
-  // Speaking: Expressive, eyes expand, ring reacts to volume, arms gesture
+  const isLocal = linkType === 'bridge';
 
   const stateConfig = useMemo(() => {
     switch (state) {
       case 'Listening':
         return {
-          glow: 'rgba(0, 240, 255, 0.4)',
-          accent: '#00F0FF',
+          glow: isLocal ? 'rgba(168, 85, 247, 0.4)' : 'rgba(0, 240, 255, 0.4)',
+          accent: isLocal ? '#A855F7' : '#00F0FF',
           corePulse: 1.2,
           speed: 2,
           eyeScale: 1,
@@ -32,17 +29,26 @@ export function DigitalEntity({ state, volume, agentName }: DigitalEntityProps) 
         };
       case 'Thinking':
         return {
-          glow: 'rgba(168, 85, 247, 0.5)',
-          accent: '#A855F7',
+          glow: isLocal ? 'rgba(139, 92, 246, 0.5)' : 'rgba(168, 85, 247, 0.5)',
+          accent: isLocal ? '#8B5CF6' : '#A855F7',
           corePulse: 1.8,
           speed: 0.8,
           eyeScale: 0.8,
           ringOpacity: 0.4,
         };
+      case 'Executing':
+        return {
+          glow: 'rgba(251, 191, 36, 0.5)', // Amber/Gold for tool execution
+          accent: '#FBBF24',
+          corePulse: 2.5,
+          speed: 0.3,
+          eyeScale: 1.5,
+          ringOpacity: 0.9,
+        };
       case 'Speaking':
         return {
-          glow: 'rgba(52, 211, 153, 0.4)',
-          accent: '#34D399',
+          glow: isLocal ? 'rgba(192, 132, 252, 0.4)' : 'rgba(52, 211, 153, 0.4)',
+          accent: isLocal ? '#C084FC' : '#34D399',
           corePulse: 1 + volume * 0.8,
           speed: 1.5,
           eyeScale: 1.2,
@@ -58,7 +64,7 @@ export function DigitalEntity({ state, volume, agentName }: DigitalEntityProps) 
           ringOpacity: 0.2,
         };
     }
-  }, [state, volume]);
+  }, [state, volume, isLocal]);
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden" ref={containerRef}>
@@ -75,8 +81,10 @@ export function DigitalEntity({ state, volume, agentName }: DigitalEntityProps) 
             exit={{ opacity: 0 }}
             className="absolute top-10 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] backdrop-blur-sm z-20"
           >
-            <ShieldCheck className="w-3 h-3 text-aether-neon" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Secure Neural Link Established</span>
+            <ShieldCheck className={`w-3 h-3 ${isLocal ? 'text-purple-400' : 'text-aether-neon'}`} />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+              {isLocal ? 'Local Spine Link Active' : 'Cloud Direct Link Active'}
+            </span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -223,9 +231,9 @@ export function DigitalEntity({ state, volume, agentName }: DigitalEntityProps) 
             <div className="flex items-center gap-3 px-4 py-1.5 rounded-full border border-white/5 bg-white/[0.02] backdrop-blur-md">
               <div className={`w-2 h-2 rounded-full shadow-[0_0_8px_currentColor] ${
                 state === 'Disconnected' ? 'text-white/20 bg-white/20' : 
-                state === 'Listening' ? 'text-aether-neon bg-aether-neon animate-pulse' :
+                state === 'Listening' ? (isLocal ? 'text-purple-400 bg-purple-400 animate-pulse' : 'text-aether-neon bg-aether-neon animate-pulse') :
                 state === 'Thinking' ? 'text-purple-500 bg-purple-500 animate-pulse' :
-                'text-emerald-400 bg-emerald-400 animate-bounce'
+                (isLocal ? 'text-purple-300 bg-purple-300 animate-bounce' : 'text-emerald-400 bg-emerald-400 animate-bounce')
               }`} />
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">
                 {state === 'Disconnected' ? 'Standby Matrix' : `${state} Mode`}

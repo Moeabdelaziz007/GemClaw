@@ -53,6 +53,12 @@ export interface WorkingBufferState {
   userProjects: ProjectMetadata[];
   agents: Agent[];
   activeAgentId: string | null;
+  linkType: 'stateless' | 'bridge' | 'hibernating';
+  voiceProfile: {
+    isCloned: boolean;
+    sampleStatus: 'none' | 'recording' | 'processing' | 'ready';
+    cloneId?: string;
+  };
 }
 
 export interface WorkingBufferActions {
@@ -66,6 +72,8 @@ export interface WorkingBufferActions {
   setAgents: (agents: Agent[]) => void;
   setActiveAgentId: (id: string | null) => void;
   hydrateAgent: (agent: Agent) => void;
+  setLinkType: (type: 'stateless' | 'bridge' | 'hibernating') => void;
+  setVoiceProfile: (profile: Partial<WorkingBufferState['voiceProfile']>) => void;
 }
 
 export type AetherState = WorkingBufferState & WorkingBufferActions;
@@ -81,6 +89,11 @@ export const useAetherStore = create<AetherState>()(
       contextUsage: 0,
       agents: [],
       activeAgentId: null,
+      linkType: 'stateless',
+      voiceProfile: {
+        isCloned: false,
+        sampleStatus: 'none',
+      },
 
       // Actions
       addTranscriptMessage: (role, content) =>
@@ -107,6 +120,10 @@ export const useAetherStore = create<AetherState>()(
       hydrateAgent: (agent) => set((state) => ({
         agents: [...state.agents.filter(a => a.id !== agent.id), agent],
         activeAgentId: agent.id
+      })),
+      setLinkType: (type) => set({ linkType: type }),
+      setVoiceProfile: (profile) => set((state) => ({ 
+        voiceProfile: { ...state.voiceProfile, ...profile } 
       })),
     }),
     {

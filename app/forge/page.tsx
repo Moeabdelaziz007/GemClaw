@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/components/Providers';
 import { useAetherStore, Agent } from '@/lib/store/useAetherStore';
-import CreateAgentForm from '@/components/CreateAgentForm';
+import ForgeArchitect from '@/components/ForgeArchitect';
 import ForgeChamber from '@/components/ForgeChamber';
 import { useRouter } from 'next/navigation';
 import { nanoid } from 'nanoid';
@@ -41,8 +41,8 @@ export default function ForgePage() {
       systemPrompt: data.systemPrompt,
       voiceName: data.voiceName,
       ownerId: user.uid,
-      memory: data.memory,
-      skills_desc: data.skills_desc,
+      memory: data.memory || 'Initializing sovereign memory...',
+      skills_desc: data.skills_desc || 'Sovereign Skillset',
       soul: data.soul,
       rules: data.rules,
       tools: data.tools,
@@ -62,14 +62,14 @@ export default function ForgePage() {
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, 'agents');
       setIsForging(false);
-      router.push('/hub');
+      router.push('/dashboard');
     }
   };
 
   return (
     <div className="w-full h-full">
       {!isForging ? (
-        <CreateAgentForm onClose={() => router.push('/dashboard')} onSubmit={handleCreateAgent} />
+        <ForgeArchitect onCancel={() => router.push('/dashboard')} onComplete={handleCreateAgent} />
       ) : (
         <ForgeChamber onComplete={handleForgeComplete} />
       )}

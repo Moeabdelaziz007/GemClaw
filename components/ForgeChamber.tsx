@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Sparkles, Cpu, Brain, Package } from 'lucide-react';
+import { Loader2, Sparkles, Cpu, Brain, Package, Fingerprint } from 'lucide-react';
 
 interface ForgeChamberProps {
   onComplete: () => void;
 }
 
 const FORGE_STEPS = [
-  { id: 'init', text: 'Initiating Aether Forge...', icon: Sparkles, duration: 2000 },
-  { id: 'soul', text: 'Synthesizing Persona (The Soul)...', icon: Brain, duration: 3000 },
-  { id: 'limbs', text: 'Connecting Workspace APIs (The Limbs)...', icon: Cpu, duration: 2500 },
-  { id: 'memory', text: 'Initializing Vector Memory (The Hippocampus)...', icon: Database, duration: 3500 },
-  { id: 'package', text: 'Packaging .ath Entity...', icon: Package, duration: 2000 },
+  { id: 'init', text: 'Calibrating Aetherial Frequencies...', icon: Sparkles, duration: 2000 },
+  { id: 'soul', text: 'Synthesizing Neural Persona Matrix...', icon: Brain, duration: 3000 },
+  { id: 'limbs', text: 'Mapping Occupational Skill Directives...', icon: Cpu, duration: 2500 },
+  { id: 'memory', text: 'Constructing Vectorized Cognitive Relays...', icon: Database, duration: 3500 },
+  { id: 'identity', text: 'Inscribing Sovereign Digital Signature...', icon: Fingerprint, duration: 2000 },
+  { id: 'package', text: 'Materializing .ath Entity...', icon: Package, duration: 2000 },
 ];
 
 // Placeholder for Database icon since it's not imported from lucide-react in the array above

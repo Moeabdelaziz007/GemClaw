@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLiveAPI } from '../hooks/useLiveAPI';
 import { useAetherStore } from '../lib/store/useAetherStore';
+import { useAudioProcessor } from '../hooks/useAudioProcessor';
 import { WidgetRenderer } from './WidgetRenderer';
 import { Mic, MicOff, Zap, Activity, Settings, Maximize2, User, Terminal, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -21,12 +22,27 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: VoiceAgentProps) 
   const [showLogs, setShowLogs] = useState(false);
   const transcript = useAetherStore(state => state.transcript);
   const contextUsage = useAetherStore(state => state.contextUsage);
+  const linkType = useAetherStore(state => state.linkType);
+  const setLinkType = useAetherStore(state => state.setLinkType);
+
+  useEffect(() => {
+    const checkBridge = async () => {
+      try {
+        const res = await fetch('http://localhost:9999/status');
+        if (res.ok) setLinkType('bridge');
+        else setLinkType('stateless');
+      } catch (e) {
+        setLinkType('stateless');
+      }
+    };
+    checkBridge();
+  }, [setLinkType]);
 
   const { 
     isConnected, 
     isRecording, 
     logs, 
-    volume, 
+    volume: cloudVolume, 
     connect, 
     disconnect, 
     startRecording, 
@@ -39,12 +55,18 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: VoiceAgentProps) 
     setIsThinking(false);
   }, googleAccessToken);
 
+  const { processStream, getVolume, isWasmLoaded } = useAudioProcessor();
+
+  // Optimized volume selection: WASM (Local) > Cloud Direct
+  const volume = isWasmLoaded ? getVolume() : cloudVolume;
+
   const agentState = useMemo(() => {
     if (!isConnected) return 'Disconnected';
+    if (activeWidget) return 'Executing';
     if (isThinking) return 'Thinking';
     if (isRecording) return 'Listening';
     return 'Speaking';
-  }, [isConnected, isThinking, isRecording]);
+  }, [isConnected, isThinking, isRecording, activeWidget]);
 
   const toggleConnection = () => {
     if (isConnected) {
@@ -135,6 +157,7 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: VoiceAgentProps) 
           state={agentState} 
           volume={volume} 
           agentName={activeAgent?.name || 'Neural Link'} 
+          linkType={linkType}
         />
       </div>
 
@@ -181,9 +204,9 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: VoiceAgentProps) 
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 px-4 py-2 rounded-xl quantum-glass border border-white/10 shadow-inner">
-              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)] animate-pulse' : 'bg-slate-600'}`} />
+              <div className={`w-2 h-2 rounded-full ${isConnected ? (linkType === 'bridge' ? 'bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.5)] animate-pulse' : 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)] animate-pulse') : 'bg-slate-600'}`} />
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                {isConnected ? `Link: ${activeAgent?.name || 'Sovereign'}` : 'Neural Link: Standby'}
+                {isConnected ? `${linkType === 'bridge' ? 'Local Spine' : 'Cloud Direct'}: ${activeAgent?.name || 'Sovereign'}` : 'Neural Link: Standby'}
               </span>
             </div>
             
@@ -219,7 +242,7 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: VoiceAgentProps) 
                   Wake the <span className="text-cyan-400 font-medium">Sovereign Entity</span>
                 </div>
                 <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">
-                  Select "Establish Link" to begin neural synchronization
+                  Select &quot;Establish Link&quot; to begin neural synchronization
                 </div>
               </motion.div>
             )}
@@ -262,28 +285,63 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: VoiceAgentProps) 
             </AnimatePresence>
           </div>
 
-          {/* Active Widget (Satellite View) */}
+          {/* Active Widget (Holographic Execution HUD) */}
           <AnimatePresence>
             {activeWidget && (
               <motion.div 
-                initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 50, scale: 0.9 }}
+                initial={{ opacity: 0, y: 50, scale: 0.9, rotateX: 20 }}
+                animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+                exit={{ opacity: 0, y: 50, scale: 0.9, rotateX: 20 }}
                 className="w-full max-w-2xl pointer-events-auto"
+                style={{ perspective: '1000px' }}
               >
-                <div className="quantum-glass border border-white/10 rounded-[32px] p-6 shadow-2xl relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-fuchsia-500/5 pointer-events-none" />
-                  <div className="flex items-center justify-between mb-4 relative z-10">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Neural Output</span>
-                    <button 
-                      onClick={() => setActiveWidget(null)}
-                      className="text-[10px] font-bold uppercase tracking-widest text-red-400 hover:text-red-300 transition-colors"
-                    >
-                      Dismiss
-                    </button>
-                  </div>
-                  <div className="relative z-10">
-                    <WidgetRenderer data={activeWidget} />
+                <div className="relative group">
+                  {/* Holographic Border Effects */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-aether-neon via-purple-500 to-aether-neon rounded-[34px] opacity-20 blur-xl group-hover:opacity-40 transition-opacity animate-pulse" />
+                  
+                  <div className="relative bg-[#050A10]/90 backdrop-blur-3xl border border-white/10 rounded-[32px] p-8 shadow-2xl overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-aether-neon/50 to-transparent" />
+                    
+                    <div className="flex items-center justify-between mb-8">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-aether-neon/10 border border-aether-neon/30 flex items-center justify-center">
+                          <Zap className="w-5 h-5 text-aether-neon animate-pulse" />
+                        </div>
+                        <div>
+                          <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Neural Execution HUD</h4>
+                          <p className="text-[8px] font-mono text-aether-neon opacity-70 uppercase tracking-widest">Active Tool: {activeWidget.name || 'Universal Resolver'}</p>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => setActiveWidget(null)}
+                        className="px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest text-red-400/60 hover:text-red-400 hover:bg-red-400/10 border border-red-400/20 transition-all"
+                      >
+                        Abort Step
+                      </button>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="flex gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                        <div className="flex-1">
+                          <WidgetRenderer data={activeWidget} />
+                        </div>
+                      </div>
+                      
+                      {/* Telemetry Data */}
+                      <div className="flex items-center justify-between px-2 text-[8px] font-mono text-white/20 uppercase tracking-[0.2em]">
+                        <div className="flex items-center gap-4">
+                          <span>Latency: 42ms</span>
+                          <span>Precision: 0.998</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Activity className="w-3 h-3 text-aether-neon/50" />
+                          <span>Stream Stable</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Scanline Effect */}
+                    <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.02),rgba(0,255,0,0.01),rgba(0,0,255,0.02))] bg-[length:100%_2px,3px_100%]" />
                   </div>
                 </div>
               </motion.div>

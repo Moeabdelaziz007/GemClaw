@@ -26,81 +26,91 @@ export default function LandingPage() {
     <div className="relative min-h-screen flex flex-col overflow-hidden bg-aether-black">
       <HeroBackground />
       
-      {/* Hero Section */}
-      <section className="relative min-h-[calc(100vh-80px)] flex items-center pt-20 pb-20 px-4 md:px-8 lg:px-20 z-10">
-        <div className="container mx-auto grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-          {/* Left Column: Vision & Action */}
+      {/* Hero Section - HUD REDESIGN */}
+      <section className="relative min-h-screen flex items-center justify-center pt-20 pb-20 px-4 z-10">
+        <div className="container mx-auto max-w-7xl grid lg:grid-cols-12 gap-12 items-center">
+          
+          {/* Left Column: Mission Control */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "circOut" }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:col-span-7 flex flex-col items-start text-left"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-aether-neon/10 border border-aether-neon/20 text-aether-neon text-[11px] uppercase tracking-[0.2em] font-black mb-6 md:mb-8">
-              <Sparkles className="w-4 h-4" />
-              <span>Protocol V2.0 Active</span>
+            <div className="relative group mb-8">
+              <div className="absolute -inset-1 bg-gradient-to-r from-aether-neon to-purple-600 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+              <div className="relative px-4 py-2 bg-black rounded-full border border-white/10 flex items-center gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-aether-neon animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/70">
+                  Gemigram Neural Link · V2.0
+                </span>
+              </div>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-tight mb-6 md:mb-8">
-              <span className="text-white block">Gemigram</span>
-              <span className="text-aether-neon">AI Operating System</span>
-              <span className="text-white/50 text-lg sm:text-xl md:text-2xl font-light block mt-2">The Sovereign Intelligence Platform</span>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] mb-8">
+              <span className="text-white block">Sovereign</span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-aether-neon via-white to-purple-400">Intelligence.</span>
+              <span className="text-white/40 block text-2xl md:text-3xl font-light tracking-widest mt-4">ZERO FRICTION AIOS</span>
             </h1>
 
-            <p className="text-base md:text-lg text-white/70 font-medium max-w-lg mb-8 md:mb-12 leading-relaxed">
-              Deploy voice-native AI agents that autonomously handle your workspace. Built on Google's Sovereign Ecosystem—zero friction, infinite possibilities.
+            <p className="text-lg md:text-xl text-white/50 font-medium max-w-xl mb-12 leading-relaxed border-l-2 border-aether-neon/30 pl-6">
+              Deploy autonomous neural agents in your workspace. Build with Google Gemini, scale with the Sovereign Local Spine. Your data, your rules.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-12 md:mb-16">
+            <div className="flex flex-wrap gap-6 mb-16">
               <motion.button 
                 onClick={login}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 md:px-10 py-3 md:py-5 rounded-xl md:rounded-2xl bg-white text-black font-black text-sm md:text-base hover:bg-aether-neon transition-all duration-300 shadow-lg hover:shadow-aether-neon/50 active:scale-95 flex items-center gap-3 group whitespace-nowrap"
+                whileHover={{ scale: 1.02, x: 5 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-10 py-5 rounded-2xl bg-white text-black font-black text-lg hover:bg-aether-neon transition-all duration-500 shadow-[0_0_30px_rgba(0,242,255,0.2)] flex items-center gap-4 group"
               >
-                <Fingerprint className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
-                <span>Get Started</span>
+                <Fingerprint className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+                <span>Initialize Identity</span>
               </motion.button>
               
               <motion.button 
                 onClick={() => router.push('/hub')}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 md:px-10 py-3 md:py-5 rounded-xl md:rounded-2xl quantum-glass border border-white/20 hover:border-aether-neon/50 text-white font-bold text-sm md:text-base hover:bg-white/5 transition-all duration-300 flex items-center gap-3 group"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-10 py-5 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-aether-neon/50 text-white font-bold text-lg transition-all duration-500 flex items-center gap-4 hover:shadow-[0_0_30px_rgba(168,85,247,0.1)]"
               >
-                <span>Explore Agents</span>
-                <Activity className="w-4 h-4 md:w-5 md:h-5 group-hover:text-aether-neon transition-colors" />
+                <span>Browse Neural Assets</span>
+                <Activity className="w-5 h-5 text-aether-neon/60" />
               </motion.button>
             </div>
 
-            {/* Trust Bar */}
-            <div className="flex items-center gap-4 md:gap-8 opacity-60 hover:opacity-100 transition-opacity duration-500">
-              <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/50 border-r border-white/10 pr-4 md:pr-8 whitespace-nowrap">Powered by</div>
-              <div className="flex items-center gap-3 md:gap-6">
-                <Image src="https://www.gstatic.com/images/branding/product/2x/firebase_64dp.png" alt="Firebase" width={20} height={20} className="opacity-70 w-5 h-5 md:w-6 md:h-6" />
-                <Image src="https://www.gstatic.com/lamda/images/favicon_v1_150160d5dd06cf22b82.svg" alt="Gemini" width={20} height={20} className="w-5 h-5 md:w-6 md:h-6" />
-                <Image src="https://www.gstatic.com/images/branding/product/2x/workspace_64dp.png" alt="GWS" width={20} height={20} className="opacity-70 w-5 h-5 md:w-6 md:h-6" />
+            {/* Infrastructure Radar */}
+            <div className="grid grid-cols-3 gap-8 pt-8 border-t border-white/5 w-full max-w-lg opacity-40 hover:opacity-100 transition-opacity">
+              <div className="flex flex-col gap-1">
+                <span className="text-[9px] font-black tracking-[0.2em] text-white/30 uppercase">Neural</span>
+                <span className="text-xs font-bold text-white/80">Gemini 1.5 Pro</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[9px] font-black tracking-[0.2em] text-white/30 uppercase">Spine</span>
+                <span className="text-xs font-bold text-white/80">Local-First</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[9px] font-black tracking-[0.2em] text-white/30 uppercase">Encryption</span>
+                <span className="text-xs font-bold text-white/80">AES-256 GCM</span>
               </div>
             </div>
           </motion.div>
 
-          {/* Right Column: Mascot & Live Feed */}
+          {/* Right Column: Standby Entity */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, x: 30 }}
+            initial={{ opacity: 0, scale: 0.8, x: 50 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
-            transition={{ duration: 1.2, delay: 0.2, ease: "circOut" }}
-            className="relative flex flex-col items-center justify-center"
+            transition={{ duration: 1.2, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:col-span-5 relative flex items-center justify-center min-h-[500px]"
           >
-            <div className="relative w-full aspect-square max-w-xs md:max-w-sm lg:max-w-md flex items-center justify-center">
-              <div className="relative z-10 w-full h-full">
-                <DigitalEntity volume={0.1} state="disconnected" />
-              </div>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] border border-white/[0.03] rounded-full animate-orbit" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] border-t border-aether-neon/10 rounded-full animate-orbit" style={{ animationDirection: 'reverse', animationDuration: '25s' }} />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,242,255,0.05)_0%,transparent_70%)] animate-pulse" />
+            <div className="relative z-10 w-full transform scale-75 md:scale-90 lg:scale-100">
+              <DigitalEntity state="Disconnected" volume={0} agentName="GEMIGRAM" />
             </div>
-
-            <div className="relative z-20 w-full max-w-xs mt-8">
-              <NeuralPulse />
-            </div>
+            
+            {/* UI Frames */}
+            <div className="absolute inset-0 pointer-events-none border border-white/[0.03] rounded-[4rem]" />
+            <div className="absolute inset-4 pointer-events-none border border-white/[0.03] rounded-[3.5rem]" />
           </motion.div>
         </div>
       </section>
