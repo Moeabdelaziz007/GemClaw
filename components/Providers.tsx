@@ -132,11 +132,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-export function Providers({ children }: { children: ReactNode }) {
-  return (
-    <AuthProvider>
-      {children}
-    </AuthProvider>
-  );
-}

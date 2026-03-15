@@ -1,6 +1,8 @@
-import type {Metadata} from 'next';
+import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
-import './globals.css'; // Global styles
+import './globals.css';
+import { AuthProvider } from '@/components/Providers';
+import AppShell from '@/components/AppShell';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -12,11 +14,9 @@ export const metadata: Metadata = {
   description: 'The Voice-Native AI Social Nexus.',
 };
 
-import { Providers } from '@/components/Providers';
-
-export default function RootLayout({children}: {children: React.ReactNode}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${outfit.variable}`}>
+    <html lang="en" className={`${outfit.variable}`} suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#050B14" />
@@ -25,9 +25,11 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
         <link rel="apple-touch-icon" href="/aether-entity.png" />
       </head>
       <body suppressHydrationWarning className="font-sans antialiased bg-[#050B14] text-white selection:bg-cyan-500/30">
-        <Providers>
-          {children}
-        </Providers>
+        <AuthProvider>
+          <AppShell>
+            {children}
+          </AppShell>
+        </AuthProvider>
       </body>
     </html>
   );
