@@ -6,14 +6,16 @@ import {
   Activity, Zap, ShieldCheck, Database, 
   Cpu, Brain, Globe, MessageSquare, 
   ChevronRight, Sparkles, Server, Network,
-  Smartphone
+  Smartphone, Search, Layers, RefreshCw, Fingerprint
 } from 'lucide-react';
+import { useAetherStore } from '../lib/store/useAetherStore';
 
 interface SovereignDashboardProps {
   user: any;
   agents: any[];
   onStartForge: () => void;
   onSelectAgent: (id: string) => void;
+  googleAccessToken?: string;
 }
 
 export default function SovereignDashboard({ user, agents, onStartForge, onSelectAgent }: SovereignDashboardProps) {
@@ -21,6 +23,14 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
   const [neuralLoad, setNeuralLoad] = useState(24);
   const [bridgeStatus, setBridgeStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
   const [showWizard, setShowWizard] = useState(false);
+  const [isDiscovering, setIsDiscovering] = useState(false);
+  
+  const { 
+    activeProjectId, 
+    setActiveProjectId, 
+    userProjects, 
+    setUserProjects 
+  } = useAetherStore();
 
   useEffect(() => {
     const checkBridge = async () => {
@@ -44,6 +54,29 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
     }, 3000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleDiscoverProjects = async () => {
+    if (!googleAccessToken) return;
+    setIsDiscovering(true);
+    try {
+      // Direct call to Google Cloud Resource Manager API (Stateless)
+      const res = await fetch('https://cloudresourcemanager.googleapis.com/v1/projects', {
+        headers: { 'Authorization': `Bearer ${googleAccessToken}` }
+      });
+      const data = await res.json();
+      if (data.projects) {
+        const mapped = data.projects.map((p: any) => ({
+          id: p.projectId,
+          name: p.name
+        }));
+        setUserProjects(mapped);
+      }
+    } catch (e) {
+      console.error("Project discovery failed", e);
+    } finally {
+      setIsDiscovering(false);
+    }
+  };
 
   const stats = [
     { label: 'Performance', value: '98%', icon: Zap, color: 'text-aether-neon' },
@@ -76,10 +109,21 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
 
         <div className="flex items-center gap-3">
           <motion.button 
+            onClick={handleDiscoverProjects}
+            disabled={isDiscovering}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl bg-white/5 border border-white/10 text-white font-bold text-xs md:text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-2 whitespace-nowrap ${isDiscovering ? 'opacity-50' : ''}`}
+          >
+            <RefreshCw className={`w-3 md:w-3.5 h-3 md:h-3.5 ${isDiscovering ? 'animate-spin text-aether-neon' : ''}`} />
+            {isDiscovering ? 'Scanning...' : 'Sync Projects'}
+          </motion.button>
+          
+          <motion.button 
             onClick={onStartForge}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl bg-white text-black font-bold text-xs md:text-[10px] uppercase tracking-widest hover:bg-aether-neon transition-all flex items-center gap-2 whitespace-nowrap"
+            className="px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl bg-white text-black font-black text-xs md:text-[10px] uppercase tracking-widest hover:bg-aether-neon transition-all flex items-center gap-2 whitespace-nowrap"
           >
             <Sparkles className="w-3 md:w-3.5 h-3 md:h-3.5" />
             <span className="hidden sm:inline">Create Agent</span>
@@ -87,6 +131,33 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
           </motion.button>
         </div>
       </div>
+
+      {/* Workspace Context Bar */}
+      {userProjects.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="quantum-glass p-3 rounded-2xl border border-aether-neon/20 flex items-center gap-4 overflow-x-auto no-scrollbar"
+        >
+          <div className="flex items-center gap-2 px-3 border-r border-white/10">
+            <Layers className="w-4 h-4 text-aether-neon" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/60 whitespace-nowrap">Active Workspace:</span>
+          </div>
+          {userProjects.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => setActiveProjectId(p.id)}
+              className={`px-4 py-1.5 rounded-lg text-[10px] font-mono transition-all border whitespace-nowrap ${
+                activeProjectId === p.id 
+                  ? 'bg-aether-neon/20 border-aether-neon text-aether-neon shadow-[0_0_15px_rgba(0,255,255,0.2)]'
+                  : 'bg-white/5 border-white/10 text-white/40 hover:border-white/30 hover:text-white'
+              }`}
+            >
+              {p.name}
+            </button>
+          ))}
+        </motion.div>
+      )}
 
       {/* Primary Metrics Grid */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
@@ -225,6 +296,25 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
               </div>
             </div>
           </div>
+
+          <motion.div 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => router.push('/dashboard/voicelab')}
+            className="quantum-glass p-6 border border-aether-neon/20 rounded-[32px] flex items-center justify-between group overflow-hidden relative cursor-pointer"
+          >
+            <div className="absolute inset-0 bg-aether-neon/5 opacity-20 group-hover:opacity-40 transition-opacity pointer-events-none" />
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="w-10 h-10 rounded-xl bg-aether-neon/10 flex items-center justify-center border border-aether-neon/30 group-hover:bg-aether-neon/20 group-hover:border-aether-neon/50 transition-all">
+                <Fingerprint className="w-5 h-5 text-aether-neon" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-white">Neural Voice Lab</p>
+                <p className="text-[9px] font-mono text-white/30 uppercase">Analyze // Tuning // Cloning</p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white transition-all transform group-hover:translate-x-1" />
+          </motion.div>
 
           <div className="quantum-glass p-6 border border-white/5 rounded-[32px] flex items-center justify-between group overflow-hidden relative">
             <div className="absolute inset-0 bg-aether-neon/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />

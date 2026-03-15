@@ -55,18 +55,19 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: VoiceAgentProps) 
     setIsThinking(false);
   }, googleAccessToken);
 
-  const { processStream, getVolume, isWasmLoaded } = useAudioProcessor();
+  const { processStream, getVolume, isWasmLoaded, isSpeaking } = useAudioProcessor();
 
-  // Optimized volume selection: WASM (Local) > Cloud Direct
-  const volume = isWasmLoaded ? getVolume() : cloudVolume;
+  // Optimized volume selection: WASM/AL (Local) > Cloud Direct
+  const volume = isWasmLoaded || isSpeaking ? getVolume() : cloudVolume;
 
-  const agentState = useMemo(() => {
+  const agentStatus = useMemo(() => {
+    if (linkType === 'hibernating') return 'Hibernating';
     if (!isConnected) return 'Disconnected';
     if (activeWidget) return 'Executing';
     if (isThinking) return 'Thinking';
-    if (isRecording) return 'Listening';
+    if (isRecording || isSpeaking) return 'Listening';
     return 'Speaking';
-  }, [isConnected, isThinking, isRecording, activeWidget]);
+  }, [isConnected, isThinking, isRecording, isSpeaking, activeWidget, linkType]);
 
   const toggleConnection = () => {
     if (isConnected) {

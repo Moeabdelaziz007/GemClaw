@@ -1,39 +1,117 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Code2, Cloud, Bitcoin, Sparkles } from 'lucide-react';
+import { Code2, Cloud, Bitcoin, Mail, Calendar, ExternalLink, Clock } from 'lucide-react';
 import { EphemeralWidget } from './ui/EphemeralWidget';
 
 export function WidgetRenderer({ data }: { data: any }) {
   if (!data) return null;
 
-  if (data.temperature !== undefined) {
+  // Gmail Triage Widget
+  if (data.type === 'gmail_triage') {
     return (
-      <EphemeralWidget className="w-full h-full flex flex-col items-center justify-center">
-        <div className="w-16 h-16 rounded-full bg-cyan-500/20 flex items-center justify-center mb-6">
-          <Cloud className="w-8 h-8 text-cyan-400" />
+      <EphemeralWidget className="w-full h-full flex flex-col p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-2xl bg-red-500/20 flex items-center justify-center border border-red-500/30">
+            <Mail className="w-6 h-6 text-red-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-black uppercase tracking-widest text-white">Gmail Triage</h2>
+            <p className="text-[10px] font-mono text-white/30 uppercase">Primary Inbox • 10x Filter</p>
+          </div>
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">{data.location}</h2>
-        <div className="text-6xl font-light text-cyan-400 mb-4">{data.temperature}°C</div>
-        <div className="flex items-center gap-4 text-slate-400">
-          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10">{data.condition}</span>
-          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10">Humidity: {data.humidity}</span>
+        <div className="flex-1 space-y-3 overflow-y-auto no-scrollbar">
+          {data.messages?.map((msg: any) => (
+            <div key={msg.id} className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-red-500/30 transition-all group cursor-pointer">
+              <p className="text-sm text-white/80 line-clamp-2 leading-relaxed">{msg.snippet}</p>
+              <div className="mt-2 flex items-center justify-between">
+                <span className="text-[9px] font-mono text-white/20 uppercase">SEC-ENCRYPTED-ID: {msg.id.slice(0, 8)}</span>
+                <ExternalLink className="w-3 h-3 text-white/0 group-hover:text-white/40 transition-all" />
+              </div>
+            </div>
+          ))}
         </div>
       </EphemeralWidget>
     );
   }
 
+  // Calendar Agenda Widget
+  if (data.type === 'calendar_agenda') {
+    return (
+      <EphemeralWidget className="w-full h-full flex flex-col p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-2xl bg-sky-500/20 flex items-center justify-center border border-sky-500/30">
+            <Calendar className="w-6 h-6 text-sky-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-black uppercase tracking-widest text-white">Neural Agenda</h2>
+            <p className="text-[10px] font-mono text-white/30 uppercase">Synchronized Events • Next 24H</p>
+          </div>
+        </div>
+        <div className="flex-1 space-y-3 overflow-y-auto no-scrollbar">
+          {data.events?.map((ev: any, i: number) => (
+            <div key={i} className="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-sky-500/30 transition-all group">
+              <div className="flex flex-col items-center justify-center min-w-[60px] border-r border-white/10 pr-4">
+                <Clock className="w-3 h-3 text-sky-400/60 mb-1" />
+                <span className="text-[10px] font-bold text-white/80">
+                  {new Date(ev.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-bold text-white group-hover:text-sky-400 transition-colors">{ev.summary}</h3>
+                {ev.location && <p className="text-[10px] text-white/40 uppercase tracking-tighter mt-1">{ev.location}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </EphemeralWidget>
+    );
+  }
+
+  // Weather Widget
+  if (data.temperature !== undefined) {
+    return (
+      <EphemeralWidget className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-cyan-500/10 to-transparent">
+        <motion.div 
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 4, repeat: Infinity }}
+          className="w-20 h-20 rounded-[2rem] bg-cyan-500/20 flex items-center justify-center mb-8 border border-cyan-400/30 shadow-[0_0_30px_rgba(34,211,238,0.2)]"
+        >
+          <Cloud className="w-10 h-10 text-cyan-400" />
+        </motion.div>
+        <h2 className="text-3xl font-black uppercase tracking-[0.2em] text-white mb-1">{data.location}</h2>
+        <p className="text-xs font-mono text-cyan-400/60 uppercase tracking-widest mb-6">{data.condition}</p>
+        <div className="text-8xl font-black text-white tracking-tighter mb-8 drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+          {data.temperature}<span className="text-cyan-400">°</span>
+        </div>
+        <div className="flex items-center gap-6">
+          <div className="text-center">
+            <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">Humidity</p>
+            <p className="text-lg font-bold text-white">{data.humidity}%</p>
+          </div>
+          <div className="w-px h-8 bg-white/10" />
+          <div className="text-center">
+            <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">Wind</p>
+            <p className="text-lg font-bold text-white">12km/h</p>
+          </div>
+        </div>
+      </EphemeralWidget>
+    );
+  }
+
+  // Crypto Widget
   if (data.symbol !== undefined) {
     const isPositive = !data.change24h.startsWith('-');
     return (
-      <EphemeralWidget className="w-full h-full flex flex-col items-center justify-center">
-        <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center mb-6">
-          <Bitcoin className="w-8 h-8 text-amber-400" />
+      <EphemeralWidget className="w-full h-full flex flex-col items-center justify-center p-8 bg-gradient-to-br from-amber-500/10 to-transparent">
+        <div className="w-20 h-20 rounded-[2rem] bg-amber-500/20 flex items-center justify-center mb-8 border border-amber-400/30 shadow-[0_0_30px_rgba(251,191,36,0.2)]">
+          <Bitcoin className="w-10 h-10 text-amber-400" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">{data.symbol}</h2>
-        <div className="text-5xl font-light text-amber-400 mb-4">{data.price}</div>
-        <div className={`flex items-center gap-2 font-medium ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
-          {isPositive ? '+' : ''}{data.change24h} (24h)
+        <h2 className="text-3xl font-black uppercase tracking-[0.2em] text-white mb-1">{data.symbol}</h2>
+        <div className="text-5xl font-black text-white tracking-tighter mb-4">
+          {data.price}
+        </div>
+        <div className={`px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest ${isPositive ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
+          {isPositive ? '▲' : '▼'} {data.change24h}
         </div>
       </EphemeralWidget>
     );
@@ -41,18 +119,18 @@ export function WidgetRenderer({ data }: { data: any }) {
 
   // Fallback for unknown tools
   return (
-    <EphemeralWidget className="w-full h-full flex flex-col">
-      <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
-        <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
-          <Code2 className="w-5 h-5 text-cyan-400" />
+    <EphemeralWidget className="w-full h-full flex flex-col p-6">
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-aether-neon/40 transition-all">
+          <Code2 className="w-6 h-6 text-white/40" />
         </div>
         <div>
-          <h2 className="text-lg font-bold text-white tracking-tight">Tool Execution Output</h2>
-          <p className="text-xs text-slate-400 font-mono">Raw JSON Data</p>
+          <h2 className="text-xl font-black uppercase tracking-widest text-white">Neural Output</h2>
+          <p className="text-[10px] font-mono text-white/20 uppercase tracking-widest">Protocol: JSON-EPHEMERAL-STREAM</p>
         </div>
       </div>
-      <div className="flex-1 overflow-auto custom-scrollbar bg-black/20 rounded-xl p-4 border border-white/5">
-        <pre className="text-cyan-300/80 font-mono text-xs leading-relaxed">
+      <div className="flex-1 overflow-hidden custom-scrollbar bg-black/40 rounded-3xl p-6 border border-white/5 shadow-inner">
+        <pre className="text-aether-neon/70 font-mono text-xs leading-relaxed whitespace-pre-wrap">
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>

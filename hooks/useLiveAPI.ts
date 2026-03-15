@@ -100,13 +100,16 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void, 
       : `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
     
     const ws = new WebSocket(wsUrl);
+    const transcript = useAetherStore.getState().transcript;
+    const setLinkType = useAetherStore.getState().setLinkType;
 
     ws.onopen = () => {
       setIsConnected(true);
+      setLinkType('stateless'); // Reset to active state
       reconnectAttemptsRef.current = 0;
       addLog("Live API connected successfully.", "system");
       
-      ws.send(JSON.stringify({
+      const setupMsg: any = {
         setup: {
           model: MODEL,
           systemInstruction: systemInstruction ? {
@@ -120,7 +123,37 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void, 
             }
           }
         }
-      }));
+      };
+
+      ws.send(JSON.stringify(setupMsg));
+
+      // ─── Phase 17: Hibernate Re-injection (Context Recovery) ────
+      if (transcript.length > 0) {
+        addLog(`Synchronizing neural context (${transcript.length} nodes)...`, "system");
+        setLinkType('hibernating');
+        
+        // Map history to model turns
+        const historyParts = transcript.slice(-10).map(msg => ({
+          text: msg.content
+        }));
+
+        // We send a clientContent message to catch up the model
+        // Note: In real-world bidi, we might need to send this after setup confirmation
+        setTimeout(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+              clientContent: {
+                turns: [{
+                  role: "user",
+                  parts: [{ text: `System Note: This is a resumed session. Previous context: ${transcript.slice(-5).map(m => m.content).join(' | ')}` }]
+                }],
+                turnComplete: true
+              }
+            }));
+            setLinkType('stateless');
+          }
+        }, 1000);
+      }
     };
 
     ws.onmessage = async (event) => {
@@ -201,14 +234,16 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void, 
       
       if (intentionalDisconnectRef.current) {
         addLog("Connection closed.", "system");
+        useAetherStore.getState().setLinkType('stateless');
       } else {
-        addLog(`Connection lost (code: ${event.code}). Preparing reconnection...`, "system");
+        addLog(`Connection lost (code: ${event.code}). Hibernating session...`, "system");
+        useAetherStore.getState().setLinkType('hibernating');
         scheduleReconnectRef.current();
       }
     };
 
     wsRef.current = ws;
-  }, [apiKey, addLog, onFunctionCall, playAudio, addTranscriptMessage, setContextUsage, setInterrupted]);
+  }, [apiKey, addLog, onFunctionCall, playAudio, addTranscriptMessage, setContextUsage, setInterrupted, accessToken]);
 
   const scheduleReconnect = useCallback(() => {
     if (intentionalDisconnectRef.current) return;
@@ -255,63 +290,64 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: any) => void, 
     addLog("Disconnected.", "system");
   }, [addLog]);
 
+  // 2. Core Logic Callbacks (Reconnection & Circular Handling)
+  const workletNodeRef = useRef<AudioWorkletNode | null>(null);
+
   const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
       if (!audioContextRef.current) {
-        audioContextRef.current = new AudioContext();
+        audioContextRef.current = new AudioContext({ sampleRate: 24000 });
       }
-      const source = audioContextRef.current.createMediaStreamSource(stream);
-      if (!analyserRef.current) {
-        analyserRef.current = audioContextRef.current.createAnalyser();
-        analyserRef.current.fftSize = 256;
-        updateVolume();
-      }
-      source.connect(analyserRef.current);
-
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = async (event) => {
-        if (event.data.size > 0) {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            const base64data = (reader.result as string).split(',')[1];
-            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-              wsRef.current.send(JSON.stringify({
-                realtimeInput: {
-                  audio: {
-                    mimeType: 'audio/webm',
-                    data: base64data
-                  }
-                }
-              }));
-            }
-          };
-          reader.readAsDataURL(event.data);
+      
+      const audioContext = audioContextRef.current;
+      await audioContext.audioWorklet.addModule('/audio-processor.js');
+      
+      const source = audioContext.createMediaStreamSource(stream);
+      workletNodeRef.current = new AudioWorkletNode(audioContext, 'neural-spine-processor');
+      
+      workletNodeRef.current.port.onmessage = (event) => {
+        if (event.data.type === 'audio_chunk') {
+          const rawPcm = event.data.payload;
+          
+          // Convert Float32 to Int16 for Gemini
+          const pcm16 = new Int16Array(rawPcm.length);
+          for (let i = 0; i < rawPcm.length; i++) {
+            pcm16[i] = Math.max(-1, Math.min(1, rawPcm[i])) * 0x7FFF;
+          }
+          
+          const base64data = btoa(String.fromCharCode(...new Uint8Array(pcm16.buffer)));
+          
+          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+            wsRef.current.send(JSON.stringify({
+              realtimeInput: {
+                mediaChunks: [{
+                  mimeType: 'audio/pcm;rate=24000',
+                  data: base64data
+                }]
+              }
+            }));
+          }
         }
       };
 
-      mediaRecorder.start(100);
+      source.connect(workletNodeRef.current);
       setIsRecording(true);
-      addLog("Microphone active. Listening...", "user");
+      addLog("Neural Spine: Raw PCM streaming active.", "user");
     } catch (err) {
-      console.error("Microphone access failed:", err);
-      addLog("Microphone access denied.", "system");
+      console.error("Neural Spine transition failure:", err);
+      addLog("Microphone access denied or Worklet failure.", "system");
     }
-  }, [addLog, updateVolume]);
+  }, [addLog]);
 
   const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      addLog("Microphone muted.", "user");
+    if (workletNodeRef.current) {
+      workletNodeRef.current.disconnect();
+      workletNodeRef.current = null;
     }
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
+    setIsRecording(false);
+    addLog("Neural Link: Microphone muted.", "user");
     setVolume(0);
   }, [addLog]);
 
