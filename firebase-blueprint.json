@@ -29,6 +29,19 @@
         "timestamp": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "role", "text"]
+    },
+    "AgentMemory": {
+      "title": "Agent Memory",
+      "description": "Long-term memory for the agent using vector embeddings.",
+      "type": "object",
+      "properties": {
+        "agentId": { "type": "string" },
+        "content": { "type": "string" },
+        "embedding": { "type": "array", "description": "Vector embedding for semantic search" },
+        "importance": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["agentId", "content", "embedding", "createdAt"]
     }
   },
   "firestore": {
@@ -39,6 +52,10 @@
     "/agents/{agentId}/history/{messageId}": {
       "schema": "History",
       "description": "Memory of conversations for each agent"
+    },
+    "/agent_memories/{memoryId}": {
+      "schema": "AgentMemory",
+      "description": "Long-term semantic memory for agents"
     }
   }
 }

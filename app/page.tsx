@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { GoogleGenAI } from "@google/genai";
 import { useLiveAPI } from '@/hooks/useLiveAPI';
 import { 
   User, Play, Mic, MicOff, Activity, Globe, Map, Mail, Calendar, FileText, 
@@ -53,6 +54,8 @@ const INITIAL_AGENTS: Agent[] = [
   { id: 'lyra', name: 'Lyra', role: 'Creative Guide', users: '8K', seed: 'hologram', systemPrompt: 'You are Lyra, a creative guide.', voiceName: 'Puck' },
   { id: 'kora', name: 'Kora', role: 'AI Companion', users: '131', seed: 'synth', systemPrompt: 'You are Kora, an AI companion.', voiceName: 'Fenrir' },
 ];
+
+const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY! });
 
 export default function Gemigram() {
   const { isConnected, isRecording, error, connect, disconnect } = useLiveAPI();
@@ -233,9 +236,14 @@ export default function Gemigram() {
           }
         } else if (call.name === 'store_memory') {
           try {
+            const embeddingResult = await ai.models.embedContent({
+              model: 'gemini-embedding-2-preview',
+              contents: call.args.content,
+            });
             await addDoc(collection(db, 'agent_memories'), {
               agentId: activeAgentId,
               content: call.args.content,
+              embedding: embeddingResult.embedding?.values,
               importance: call.args.importance || 5,
               createdAt: serverTimestamp()
             });
@@ -271,6 +279,21 @@ export default function Gemigram() {
           } catch (err) {
             console.error("Avatar generation error:", err);
             result = "Error generating avatar.";
+          }
+        } else if (call.name.startsWith('workspace_')) {
+          try {
+            setActiveTask({ name: call.name, status: 'running', logs: [`Executing ${call.name}: ${call.action}`] });
+            const response = await fetch('/api/agent/execute', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ toolName: call.name, action: call.args.action, params: call.args.params })
+            });
+            const data = await response.json();
+            result = JSON.stringify(data);
+            setActiveTask(prev => prev ? { ...prev, status: 'completed', logs: [...prev.logs, "Operation completed."] } : null);
+          } catch (err) {
+            console.error("Workspace tool error:", err);
+            result = "Error executing workspace tool.";
           }
         } else if (call.name.startsWith('gmail_')) {
           result = "Gmail operation completed.";

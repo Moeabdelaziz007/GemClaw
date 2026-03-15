@@ -1,22 +1,19 @@
-# Gemigram: The Voice-Native AI Social Nexus
+# Gemigram: The Voice-First AI Agent Platform
 
-Gemigram is a cutting-edge platform where human consciousness meets artificial intelligence. Built on the Gemini 2.5 Live API, Gemigram allows you to forge, interact with, and deploy sophisticated AI agents through natural voice conversation.
+Gemigram is a Voice-First, Zero-Chatbox AI agent platform. Built on the Gemini Multimodal Live API, Gemigram provides a real-time, immersive experience where users interact with the agent through natural voice conversation.
 
-## 🌌 Features
+## 🌌 System Architecture
 
-- **Aether Forge**: A voice-native conversational agent creation system. Speak your agent into existence.
-- **.ath DNA Packages**: Every agent is defined by a unique DNA package containing its Soul, Rules, Memory, and Skills.
-- **Neural Link**: Real-time, low-latency voice interaction powered by Gemini's native audio capabilities.
-- **Neural Workspace**: A real-time execution environment where users can observe AI task logic, logs, and tool calls.
-- **Smart Profile Widget**: Dynamic agent identity cards that reflect the agent's current state and .ath DNA parameters.
-- **Persistent Memory**: Agents remember your past interactions, creating a deep, evolving bond.
-- **Skill Integration**: Connect your agents to Gmail, Calendar, and Google Drive.
+- **Voice-First Foundation:** The Gemini Multimodal Live API serves as the foundational UI router, handling real-time audio streams and triggering actions via function calling.
+- **Zero-Chatbox UI:** An immersive interface where the agent's actions are rendered via real-time UI widgets, eliminating traditional text chat.
+- **Action Bridge:** Firebase Cloud Functions bridge the agent's actions to workspace tools (Gmail, Calendar, Tasks).
+- **Real-time Nervous System:** A WebSocket-based connection manages bidirectional audio and function call interception.
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: Next.js 15, Tailwind CSS, Framer Motion
-- **Backend**: Firebase (Firestore, Auth)
-- **AI Engine**: Google Gemini 2.5 Flash (Live API)
+- **Backend**: Firebase (Firestore, Auth, Cloud Functions)
+- **AI Engine**: Google Gemini Multimodal Live API
 - **Voice**: Web Audio API (PCM 16kHz)
 
 ## 🚀 Getting Started
