@@ -9,6 +9,7 @@ import { ProjectSwitcher } from './ui/ProjectSwitcher';
 import { useAuth } from './Providers';
 import { usePathname } from 'next/navigation';
 import { useAetherStore } from '../lib/store/useAetherStore';
+import { ThemeToggle } from './ThemeToggle';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -75,12 +76,21 @@ export default function AppShell({ children }: AppShellProps) {
         </div>
 
         <div className="flex items-center gap-3 md:gap-6">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+          
+          <div className="h-3 md:h-4 w-[1px] bg-white/10 hidden md:block" />
+          
+          {/* System Status Icons */}
           <div className="flex items-center gap-1 md:gap-2 text-white/40 hidden md:flex">
             <Signal className="w-3 h-3" />
             <Wifi className="w-3 h-3" />
             <Battery className="w-3 h-3 rotate-90" />
           </div>
+          
           <div className="h-3 md:h-4 w-[1px] bg-white/10 hidden md:block" />
+          
+          {/* Clock */}
           <span className="text-xs md:text-[12px] font-mono font-bold tabular-nums text-aether-neon">
             {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
           </span>

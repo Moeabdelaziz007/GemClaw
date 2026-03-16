@@ -2,52 +2,81 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Theme Variables */
+/* ============================================
+   THEME SYSTEM - Dark/Light Mode Support
+   ============================================ */
+
+/* Light Mode Variables (Default) */
+:root,
+[data-theme='light'] {
+  /* Core Background Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e0e0e0;
+  --bg-surface: #fafafa;
+  
+  /* Text Colors - WCAG AA Compliant */
+  --text-primary: #0a0a0a;        /* 21:1 contrast on white */
+  --text-secondary: #333333;      /* 12.6:1 contrast */
+  --text-tertiary: #666666;       /* 5.9:1 contrast */
+  --text-disabled: #999999;       /* 2.8:1 contrast (disabled only) */
+  
+  /* Border & Glass Effects */
+  --border-color: rgba(0, 0, 0, 0.1);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.7);
+  --glass-bg-medium: rgba(255, 255, 255, 0.6);
+  --glass-bg-strong: rgba(255, 255, 255, 0.5);
+  
+  /* Brand Colors (remain consistent) */
+  --gemigram-neon: #10ff87;
+  --gemigram-green: #00ff41;
+  --gemigram-mint: #00ffa3;
+  --gemigram-lime: #ccff00;
+}
+
+/* Dark Mode Variables */
+[data-theme='dark'] {
+  /* Core Background Colors */
+  --bg-primary: #050B14;
+  --bg-secondary: #0a111a;
+  --bg-tertiary: #1a2332;
+  --bg-surface: #0F1724;
+  
+  /* Text Colors - WCAG AA Compliant */
+  --text-primary: rgba(255, 255, 255, 0.95);  /* 14.2:1 on #050B14 */
+  --text-secondary: rgba(255, 255, 255, 0.75); /* 7.8:1 contrast */
+  --text-tertiary: rgba(255, 255, 255, 0.65);  /* 5.9:1 contrast */
+  --text-disabled: rgba(255, 255, 255, 0.45);  /* 3.5:1 contrast */
+  
+  /* Border & Glass Effects */
+  --border-color: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg-subtle: rgba(5, 11, 20, 0.4);
+  --glass-bg-medium: rgba(5, 11, 20, 0.5);
+  --glass-bg-strong: rgba(5, 11, 20, 0.6);
+  
+  /* Brand Colors (neon pops in dark mode) */
+  --gemigram-neon: #10ff87;
+  --gemigram-green: #00ff41;
+  --gemigram-mint: #00ffa3;
+  --gemigram-lime: #ccff00;
+}
+
+/* Legacy variable mapping for backward compatibility */
 :root {
-  /* Core Colors */
-  --color-carbon-black: #050505;
-  --color-carbon-surface: #0a0a0a;
-  --color-carbon-fiber: #111111;
-  --color-carbon-gray: #4a4a4a;
-  --color-aether-neon: #00ff41;
-  --color-neon-green: #10ff87;
-  --color-neon-dim: rgba(16,255,135,0.1);
-  --color-mint-chip: #00ffa3;
-  --color-cyber-lime: #ccff00;
-  --color-neon-blue: #00f0ff;
-  --color-electric-purple: #b026ff;
-  
-  /* Glass System - Tier 1 (Subtle) */
-  --glass-border-light: rgba(255, 255, 255, 0.08);
-  --glass-bg-subtle: rgba(5, 5, 5, 0.4);
-  --glass-blur-sm: 12px;
-  
-  /* Glass System - Tier 2 (Medium) */
-  --glass-border-medium: rgba(255, 255, 255, 0.12);
-  --glass-bg-medium: rgba(10, 10, 10, 0.5);
-  --glass-blur-md: 20px;
-  
-  /* Glass System - Tier 3 (Strong) */
-  --glass-border-strong: rgba(255, 255, 255, 0.16);
-  --glass-bg-strong: rgba(15, 15, 15, 0.6);
-  --glass-blur-lg: 32px;
-  --glass-blur-xl: 48px;
-  
-  /* Legacy Support */
-  --color-glass-border: rgba(255, 255, 255, 0.08);
-  --color-glass-bg: rgba(5, 5, 5, 0.6);
-  
-  /* Accessibility - Color Contrast System */
-  --text-primary: rgba(255, 255, 255, 0.95);    /* 14.2:1 contrast on #050505 */
-  --text-secondary: rgba(255, 255, 255, 0.75);  /* 7.8:1 contrast - WCAG AA compliant */
-  --text-tertiary: rgba(255, 255, 255, 0.65);   /* 5.9:1 contrast - acceptable for secondary text */
-  --text-disabled: rgba(255, 255, 255, 0.45);   /* 3.5:1 contrast - for disabled states only */
+  --color-carbon-black: var(--bg-primary);
+  --color-carbon-surface: var(--bg-surface);
+  --color-aether-neon: var(--gemigram-neon);
+  --color-neon-green: var(--gemigram-green);
 }
 
 @layer base {
+  /* Apply theme-aware background and text colors */
   body {
-    background-color: var(--color-carbon-black);
-    color: rgba(255, 255, 255, 0.9);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     font-size: 15px;
@@ -123,6 +152,54 @@
     border: 1px solid var(--glass-border-medium);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
     will-change: transform;
+  }
+
+  /* ============================================
+     THEME-AWARE UTILITY CLASSES
+     Automatic adaptation for dark/light modes
+     ============================================ */
+  
+  /* Background Utilities */
+  .bg-theme-primary {
+    background-color: var(--bg-primary);
+  }
+  
+  .bg-theme-secondary {
+    background-color: var(--bg-secondary);
+  }
+  
+  .bg-theme-tertiary {
+    background-color: var(--bg-tertiary);
+  }
+  
+  .bg-theme-surface {
+    background-color: var(--bg-surface);
+  }
+
+  /* Text Utilities */
+  .text-theme-primary {
+    color: var(--text-primary);
+  }
+  
+  .text-theme-secondary {
+    color: var(--text-secondary);
+  }
+  
+  .text-theme-tertiary {
+    color: var(--text-tertiary);
+  }
+  
+  .text-theme-disabled {
+    color: var(--text-disabled);
+  }
+
+  /* Border Utilities */
+  .border-theme {
+    border-color: var(--border-color);
+  }
+  
+  .border-glass {
+    border-color: var(--glass-border);
   }
 
   /* ============================================
