@@ -268,7 +268,7 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-3xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/90 backdrop-blur-3xl overflow-hidden">
       {/* HUD Background Effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(0,240,255,0.05),transparent_70%)]" />
@@ -278,34 +278,34 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-4xl h-[80vh] bg-[#03070C]/80 border border-white/5 rounded-[40px] shadow-2xl relative flex flex-col overflow-hidden"
+        className="w-full max-w-4xl h-[85vh] sm:h-[80vh] bg-[#03070C]/80 border border-white/5 rounded-[32px] sm:rounded-[40px] shadow-2xl relative flex flex-col overflow-hidden mx-2 sm:mx-4"
       >
         {/* Header HUD */}
-        <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between bg-black/40">
-          <div className="flex items-center gap-6">
-            <div className="w-12 h-12 rounded-2xl bg-aether-neon/10 border border-aether-neon/30 flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-aether-neon animate-pulse" />
+        <div className="px-4 sm:px-6 md:px-10 py-4 sm:py-6 md:py-8 border-b border-white/5 flex items-center justify-between bg-black/40">
+          <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-aether-neon/10 border border-aether-neon/30 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-aether-neon animate-pulse" />
             </div>
-            <div>
-              <h1 className="text-xl font-black uppercase tracking-widest text-white">Aether Forge</h1>
-              <p className="text-hud text-white/40">Voice-Only Interface</p>
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-black uppercase tracking-widest text-white truncate">Aether Forge</h1>
+              <p className="text-hud text-white/40 text-xs sm:text-sm hidden xs:block">Voice-Only Interface</p>
             </div>
           </div>
           
           {/* Connection Status */}
-          <div className="flex items-center gap-3">
-            <Activity className={`w-4 h-4 ${isConnected ? 'text-green-400' : 'text-red-400'}`} />
-            <span className="text-hud text-white/40">{isConnected ? 'LINKED' : 'DISCONNECTED'}</span>
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <Activity className={`w-3 h-3 sm:w-4 sm:h-4 ${isConnected ? 'text-green-400' : 'text-red-400'}`} />
+            <span className="text-hud text-white/40 text-xs sm:text-sm hidden sm:inline">{isConnected ? 'LINKED' : 'DISCONNECTED'}</span>
           </div>
         </div>
 
         {/* Main Voice Interface */}
-        <div className="flex-1 flex flex-col items-center justify-center p-12 relative">
+        <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 lg:p-12 relative overflow-y-auto">
           {/* Central Voice Orb */}
-          <div className="relative w-64 h-64 mb-12">
+          <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mb-6 sm:mb-8 md:mb-12">
             {/* Pulsing Core */}
             <motion.div 
-              className={`absolute inset-0 rounded-full blur-[40px] ${getStatusColor()}`}
+              className={`absolute inset-0 rounded-full blur-[30px] sm:blur-[40px] ${getStatusColor()}`}
               animate={{ 
                 scale: voiceState.isSpeaking ? [1, 1.3, 1] : [1, 1.05, 1],
                 opacity: voiceState.isSpeaking ? [0.6, 1, 0.6] : 0.4
@@ -315,13 +315,13 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
             
             {/* Icon Container */}
             <div className="relative w-full h-full flex items-center justify-center">
-              <div className={`w-32 h-32 rounded-full bg-white/5 border-2 border-white/20 flex items-center justify-center ${getStatusColor()}`}>
+              <div className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full bg-white/5 border-2 border-white/20 flex items-center justify-center ${getStatusColor()}`}>
                 {getStatusIcon()}
               </div>
             </div>
             
             {/* Confidence Ring */}
-            <svg className="absolute inset-0 w-full h-full -rotate-90">
+            <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 256 256">
               <circle
                 cx="128"
                 cy="128"
@@ -346,12 +346,12 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
           </div>
 
           {/* Status Text */}
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-3 sm:space-y-4 w-full max-w-md px-2">
             <motion.h2 
               key={voiceState.currentStep}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-2xl font-bold text-white uppercase tracking-widest"
+              className="text-lg sm:text-xl md:text-2xl font-bold text-white uppercase tracking-widest px-2"
             >
               {voiceState.status === 'listening' && 'Listening...'}
               {voiceState.status === 'speaking' && 'Speaking...'}
@@ -359,7 +359,7 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
               {voiceState.status === 'complete' && 'Configuration Complete'}
             </motion.h2>
             
-            <p className="text-white/60 max-w-md">
+            <p className="text-white/60 text-sm sm:text-base max-w-md px-4">
               {voiceState.status === 'listening' && 'Speak clearly to configure your agent'}
               {voiceState.status === 'speaking' && 'Please listen to the instructions'}
               {voiceState.status === 'processing' && 'Analyzing voice input...'}
@@ -368,17 +368,17 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
             
             {/* Confidence Indicator */}
             {voiceState.confidence < 0.8 && (
-              <div className="flex items-center justify-center gap-2 text-yellow-400">
+              <div className="flex items-center justify-center gap-2 text-yellow-400 px-4">
                 <AlertCircle className="w-4 h-4" />
-                <span className="text-sm">Low confidence - please repeat</span>
+                <span className="text-xs sm:text-sm">Low confidence - please repeat</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Progress Steps */}
-        <div className="px-10 py-6 border-t border-white/5 bg-black/40">
-          <div className="flex items-center justify-between">
+        <div className="px-4 sm:px-6 md:px-10 py-4 sm:py-6 border-t border-white/5 bg-black/40 overflow-x-auto">
+          <div className="flex items-center justify-start sm:justify-between min-w-max sm:min-w-0 gap-4 sm:gap-0">
             {['name', 'description', 'soul', 'persona', 'voice', 'rules'].map((step, index) => {
               const steps = ['name', 'description', 'systemPrompt', 'soul', 'persona', 'voiceName', 'rules'];
               const currentStepIndex = steps.indexOf(voiceState.currentStep);
@@ -388,10 +388,10 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
               
               return (
                 <div key={step} className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${
+                  <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${
                     isComplete ? 'bg-green-400' : isCurrent ? getStatusColor() : 'bg-white/20'
                   }`} />
-                  <span className={`text-xs uppercase tracking-wider ${
+                  <span className={`text-[10px] sm:text-xs uppercase tracking-wider whitespace-nowrap ${
                     isCurrent ? 'text-white' : 'text-white/40'
                   }`}>
                     {step}
