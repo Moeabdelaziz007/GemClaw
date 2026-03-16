@@ -27,8 +27,8 @@ export const GemigramLogo = ({ size = 48, className = "" }: { size?: number, cla
         {/* Outer Sovereign Hexagon */}
         <motion.path
           d="M50 5 L89 27.5 L89 72.5 L50 95 L11 72.5 L11 27.5 Z"
-          stroke="url(#gemigram-gradient)"
-          strokeWidth="1.5"
+          stroke="url(#aether-gradient)"
+          strokeWidth="2"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ duration: 2, ease: "easeInOut" }}
@@ -48,7 +48,7 @@ export const GemigramLogo = ({ size = 48, className = "" }: { size?: number, cla
         {/* Data Pulses on the 'G' */}
         <motion.circle
           r="2"
-          fill="#00f2ff"
+          fill="#00ff41"
           animate={{
             cx: [68, 40, 24, 50, 72, 50],
             cy: [32, 28, 60, 82, 55, 55],
@@ -67,7 +67,7 @@ export const GemigramLogo = ({ size = 48, className = "" }: { size?: number, cla
             cx={node.x}
             cy={node.y}
             r="1.5"
-            fill={i % 2 === 0 ? "#00f2ff" : "#a855f7"}
+            fill={i % 2 === 0 ? "#00ff41" : "#10b981"}
             initial={{ scale: 0 }}
             animate={{ scale: [0, 1.2, 1], opacity: [0, 1, 0.8] }}
             transition={{ duration: 0.5, delay: 1.2 + i * 0.1 }}
@@ -75,10 +75,9 @@ export const GemigramLogo = ({ size = 48, className = "" }: { size?: number, cla
         ))}
 
         <defs>
-          <linearGradient id="gemigram-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#00f2ff" />
-            <stop offset="50%" stopColor="#a855f7" />
-            <stop offset="100%" stopColor="#34d399" />
+          <linearGradient id="aether-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#00ff41" />
+            <stop offset="100%" stopColor="#10b981" />
           </linearGradient>
         </defs>
       </svg>

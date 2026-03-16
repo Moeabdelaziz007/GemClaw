@@ -14,49 +14,43 @@ const ORBS_CONFIG = [
     id: 'home',
     path: '/dashboard',
     color: 'bg-aether-neon',
-    shadow: 'shadow-[0_0_20px_rgba(0,242,255,0.3)]',
     icon: <Home className="w-5 h-5" />,
-    label: 'Home'
+    label: 'HOME_OPS'
   },
   {
     id: 'workspace',
     path: '/workspace',
     color: 'bg-blue-500',
-    shadow: 'shadow-[0_0_20px_rgba(59,130,246,0.3)]',
     icon: <LayoutDashboard className="w-5 h-5" />,
-    label: 'Workspace'
+    label: 'WORKSPACE'
   },
   {
     id: 'hub',
     path: '/hub',
-    color: 'bg-purple-500',
-    shadow: 'shadow-[0_0_20px_rgba(168,85,247,0.3)]',
+    color: 'bg-aether-neon',
     icon: <Users className="w-5 h-5" />,
-    label: 'Agents'
+    label: 'NEURAL_HUB'
   },
   {
     id: 'forge',
     path: '/forge',
     color: 'bg-emerald-500',
-    shadow: 'shadow-[0_0_20px_rgba(16,185,129,0.3)]',
     icon: <Plus className="w-5 h-5" />,
-    label: 'Create'
+    label: 'FORGE'
   },
   {
     id: 'galaxy',
     path: '/galaxy',
     color: 'bg-cyan-500',
-    shadow: 'shadow-[0_0_20px_rgba(34,211,238,0.3)]',
     icon: <Globe className="w-5 h-5" />,
-    label: 'Gallery'
+    label: 'GALAXY'
   },
   {
     id: 'settings',
     path: '/settings',
     color: 'bg-gray-500',
-    shadow: 'shadow-[0_0_20px_rgba(107,114,128,0.3)]',
     icon: <Settings className="w-5 h-5" />,
-    label: 'Settings'
+    label: 'CONFIG'
   }
 ];
 
@@ -124,7 +118,7 @@ export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNa
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] hidden md:flex items-center gap-2 px-6 py-4 rounded-full quantum-glass"
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] hidden md:flex items-center gap-2 px-5 py-3 rounded-2xl aether-glass border border-white/5 shadow-2xl shadow-black/50"
       >
         {ORBS_CONFIG.map((orb, index) => {
           const isActive = currentView === orb.id;
@@ -133,18 +127,20 @@ export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNa
           return (
             <motion.button
               key={orb.id}
-              whileHover={{ y: -2 }}
+              whileHover={{ y: -2, scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => handleNavigate(orb.id, orb.path)}
-              className={`relative px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 ${
+              className={`relative px-4 py-2.5 rounded-xl transition-all duration-300 flex items-center gap-2.5 ${
                 isActive
-                  ? 'bg-white/15 text-aether-neon border border-aether-neon/50 shadow-lg'
-                  : 'text-white/60 hover:text-white hover:bg-white/5 border border-transparent'
+                  ? 'bg-aether-neon/10 text-aether-neon border border-aether-neon/30 shadow-[0_0_15px_rgba(0,255,65,0.15)] ring-1 ring-aether-neon/20'
+                  : 'text-white/40 hover:text-white hover:bg-white/5 border border-transparent'
               }`}
               title={orb.label}
             >
-              {orb.icon}
-              <span className="text-sm font-semibold hidden lg:inline">{orb.label}</span>
+              <div className={isActive ? 'drop-shadow-[0_0_8px_rgba(0,255,65,0.5)]' : ''}>
+                {orb.icon}
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] hidden lg:inline">{orb.label}</span>
               {hasNotif && (
                 <motion.span
                   animate={{ scale: [1, 1.2, 1] }}

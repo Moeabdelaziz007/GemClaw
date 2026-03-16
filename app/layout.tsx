@@ -24,10 +24,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/aether-entity.png" />
       </head>
-      <body suppressHydrationWarning className="font-sans antialiased bg-[#050B14] text-white selection:bg-cyan-500/30">
+      <body suppressHydrationWarning className="font-sans antialiased bg-carbon-black text-white selection:bg-aether-neon/30 overflow-x-hidden">
+        <div className="fixed inset-0 pointer-events-none hud-grid opacity-10 z-[0]" />
         <AuthProvider>
           <AppShell>
-            {children}
+            <main className="relative z-[1]">
+              {children}
+            </main>
           </AppShell>
         </AuthProvider>
       </body>

@@ -12,6 +12,7 @@ AetherOS is a voice-native, sovereign AI operating system. It prioritizes local 
 - [x] Phase 14: Rust Voice Engine (Zero-Latency WASM)
 - [x] Phase 15: E2E UI/UX Master Polish (Premium HUD & Workspaces)
 - [x] Phase 16: Neural-Spine Voice Protocol (NSVP - Raw PCM & Rust)
+- [x] Phase 17: Enterprise Sovereignty Redesign (Gemini 2.5 Flash & Google Auth)
 
 ### Major Milestones
 - [x] Sovereign Neural Spine Bridge implemented (`scripts/aether-local-bridge.ts`).
@@ -49,6 +50,7 @@ AetherOS is a voice-native, sovereign AI operating system. It prioritizes local 
 - **2024-05-18**: Optimised `manifest.json` and implemented dynamic shortcut injection for standalone PWA mode.
 - **2026-03-15**: Evolved to **Cloud-Native / Mobile-First** architecture. Implemented stateless GWS client-side spine and Jina-powered "Neural Link" for $0 cost browsing, eliminating local bridge requirements for mobile users.
 - **2026-03-15**: Completed **E2E UI/UX Master Polish**. Integrated premium Workspace Selector in Dashboard for multi-project GCP orchestration and high-fidelity Widget rendering for GWS/Weather/Crypto results.
+- **2026-03-16**: Launched **Enterprise Sovereignty v2.4.0**. Redesigned Landing Page for Gemini 2.5 Flash, implemented industrial Biometric Auth via Google, and optimized Neural Engine for Zero-Friction tool responses.
 
 ## Architectural Vision (V7 Evolution)
 1. **Core Logic**: Next.js 15 + Stateless Neural Handlers.

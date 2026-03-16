@@ -133,6 +133,11 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
               <div className="absolute inset-0 bg-white/5 backdrop-blur-md rounded-[40px] border border-white/10 overflow-hidden">
                 {/* Circuit Veins (Procedural) */}
                 <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_30%_30%,#00F0FF_0%,transparent_50%),radial-gradient(circle_at_70%_60%,#A855F7_0%,transparent_50%)]" />
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent h-1"
+                  animate={{ y: ['-100%', '300%'] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                />
               </div>
               
               {/* Sovereign Eyes (Tracking UI) */}
@@ -180,12 +185,12 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
             {/* Torso - Liquid Obsidian Panel */}
             <div className="relative w-48 h-72 rounded-[60px] bg-white/[0.03] backdrop-blur-2xl border border-white/10 overflow-hidden group">
               {/* The Core Singularity */}
-              <motion.div 
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-[25px]"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-[40px]"
                 style={{ backgroundColor: stateConfig.accent }}
                 animate={{ 
                   scale: [1, stateConfig.corePulse, 1],
-                  opacity: [0.3, 0.6, 0.3]
+                  opacity: [0.3, 0.7, 0.3],
+                  boxShadow: [`0 0 20px ${stateConfig.glow}`, `0 0 60px ${stateConfig.glow}`, `0 0 20px ${stateConfig.glow}`]
                 }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
               />

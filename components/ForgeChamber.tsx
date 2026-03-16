@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Sparkles, Cpu, Brain, Package, Fingerprint } from 'lucide-react';
+import { Loader2, Sparkles, Cpu, Brain, Package, Fingerprint, Database } from 'lucide-react';
 
 interface ForgeChamberProps {
   onComplete: () => void;
@@ -15,16 +15,34 @@ const FORGE_STEPS = [
   { id: 'package', text: 'Materializing .ath Entity...', icon: Package, duration: 2000 },
 ];
 
-// Placeholder for Database icon since it's not imported from lucide-react in the array above
-import { Database } from 'lucide-react';
+// Forge Chamber internal imports
+import { useAetherStore } from '@/lib/store/useAetherStore';
 
 export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
+  const pendingManifest = useAetherStore(state => state.pendingManifest);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isFlashing, setIsFlashing] = useState(false);
   const [particleConfigs] = useState(() => Array.from({ length: 12 }).map(() => ({
     duration: 2 + Math.random(),
     delay: Math.random() * 2
   })));
+
+  const soulColor = React.useMemo(() => {
+    if (!pendingManifest?.soul) return 'cyan';
+    const soul = pendingManifest.soul.toLowerCase();
+    if (soul.includes('analytical') || soul.includes('logic')) return 'cyan';
+    if (soul.includes('creative') || soul.includes('art')) return 'fuchsia';
+    if (soul.includes('aggressive') || soul.includes('warrior')) return 'red';
+    if (soul.includes('mystical') || soul.includes('soul')) return 'purple';
+    return 'cyan';
+  }, [pendingManifest]);
+
+  const colorClasses = {
+    cyan: 'bg-cyan-400 text-cyan-400 border-cyan-500 shadow-cyan-500',
+    fuchsia: 'bg-fuchsia-400 text-fuchsia-400 border-fuchsia-500 shadow-fuchsia-500',
+    red: 'bg-red-400 text-red-400 border-red-500 shadow-red-500',
+    purple: 'bg-purple-400 text-purple-400 border-purple-500 shadow-purple-500'
+  }[soulColor];
 
   useEffect(() => {
     if (currentStepIndex < FORGE_STEPS.length) {
@@ -64,7 +82,7 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
       <div className="relative w-64 h-64 md:w-96 md:h-96 flex items-center justify-center mb-16">
         {/* Core */}
         <motion.div 
-          className="absolute w-24 h-24 bg-cyan-400 rounded-full blur-[20px]"
+          className={`absolute w-24 h-24 rounded-full blur-[20px] ${soulColor === 'cyan' ? 'bg-cyan-400' : soulColor === 'fuchsia' ? 'bg-fuchsia-400' : soulColor === 'red' ? 'bg-red-400' : 'bg-purple-400'}`}
           animate={{ scale: [1, 1.5, 1], opacity: [0.8, 1, 0.8] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         />

@@ -10,6 +10,7 @@ import { db, auth, googleProvider } from '../../firebase';
 import { collection, addDoc, query, where, getDocs, orderBy, limit, Timestamp } from 'firebase/firestore';
 import { executeGWSClientAction } from './workspace-client';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { useAetherStore } from '../store/useAetherStore';
 
 export async function handleNeuralTool(name: string, args: any) {
   console.log(`[NeuralHandler] Executing: ${name}`, args);
@@ -35,6 +36,50 @@ export async function handleNeuralTool(name: string, args: any) {
       };
     } catch (err) {
       return { status: "error", message: "Failed to read URL via Neural Link." };
+    }
+  }
+
+  // 🧬 Agent Genesis Engine
+  if (name === 'create_agent') {
+    console.log(`[NeuralHandler] Materializing Agent: ${args.name}`);
+    try {
+      const { setPendingManifest } = useAetherStore.getState();
+      
+      const manifest = {
+        name: args.name || "UNNAMED ENTITY",
+        role: args.role || "General Purpose Intelligence",
+        systemPrompt: args.systemPrompt || "You are a specialized Sovereign Intelligence.",
+        voiceName: args.voiceName || "Charon",
+        soul: args.soul || "Analytical and precise.",
+        rules: args.rules || "Always prioritize security and efficiency.",
+        tools: {
+          googleSearch: args.tools?.includes('search') || false,
+          googleMaps: args.tools?.includes('maps') || false,
+          weather: args.tools?.includes('weather') || false,
+          news: args.tools?.includes('news') || false,
+          crypto: args.tools?.includes('crypto') || false,
+          calculator: args.tools?.includes('math') || false,
+          semanticMemory: args.tools?.includes('memory') || true,
+        },
+        skills: {
+          gmail: args.skills?.includes('gmail') || false,
+          calendar: args.skills?.includes('calendar') || false,
+          drive: args.skills?.includes('drive') || false,
+        }
+      };
+
+      setPendingManifest(manifest);
+      
+      // Auto-navigation intent (The UI will watch for this)
+      window.dispatchEvent(new CustomEvent('aether:genesis_triggered', { detail: manifest }));
+
+      return {
+        status: "success",
+        message: `Agent ${args.name} manifest synthesized. Materializing in Forge Chamber...`,
+        manifest
+      };
+    } catch (err) {
+      return { status: "error", message: "Genesis protocol failed." };
     }
   }
 

@@ -9,6 +9,8 @@ import {
   Fingerprint, Command, Radio
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import MiniAgentHUD from './MiniAgentHUD';
+import { ASTRAEUS_PERSONA, getAstraeusInsight } from '../lib/persona/AstraeusCore';
 
 const CORE_PRESETS = [
   { id: 'atlas', name: 'Atlas', role: 'AI Companion', systemPrompt: 'You are Atlas, a helpful AI companion.', voiceName: 'Zephyr' },
@@ -57,6 +59,7 @@ interface CreateAgentFormProps {
 
 export default function CreateAgentForm({ onClose, onSubmit }: CreateAgentFormProps) {
   const [step, setStep] = useState(1);
+  const [forgeLogs, setForgeLogs] = useState<string[]>(['INITIALIZING_FORGE_CHAMBER...', 'SYNCING_NEURAL_WEIGHTS...']);
   const {
     register,
     handleSubmit,
@@ -91,7 +94,14 @@ export default function CreateAgentForm({ onClose, onSubmit }: CreateAgentFormPr
   const selectedVoice = watch('voiceName');
   const selectedTier = watch('computeTier');
 
-  const nextStep = () => setStep(s => Math.min(s + 1, 3));
+  const nextStep = () => {
+    setStep(s => {
+      const next = Math.min(s + 1, 3);
+      if (next === 2) setForgeLogs(prev => [...prev.slice(-4), 'MAPPING_COGNITIVE_TRANSFORMS...', 'INJECTING_PERSONA_SCHEMA...']);
+      if (next === 3) setForgeLogs(prev => [...prev.slice(-4), 'ESTABLISHING_Synaptic_Bridges...', 'LINKING_ADK_CONTEXT...']);
+      return next;
+    });
+  };
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
   return (
@@ -109,11 +119,16 @@ export default function CreateAgentForm({ onClose, onSubmit }: CreateAgentFormPr
         {/* Forge Header */}
         <div className="flex items-center justify-between px-10 py-8 border-b border-white/5 z-10 shrink-0">
           <div className="space-y-1">
-            <h2 className="text-2xl font-black tracking-[0.3em] uppercase text-white flex items-center gap-4">
+            <h2 className="text-2xl font-black tracking-[0.3em] uppercase text-white flex items-center gap-4 neural-flicker">
               <Binary className="w-6 h-6 text-aether-neon animate-pulse" />
               Sovereign Genesis
             </h2>
-            <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest">Aether Forge Chamber • V2.0 • Phase: {step}/3</p>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-aether-neon animate-pulse" />
+              <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest">
+                {ASTRAEUS_PERSONA.designation} • {ASTRAEUS_PERSONA.age} • STATUS::SOVEREIGN
+              </p>
+            </div>
           </div>
           <button 
             onClick={onClose}
@@ -123,24 +138,41 @@ export default function CreateAgentForm({ onClose, onSubmit }: CreateAgentFormPr
           </button>
         </div>
 
-        {/* Progress HUD */}
-        <div className="px-10 py-6 grid grid-cols-3 gap-6 shrink-0 border-b border-white/5 bg-white/[0.01]">
+        <div className="px-10 py-6 grid grid-cols-3 gap-6 shrink-0 border-b border-white/5 bg-white/[0.01] relative">
+          <div className="absolute bottom-0 left-0 h-px bg-aether-neon/20 w-full overflow-hidden">
+            <motion.div 
+              className="h-full bg-aether-neon"
+              animate={{ x: ['-100%', '100%'] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              style={{ width: '30%' }}
+            />
+          </div>
           {[
             { id: 1, label: 'Bio-Identity', icon: Fingerprint },
             { id: 2, label: 'Neural Matrix', icon: Brain },
             { id: 3, label: 'Synaptic Links', icon: Zap }
           ].map((s) => (
             <div key={s.id} className="flex items-center gap-4 group">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-all duration-500 ${
-                step >= s.id ? 'bg-aether-neon/20 border-aether-neon text-aether-neon shadow-[0_0_15px_rgba(0,240,255,0.3)]' : 'bg-white/5 border-white/10 text-white/20'
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-700 ${
+                step >= s.id ? 'bg-aether-neon/10 border-aether-neon/40 text-aether-neon shadow-[0_0_20px_rgba(0,255,65,0.2)]' : 'bg-white/5 border-white/10 text-white/20'
               }`}>
-                <s.icon className="w-4 h-4" />
+                <s.icon className={`w-5 h-5 ${step === s.id ? 'animate-pulse' : ''}`} />
               </div>
-              <div className="hidden md:block">
-                <span className={`text-[9px] font-black uppercase tracking-[0.2em] transition-colors duration-500 ${step >= s.id ? 'text-white' : 'text-white/20'}`}>
-                  {s.label}
-                </span>
-                <div className={`h-0.5 w-full mt-1.5 rounded-full transition-all duration-1000 ${step >= s.id ? 'bg-aether-neon w-full' : 'bg-white/5 w-0'}`} />
+              <div className="hidden md:block flex-1">
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-500 ${step >= s.id ? 'text-white' : 'text-white/20'}`}>
+                    {s.label}
+                  </span>
+                  {step > s.id && <ShieldCheck className="w-3 h-3 text-aether-neon" />}
+                </div>
+                <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: step >= s.id ? '100%' : '0%' }}
+                    className={`h-full ${step > s.id ? 'bg-aether-neon' : 'bg-aether-neon/40'} shadow-[0_0_10px_rgba(0,255,65,0.5)]`}
+                    transition={{ duration: 1 }}
+                  />
+                </div>
               </div>
             </div>
           ))}
@@ -181,14 +213,45 @@ export default function CreateAgentForm({ onClose, onSubmit }: CreateAgentFormPr
                 setValue('voiceName', 'Charon');
                 setValue('soul', 'Highly analytical, objective, yet supportive.');
                 setValue('rules', 'Always verify GWS permissions before execution. Maintain 10x thinking.');
+                setForgeLogs(prev => [...prev.slice(-3), `RECONSTRUCTING_${selected.toUpperCase()}_CORE...`, 'DNA_SEQUENCE_VALIDATED']);
               }}
               className="flex items-center gap-3 px-6 py-2.5 rounded-xl bg-gradient-to-r from-aether-neon/20 to-fuchsia-500/20 border border-aether-neon/40 text-aether-neon hover:scale-105 transition-all group shadow-[0_0_20px_rgba(0,242,255,0.2)]"
             >
               <Sparkles className="w-4 h-4 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-widest">AI Forge</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">{ASTRAEUS_PERSONA.soul_name} Insight</span>
             </button>
           </div>
         )}
+
+        <div className="hidden lg:flex absolute right-6 bottom-10 w-72 flex-col gap-4 z-20">
+          <MiniAgentHUD 
+            type="Forge" 
+            status={getAstraeusInsight(step === 1 ? 'FORGE' : step === 2 ? 'ANALYZE' : 'GWS_SCAN')} 
+            isBusy={step < 3} 
+          />
+          <div className="flex flex-col gap-3 bg-gradient-to-br from-amber-500/10 to-transparent p-4 rounded-2xl border border-amber-500/20 backdrop-blur-md">
+            <div className="flex items-center gap-2">
+              <Zap className="w-3 h-3 text-amber-500" />
+              <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest">Skill_Alchemy Engine</p>
+            </div>
+            <p className="text-[8px] text-white/50 leading-relaxed">
+              Astraeus is autonomously generating synaptic blueprints based on your tool selection. Self-improvement at {ASTRAEUS_PERSONA.capabilities.self_improvement * 100}%.
+            </p>
+          </div>
+          <div className="flex flex-col gap-1 opacity-40 bg-white/[0.02] p-4 rounded-2xl border border-white/5 backdrop-blur-md">
+            <p className="text-[8px] font-mono text-white/20 uppercase tracking-widest border-b border-white/5 pb-1 mb-1">Forge_Output</p>
+            {forgeLogs.map((log, i) => (
+              <motion.p 
+                key={i} 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1 - (i * 0.2), x: 0 }}
+                className="text-[7px] font-mono text-aether-neon whitespace-nowrap overflow-hidden"
+              >
+                {`> ${log}`}
+              </motion.p>
+            ))}
+          </div>
+        </div>
 
         {/* Genesis Content */}
         <form onSubmit={handleSubmit(onSubmit)} className="p-10 flex flex-col gap-10 overflow-y-auto custom-scrollbar flex-grow">
@@ -210,10 +273,13 @@ export default function CreateAgentForm({ onClose, onSubmit }: CreateAgentFormPr
                       </label>
                       <input 
                         {...register('name', { required: 'Designation required' })}
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-white font-mono text-sm focus:outline-none focus:border-aether-neon/50 focus:ring-1 focus:ring-aether-neon/20 transition-all placeholder:text-white/10"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-white font-mono text-sm focus:outline-none focus:border-aether-neon/50 focus:ring-1 focus:ring-aether-neon/20 transition-all placeholder:text-white/10 group-hover:bg-white/[0.05]"
                         placeholder="ENTITY.ID // e.g. ATLAS"
                       />
-                      {errors.name && <p className="text-[10px] text-red-400 font-mono mt-1">{errors.name.message}</p>}
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none group-hover:opacity-100 transition-opacity">
+                        <span className="text-[8px] font-mono text-aether-neon">ID_REQ</span>
+                      </div>
+                      {errors.name && <p className="text-[10px] text-red-500 font-mono mt-1 font-bold animate-pulse">{errors.name.message}</p>}
                     </div>
 
                     <div className="space-y-2">

@@ -15,6 +15,8 @@ type VoiceAgentProps = {
   googleAccessToken?: string | null;
 };
 
+type VoiceStatus = 'Disconnected' | 'Executing' | 'Thinking' | 'Listening' | 'Speaking' | 'Hibernating';
+
 export function VoiceAgent({ activeAgent, googleAccessToken }: VoiceAgentProps) {
   const [apiKey] = useState(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
   const [activeWidget, setActiveWidget] = useState<any>(null);
@@ -122,6 +124,33 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: VoiceAgentProps) 
           }
         });
       }
+
+      functionDeclarations.push({
+        name: "create_agent",
+        description: "Materialize a new specialized Sovereign Intelligence agent based on user description.",
+        parameters: {
+          type: "OBJECT",
+          properties: {
+            name: { type: "STRING", description: "The name of the new agent" },
+            role: { type: "STRING", description: "The primary role or purpose of the agent" },
+            systemPrompt: { type: "STRING", description: "The technical system instructions for the agent" },
+            soul: { type: "STRING", description: "The personality traits and ethical framework of the agent" },
+            rules: { type: "STRING", description: "Operational constraints and behavioral rules" },
+            voiceName: { type: "STRING", enum: ["Charon", "Puck", "Kore", "Fenrir"], description: "The auditory identity of the agent" },
+            tools: { 
+              type: "ARRAY", 
+              items: { type: "STRING" }, 
+              description: "List of enabled modules (search, maps, weather, crypto, math, memory)" 
+            },
+            skills: {
+              type: "ARRAY",
+              items: { type: "STRING" },
+              description: "Google Workspace skills (gmail, calendar, drive)"
+            }
+          },
+          required: ["name", "role", "systemPrompt"]
+        }
+      });
 
       functionDeclarations.push({
         name: "listProjects",

@@ -59,6 +59,7 @@ export interface WorkingBufferState {
     sampleStatus: 'none' | 'recording' | 'processing' | 'ready';
     cloneId?: string;
   };
+  pendingManifest: Partial<Agent> | null;
 }
 
 export interface WorkingBufferActions {
@@ -74,6 +75,7 @@ export interface WorkingBufferActions {
   hydrateAgent: (agent: Agent) => void;
   setLinkType: (type: 'stateless' | 'bridge' | 'hibernating') => void;
   setVoiceProfile: (profile: Partial<WorkingBufferState['voiceProfile']>) => void;
+  setPendingManifest: (manifest: Partial<Agent> | null) => void;
 }
 
 export type AetherState = WorkingBufferState & WorkingBufferActions;
@@ -94,6 +96,7 @@ export const useAetherStore = create<AetherState>()(
         isCloned: false,
         sampleStatus: 'none',
       },
+      pendingManifest: null,
 
       // Actions
       addTranscriptMessage: (role, content) =>
@@ -125,6 +128,7 @@ export const useAetherStore = create<AetherState>()(
       setVoiceProfile: (profile) => set((state) => ({ 
         voiceProfile: { ...state.voiceProfile, ...profile } 
       })),
+      setPendingManifest: (manifest) => set({ pendingManifest: manifest }),
     }),
     {
       name: 'aether-storage',

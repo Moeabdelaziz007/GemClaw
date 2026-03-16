@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/Providers';
 import { useAetherStore, Agent } from '@/lib/store/useAetherStore';
 import ForgeArchitect from '@/components/ForgeArchitect';
@@ -12,10 +12,19 @@ import { db, handleFirestoreError, OperationType } from '@/firebase';
 
 export default function ForgePage() {
   const { user } = useAuth();
-  const { setActiveAgentId } = useAetherStore();
+  const { setActiveAgentId, pendingManifest, setPendingManifest } = useAetherStore();
   const [isForging, setIsForging] = useState(false);
   const [pendingAgentData, setPendingAgentData] = useState<any>(null);
   const router = useRouter();
+
+  // 🧬 Genesis Protocol: Handle automated forging from Voice Prompt
+  useEffect(() => {
+    if (pendingManifest && !isForging) {
+      console.log("[ForgePage] Genesis Intent Detected. Materializing...");
+      setPendingAgentData(pendingManifest);
+      setIsForging(true);
+    }
+  }, [pendingManifest, isForging]);
 
   const handleCreateAgent = (data: any) => {
     setPendingAgentData(data);
@@ -35,7 +44,7 @@ export default function ForgePage() {
       id: agentId,
       aetherId,
       name: data.name,
-      role: data.description,
+      role: data.role || data.description,
       users: '0',
       seed: data.name.toLowerCase(),
       systemPrompt: data.systemPrompt,
@@ -56,6 +65,7 @@ export default function ForgePage() {
       });
       
       setPendingAgentData(null);
+      setPendingManifest(null);
       setIsForging(false);
       setActiveAgentId(agentId);
       router.push('/workspace');

@@ -8,8 +8,11 @@ import {
   ChevronRight, Sparkles, Server, Network,
   Smartphone, Search, Layers, RefreshCw, Fingerprint
 } from 'lucide-react';
-import { useAetherStore } from '../lib/store/useAetherStore';
 import { useRouter } from 'next/navigation';
+import GemigramLogo from './GemigramLogo';
+import SystemMetrics from './SystemMetrics';
+import NeuralNetworkGraph from './NeuralNetworkGraph';
+import MiniAgentHUD from './MiniAgentHUD';
 
 interface SovereignDashboardProps {
   user: any;
@@ -98,18 +101,28 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
   ];
 
   return (
-    <div className="p-6 lg:p-10 space-y-10 max-w-7xl mx-auto">
-      {/* Header HUD */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      className="p-6 lg:p-10 space-y-10 max-w-7xl mx-auto relative"
+    >
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-aether-neon/10 to-transparent pointer-events-none" />
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.2 }}
+        className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6"
+      >
         <div className="space-y-2">
           <div className="flex items-center gap-2 md:gap-3">
-            <div className="w-8 md:w-10 h-8 md:h-10 rounded-lg md:rounded-xl bg-aether-neon/20 flex items-center justify-center border border-aether-neon/30 flex-shrink-0">
-              <Activity className="w-4 md:w-5 h-4 md:h-5 text-aether-neon animate-pulse" />
+            <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+              <GemigramLogo className="w-8 h-8 md:w-10 md:h-10" />
             </div>
-            <h1 className="text-2xl md:text-3xl font-black uppercase tracking-[0.2em] text-white">Gemigram Dashboard</h1>
+            <h1 className="text-2xl md:text-3xl font-black uppercase tracking-[0.2em] text-white">GEMIGRAM // <span className="text-aether-neon">OS</span></h1>
           </div>
-          <p className="text-white/40 font-mono text-xs md:text-[10px] uppercase tracking-widest pl-1 hidden sm:block">
-            Neural Link: {bridgeStatus === 'connected' ? 'Local Spine' : 'Cloud Direct'} • Status: Active
+          <p className="text-hud pl-1 hidden sm:block">
+            Neural_Link::{bridgeStatus === 'connected' ? 'LOCAL_SPINE' : 'CLOUD_DIRECT'} • Status::<span className="text-aether-neon">ACTIVE</span>
           </p>
         </div>
 
@@ -117,37 +130,37 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
           <motion.button 
             onClick={handleDiscoverProjects}
             disabled={isDiscovering}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            className={`px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl bg-white/5 border border-white/10 text-white font-bold text-xs md:text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-2 whitespace-nowrap ${isDiscovering ? 'opacity-50' : ''}`}
+            className={`px-4 md:px-6 py-2 md:py-3 aether-button rounded-xl font-bold text-xs md:text-[10px] uppercase tracking-widest flex items-center gap-2 whitespace-nowrap ${isDiscovering ? 'opacity-50' : ''}`}
           >
             <RefreshCw className={`w-3 md:w-3.5 h-3 md:h-3.5 ${isDiscovering ? 'animate-spin text-aether-neon' : ''}`} />
-            {isDiscovering ? 'Scanning...' : 'Sync Projects'}
+            {isDiscovering ? 'SCANNING...' : 'SYNC_PROJECTS'}
           </motion.button>
           
           <motion.button 
             onClick={onStartForge}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, y: -2, boxShadow: '0 0 25px rgba(0, 255, 65, 0.4)' }}
             whileTap={{ scale: 0.95 }}
-            className="px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl bg-white text-black font-black text-xs md:text-[10px] uppercase tracking-widest hover:bg-aether-neon transition-all flex items-center gap-2 whitespace-nowrap"
+            className="px-4 md:px-6 py-2 md:py-3 rounded-xl bg-aether-neon text-black font-black text-xs md:text-[10px] uppercase tracking-widest hover:bg-white transition-all flex items-center gap-2 whitespace-nowrap shadow-[0_0_20px_rgba(0,255,65,0.4)]"
           >
             <Sparkles className="w-3 md:w-3.5 h-3 md:h-3.5" />
-            <span className="hidden sm:inline">Create Agent</span>
-            <span className="sm:hidden">New</span>
+            <span className="hidden sm:inline">CREATE_ENTITY</span>
+            <span className="sm:hidden">NEW</span>
           </motion.button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Workspace Context Bar */}
       {userProjects.length > 0 && (
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="quantum-glass p-3 rounded-2xl border border-aether-neon/20 flex items-center gap-4 overflow-x-auto no-scrollbar"
+          className="aether-glass p-3 rounded-2xl border border-aether-neon/10 flex items-center gap-4 overflow-x-auto no-scrollbar"
         >
           <div className="flex items-center gap-2 px-3 border-r border-white/10">
             <Layers className="w-4 h-4 text-aether-neon" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-white/60 whitespace-nowrap">Active Workspace:</span>
+            <span className="text-hud text-white/60 whitespace-nowrap">ACTIVE_WORKSPACE:</span>
           </div>
           {userProjects.map((p) => (
             <button
@@ -165,31 +178,66 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
         </motion.div>
       )}
 
-      {/* Primary Metrics Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-        {stats.map((stat) => (
+      {/* Primary Metrics & Sub-Agents Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Left Column: Image-Perfect Stats */}
+        <div className="lg:col-span-1 space-y-6">
+          <NeuralNetworkGraph />
+          <SystemMetrics />
+        </div>
+
+        {/* Center/Right Column: Sub-Agent HUDs & Main Context */}
+        <div className="lg:col-span-3 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <MiniAgentHUD 
+              type="Memory" 
+              status="Analyzing workspace semantic clusters... 12.4GB indexed." 
+              isBusy={true} 
+            />
+            <MiniAgentHUD 
+              type="Skills" 
+              status="Toolsets standby. Ready for execution in 4 nodes." 
+            />
+          </div>
+
           <motion.div 
-            key={stat.label} 
-            whileHover={{ y: -4 }}
-            className="quantum-glass p-3 md:p-6 border border-white/5 rounded-2xl md:rounded-3xl relative overflow-hidden group cursor-pointer"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.1, delayChildren: 0.4 }
+              }
+            }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4"
           >
-            <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <stat.icon className="w-16 md:w-24 h-16 md:h-24" />
-            </div>
-            <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/40 mb-2 md:mb-3 line-clamp-2">{stat.label}</p>
-            <div className="flex items-end justify-between">
-              <span className="text-lg md:text-2xl font-bold text-white tracking-tight">{stat.value}</span>
-              <stat.icon className={`w-5 h-5 ${stat.color} mb-1`} />
-            </div>
+            {stats.map((stat) => (
+              <motion.div 
+                key={stat.label} 
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 }
+                }}
+                whileHover={{ y: -4, scale: 1.02 }}
+                className="aether-card p-4 border border-white/5 rounded-2xl cursor-pointer group hover:border-aether-neon/30 transition-colors"
+              >
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2 group-hover:text-aether-neon transition-colors">{stat.label}</p>
+                <div className="flex items-end justify-between">
+                  <span className="text-xl font-bold text-white tracking-[0.1em]">{stat.value}</span>
+                  <stat.icon className={`w-4 h-4 ${stat.color} mb-1 drop-shadow-[0_0_8px_rgba(0,ff,65,0.4)] group-hover:animate-pulse`} />
+                </div>
+              </motion.div>
+            ))}
           </motion.div>
-        ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10">
         {/* Active Agents Column */}
         <div className="lg:col-span-2 space-y-6">
            <div className="flex items-center justify-between px-2">
-            <h3 className="text-lg font-black uppercase tracking-widest text-white/80">Sovereign Entities</h3>
+            <h3 className="text-lg font-black uppercase tracking-widest text-white/80">Gemigram // Entities</h3>
             <span className="text-[10px] font-mono text-aether-neon/40">{agents.length} Nodes</span>
           </div>
           
@@ -200,33 +248,33 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
                 onClick={() => onSelectAgent(agent.id)}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="quantum-glass p-6 rounded-[32px] border border-white/5 hover:border-aether-neon/30 text-left transition-all group relative overflow-hidden"
+                className="aether-card p-6 rounded-[32px] border border-white/5 hover:border-aether-neon/30 text-left transition-all group"
               >
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20">
+                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10">
                   <Brain className="w-12 h-12" />
                 </div>
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-aether-neon/20 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-aether-neon/20 transition-all shadow-inner">
                     <Fingerprint className="w-6 h-6 text-white group-hover:text-aether-neon transition-colors" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-white text-lg group-hover:text-aether-neon transition-colors">{agent.name}</h4>
-                    <p className="text-[9px] font-mono text-white/30 uppercase tracking-widest">{agent.voiceName} Profile</p>
+                    <h4 className="font-bold text-white text-lg group-hover:text-aether-neon transition-colors tracking-tight">{agent.name}</h4>
+                    <p className="text-hud text-white/30">{agent.voiceName}_PROFILE</p>
                   </div>
                 </div>
-                <p className="text-xs text-white/60 mb-6 line-clamp-2 leading-relaxed">
+                <p className="text-sm text-white/60 mb-6 line-clamp-2 leading-relaxed font-body">
                   {agent.description}
                 </p>
                 <div className="flex items-center justify-between">
                   <div className="flex-1 mr-4">
                     <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
                       <div 
-                        className="bg-aether-neon h-full rounded-full transition-all duration-1000" 
+                        className="bg-aether-neon h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(0,255,65,0.5)]" 
                         style={{ width: `${60 + (agent.id.length % 30)}%` }}
                       />
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white transition-all transform group-hover:translate-x-1" />
+                  <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-aether-neon transition-all transform group-hover:translate-x-1" />
                 </div>
               </motion.button>
             ))}
@@ -247,14 +295,14 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
         <div className="space-y-6">
            <div className="flex items-center justify-between px-2">
             <h3 className="text-lg font-black uppercase tracking-widest text-white/80">Neural Status</h3>
-            <span className="text-[10px] font-mono text-emerald-400/60 font-bold">L-LINK: OK</span>
+            <span className="text-hud text-aether-neon font-bold">L-LINK::OK</span>
           </div>
 
-          <div className="quantum-glass p-8 rounded-[40px] border border-white/5 space-y-8">
+          <div className="aether-card p-8 rounded-[40px] border border-white/5 space-y-8">
             <div className="space-y-6">
               {systems.map((sys) => (
                 <div key={sys.name} className="space-y-3">
-                  <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-widest">
+                  <div className="flex justify-between items-center text-hud">
                     <span className="text-white/60">{sys.name}</span>
                     <span className={sys.status === 'Operational' || sys.status === 'Active' || sys.status === 'Secure' ? 'text-aether-neon' : 'text-amber-400'}>{sys.status}</span>
                   </div>
@@ -262,12 +310,12 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: `${sys.health}%` }}
-                      className={`h-full rounded-full ${sys.health > 90 ? 'bg-aether-neon' : 'bg-amber-400'}`}
+                      className={`h-full rounded-full shadow-[0_0_8px_rgba(0,255,65,0.4)] ${sys.health > 90 ? 'bg-aether-neon' : 'bg-amber-400'}`}
                     />
                   </div>
                   <div className="flex justify-between text-[8px] font-mono text-white/20 uppercase tracking-[0.2em]">
-                    <span>Health: {sys.health}%</span>
-                    <span>Lat: {sys.latency}</span>
+                    <span>HEALTH::{sys.health}%</span>
+                    <span>LATENCY::{sys.latency}</span>
                   </div>
                 </div>
               ))}
@@ -399,6 +447,6 @@ export default function SovereignDashboard({ user, agents, onStartForge, onSelec
           </motion.div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

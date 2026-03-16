@@ -2,22 +2,50 @@
 
 @theme {
   --color-carbon-black: #050505;
-  --color-carbon-surface: #0f0f0f;
-  --color-carbon-fiber: #1a1a1a;
+  --color-carbon-surface: #0a0a0a;
+  --color-carbon-fiber: #111111;
   --color-carbon-gray: #4a4a4a;
-  --color-carbon-neon: #39ff14; /* Cyber Neon Green */
-  --color-carbon-glass: rgba(255, 255, 255, 0.02);
-  --color-carbon-border: rgba(57, 255, 20, 0.1);
+  --color-aether-neon: #00ff41; /* Pure Matrix/Digital Green */
+  --color-neon-dim: rgba(0, 255, 65, 0.1);
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+  --color-glass-bg: rgba(5, 5, 5, 0.6);
   
   --font-heading: "Inter", sans-serif;
   --font-body: "Inter", sans-serif;
-  --font-mono: "Fira Code", monospace;
+  --font-mono: "IBM Plex Mono", monospace;
 
   --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-neon: pulse-neon 2s ease-in-out infinite;
 
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
+  }
+
+  @keyframes pulse-neon {
+    0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 65, 0.1); }
+    50% { box-shadow: 0 0 20px rgba(0, 255, 65, 0.3); }
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes flicker {
+    0% { opacity: 0.1; }
+    5% { opacity: 0.8; }
+    10% { opacity: 0.2; }
+    15% { opacity: 0.9; }
+    20% { opacity: 0.3; }
+    25% { opacity: 1; }
+    30% { opacity: 0.4; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes grid-move {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(40px); }
   }
 }
 
@@ -26,75 +54,109 @@
     @apply bg-carbon-black text-white/90 font-body antialiased;
     font-size: 15px;
     letter-spacing: -0.01em;
+    /* Carbon Fiber Matrix Pattern */
+    background-image: 
+      linear-gradient(45deg, #0a0a0a 25%, transparent 25%), 
+      linear-gradient(-45deg, #0a0a0a 25%, transparent 25%), 
+      linear-gradient(45deg, transparent 75%, #0a0a0a 75%), 
+      linear-gradient(-45deg, transparent 75%, #0a0a0a 75%);
+    background-size: 4px 4px;
+    background-color: #050505;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading tracking-tight font-semibold text-white;
+    @apply font-heading tracking-[0.05em] font-bold text-white uppercase;
   }
 }
 
 @layer utilities {
-  .cyber-glass {
-    @apply bg-white/[0.01] backdrop-blur-2xl border border-white/[0.05] shadow-[0_8px_32px_0_rgba(0,0,0,0.8)];
+  .aether-glass {
+    @apply bg-glass-bg backdrop-blur-[20px] border border-white/[0.05] shadow-[0_8px_32px_0_rgba(0,0,0,0.8)];
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
   }
 
-  .cyber-panel {
-    @apply bg-carbon-fiber/20 backdrop-blur-xl border border-white/[0.03];
+  .aether-card {
+    @apply aether-glass rounded-xl overflow-hidden relative;
   }
 
-  .cyber-button {
-    @apply relative overflow-hidden bg-white/[0.05] border border-white/10 hover:bg-carbon-neon/10 hover:border-carbon-neon/30 transition-all active:scale-95;
+  .aether-card::after {
+    content: "";
+    @apply absolute inset-0 pointer-events-none opacity-[0.03];
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 86c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm28-65c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm23-11c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-40 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm50 2c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm8-16c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-56 8c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm12 20c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm60-32c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-14-52c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm45 82c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-36-70c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-51 5c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm82-14c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-1 51c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-58 25c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm29-59c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-54 61c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm86 14c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-11-2c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM44 71c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-32-4c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm58-1c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-33-37c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm42 14c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-33 51c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-40-12c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm57 12c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-9-46c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM33 35c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-12-2c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm13-17c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm10 50c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm10-73c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm1-9c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm48 18c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm23 25c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-86-10c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm35 39c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm0-53c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-33 15c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm25 2c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-7 66c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-7-34c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM9 19c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm23 10c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-7-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm17 90c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm1-41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm33-26c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-7-39c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-4-1c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-1-10c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-35 8c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-41 12c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM15 8c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm46 13c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-11 69c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm20 1c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-6-33c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm20-5c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm1-20c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-56-12c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm69 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-9-4c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-10-56c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-1 33c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-33-14c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-10 10c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm71 44c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-10 4c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%2300ff41' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
   }
 
-  .cyber-accent-button {
-    @apply cyber-button bg-carbon-neon/5 border-carbon-neon/20 hover:bg-carbon-neon/20 hover:border-carbon-neon/40 text-carbon-neon;
+  .aether-button {
+    @apply relative overflow-hidden bg-white/[0.03] border border-white/10 hover:border-aether-neon transition-all duration-300;
+    @apply text-white/70 hover:text-aether-neon;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  }
+
+  .aether-button:hover {
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.1), inset 0 0 10px rgba(0, 255, 65, 0.05);
   }
 
   .text-neon {
-    @apply text-carbon-neon drop-shadow-[0_0_8px_rgba(57,255,20,0.3)];
+    @apply text-aether-neon drop-shadow-[0_0_8px_rgba(0,255,65,0.4)];
   }
 
-  .carbon-gradient {
-    @apply bg-gradient-to-br from-carbon-surface via-carbon-black to-carbon-black;
+  .text-hud {
+    @apply font-mono text-[10px] uppercase tracking-[0.2em] text-white/40;
   }
 
-  .gradient-border-neon {
-    position: relative;
-    border-radius: inherit;
+  .skeleton {
+    @apply bg-white/[0.03] animate-pulse rounded-md relative overflow-hidden;
   }
 
-  .gradient-border-neon::before {
+  .skeleton::after {
+    @apply absolute inset-0;
     content: "";
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(to bottom right, rgba(57, 255, 20, 0.2), transparent, rgba(255, 255, 255, 0.05));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.03),
+      transparent
+    );
+    transform: translateX(-100%);
+    animation: shimmer 2s infinite;
   }
-  .ambient-neon {
-    @apply absolute inset-0 bg-carbon-neon/10 blur-[150px] opacity-0 transition-opacity duration-300;
+
+  .carbon-fiber {
+    background: 
+      linear-gradient(45deg, #111 25%, transparent 25%), 
+      linear-gradient(-45deg, #111 25%, transparent 25%), 
+      linear-gradient(45deg, transparent 75%, #111 75%), 
+      linear-gradient(-45deg, transparent 75%, #111 75%);
+    background-size: 4px 4px;
+  }
+
+  .hud-grid {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  .scanline {
+    width: 100%;
+    height: 100px;
+    background: linear-gradient(to bottom, transparent, rgba(0, 255, 65, 0.05), transparent);
+    position: absolute;
+    animation: scanline 4s linear infinite;
   }
 }
 
-  @keyframes scanline {
-    0% { bottom: 100%; }
-    100% { bottom: -100px; }
-  }
+@keyframes scanline {
+  0% { top: -100px; }
+  100% { top: 100%; }
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  @apply bg-carbon-black;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+  @apply bg-aether-neon/20 rounded-full hover:bg-aether-neon/40 transition-colors;
 }
