@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { getFirestore, collection, doc, getDoc, setDoc, addDoc, onSnapshot, query, where, orderBy, getDocFromServer } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -14,19 +15,22 @@ const firebaseConfig = {
 let app;
 let db: any;
 let auth: any;
+let storage: any;
 
 if (typeof window !== 'undefined') {
   app = initializeApp(firebaseConfig);
   db = getFirestore(app);
   auth = getAuth(app);
+  storage = getStorage(app);
 } else {
   // Mock implementations for server-side/build-time
   app = {} as any;
   db = {} as any;
   auth = { currentUser: null } as any;
+  storage = {} as any;
 }
 
-export { db, auth };
+export { db, auth, storage };
 export const googleProvider = new GoogleAuthProvider();
 
 // Standard Scopes for GWS Discovery

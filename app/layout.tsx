@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body suppressHydrationWarning className="font-sans antialiased text-white selection:bg-aether-neon/30 overflow-x-hidden" style={{ backgroundColor: 'var(--color-carbon-black)' }}>
+      <body suppressHydrationWarning className="font-sans antialiased selection:bg-aether-neon/30 overflow-x-hidden bg-theme-primary text-theme-primary">
         <div className="fixed inset-0 pointer-events-none hud-grid opacity-10 z-[0]" />
         <AuthProvider>
           <AppShell>

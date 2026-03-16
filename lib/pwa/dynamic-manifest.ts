@@ -63,19 +63,17 @@ function generateManifestIcons(baseUrl: string): ManifestIcon[] {
 
 /**
  * Install agent as PWA
+ * Uses the permanent manifest route for reliable PWA installation
  */
 export async function installAgentAsPWA(config: AgentManifestConfig): Promise<boolean> {
   try {
-    const manifest = generateAgentManifest(config);
+    const { agent } = config;
     
-    // Create blob URL for dynamic manifest
-    const manifestBlob = new Blob([JSON.stringify(manifest)], {
-      type: 'application/json',
-    });
-    const manifestURL = URL.createObjectURL(manifestBlob);
+    // Use the permanent manifest route instead of blob URL
+    const manifestUrl = `/manifest/${agent.id}`;
     
     // Update or create manifest link
-    updateManifestLink(manifestURL);
+    updateManifestLink(manifestUrl);
     
     // Handle desktop browsers with beforeinstallprompt
     if (typeof window !== 'undefined') {
