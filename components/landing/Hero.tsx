@@ -1,10 +1,37 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Activity, Shield, Zap, Globe } from 'lucide-react';
+import { Activity, Shield, Zap, Globe, Users, Cpu, Network } from 'lucide-react';
 
 export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
+  const [mounted, setMounted] = useState(false);
+  const [stats, setStats] = useState({ agents: 0, latency: 0, uptime: 0 });
+
+  useEffect(() => {
+    setMounted(true);
+    // Animate counter for stats
+    const duration = 2000;
+    const steps = 60;
+    const interval = duration / steps;
+    let step = 0;
+    
+    const timer = setInterval(() => {
+      step++;
+      const progress = step / steps;
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      
+      setStats({
+        agents: Math.floor(2847 * easeOut),
+        latency: Math.floor(12 * easeOut),
+        uptime: Math.floor(99.99 * easeOut)
+      });
+      
+      if (step >= steps) clearInterval(timer);
+    }, interval);
+    
+    return () => clearInterval(timer);
+  }, []);
   return (
     <section className="relative min-h-[95vh] flex items-center justify-center pt-32 pb-20 overflow-hidden bg-carbon-black">
       {/* Subtle Carbon Fiber Background Pattern */}
@@ -76,25 +103,73 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
             </motion.button>
           </motion.div>
 
+          {/* Trust Indicators */}
           <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-12 mt-32 max-w-4xl mx-auto border-t border-white/[0.03] pt-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.8 }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mt-20 max-w-4xl mx-auto border-t border-white/[0.03] pt-10"
           >
             {[
-              { icon: Shield, label: 'Carbon Secure' },
-              { icon: Activity, label: 'L1 Latency' },
-              { icon: Zap, label: 'Neon Realtime' },
-              { icon: Globe, label: 'Edge Distributed' },
+              { icon: Shield, label: 'Carbon Secure', value: 'AES-256', color: 'text-neon-green' },
+              { icon: Activity, label: 'L1 Latency', value: `${stats.latency}ms`, color: 'text-neon-blue' },
+              { icon: Zap, label: 'Neon Realtime', value: '12ms', color: 'text-cyber-lime' },
+              { icon: Globe, label: 'Edge Distributed', value: '14 PoPs', color: 'text-electric-purple' },
             ].map((item, idx) => (
-              <div key={idx} className="flex flex-col items-center gap-3 group">
-                <item.icon className="w-5 h-5 text-carbon-neon/30 group-hover:text-carbon-neon transition-colors" />
-                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 group-hover:text-white/60 transition-colors">
+              <motion.div 
+                key={idx} 
+                className="flex flex-col items-center gap-3 group cursor-default"
+                whileHover={{ scale: 1.05, y: -5 }}
+              >
+                <div className={`p-3 rounded-xl bg-gradient-to-br from-white/5 to-transparent border border-white/10 group-hover:border-${item.color.split('-')[1]}-500/50 transition-all`}>
+                  <item.icon className={`w-5 h-5 ${item.color} opacity-60 group-hover:opacity-100 transition-opacity`} />
+                </div>
+                <span className="text-sm font-bold text-white">{item.value}</span>
+                <span className="text-[8px] font-black uppercase tracking-[0.25em] text-white/20 group-hover:text-white/50 transition-colors">
                   {item.label}
                 </span>
-              </div>
+              </motion.div>
             ))}
+          </motion.div>
+
+          {/* Active Agents Counter */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 1.2 }}
+            className="mt-16 p-6 cyber-panel rounded-2xl border border-neon-green/20 bg-gradient-to-br from-neon-green/5 to-transparent"
+          >
+            <div className="flex items-center justify-center gap-8">
+              <div className="text-center">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="w-4 h-4 text-neon-green" />
+                  <span className="text-xs font-black uppercase tracking-widest text-white/40">Active Agents</span>
+                </div>
+                <div className="text-4xl md:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-neon-green to-mint-chip">
+                  {mounted ? stats.agents.toLocaleString() : '0'}
+                </div>
+              </div>
+              <div className="w-px h-16 bg-gradient-to-b from-transparent via-neon-green/50 to-transparent" />
+              <div className="text-center">
+                <div className="flex items-center gap-2 mb-2">
+                  <Cpu className="w-4 h-4 text-neon-blue" />
+                  <span className="text-xs font-black uppercase tracking-widest text-white/40">Network Load</span>
+                </div>
+                <div className="text-4xl md:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-neon-blue to-electric-purple">
+                  2.4K
+                </div>
+              </div>
+              <div className="w-px h-16 bg-gradient-to-b from-transparent via-neon-blue/50 to-transparent" />
+              <div className="text-center">
+                <div className="flex items-center gap-2 mb-2">
+                  <Network className="w-4 h-4 text-electric-purple" />
+                  <span className="text-xs font-black uppercase tracking-widest text-white/40">Uptime</span>
+                </div>
+                <div className="text-4xl md:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-electric-purple to-pink-500">
+                  {mounted ? stats.uptime.toFixed(2) : '0'}%
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
