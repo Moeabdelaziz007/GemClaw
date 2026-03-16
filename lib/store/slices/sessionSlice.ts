@@ -142,7 +142,6 @@ export const createSessionSlice = (
       };
     }
 
-    console.log(`[SessionFSM] ${currentState} → ${newState} (${reason})`);
     set(updates);
     return true;
   },
@@ -223,7 +222,6 @@ export const createSessionSlice = (
         sessionMetadata: snapshot.metadata ? { ...snapshot.metadata } : null,
         consecutiveErrors: 0,
       });
-      console.log('[SessionFSM] Restored from snapshot');
       return true;
     } catch (err) {
       console.error('[SessionFSM] Restore failed:', err);
