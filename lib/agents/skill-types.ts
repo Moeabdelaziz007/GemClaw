@@ -189,3 +189,122 @@ export interface SkillEvent {
  * Callback type for skill event listeners
  */
 export type SkillEventListener = (event: SkillEvent) => void;
+
+/**
+ * MCP Provider definition - external service providers
+ */
+export interface MCPProvider {
+  /** Unique provider identifier */
+  id: string;
+  /** Human-readable provider name */
+  name: string;
+  /** Base URL for provider API */
+  baseUrl: string;
+  /** Authentication method required */
+  authType: 'oauth2' | 'api_key' | 'none';
+  /** OAuth scopes or API permissions needed */
+  scopes?: string[];
+  /** Provider description */
+  description?: string;
+  /** Provider documentation URL */
+  documentationUrl?: string;
+  /** Whether provider is enabled */
+  enabled: boolean;
+}
+
+/**
+ * MCP Server endpoint configuration
+ */
+export interface MCPServer {
+  /** Unique server identifier */
+  id: string;
+  /** Provider that hosts this server */
+  providerId: string;
+  /** Server name */
+  name: string;
+  /** Server endpoint URL */
+  endpoint: string;
+  /** Server version */
+  version: string;
+  /** Capabilities exposed by this server */
+  capabilities: string[];
+  /** Current connection status */
+  status: 'active' | 'inactive' | 'error' | 'connecting';
+  /** Last health check timestamp */
+  lastHealthCheck?: number;
+  /** Connection error message if any */
+  errorMessage?: string;
+}
+
+/**
+ * MCP Resource reference - remote data source
+ */
+export interface MCPResource {
+  /** Resource URI */
+  uri: string;
+  /** Resource name */
+  name: string;
+  /** Resource description */
+  description?: string;
+  /** MIME type of resource content */
+  mimeType?: string;
+  /** Resource size in bytes */
+  size?: number;
+  /** Last modified timestamp */
+  lastModified?: number;
+}
+
+/**
+ * MCP Tool capability - remote function invocation
+ */
+export interface MCPTool {
+  /** Tool identifier */
+  id: string;
+  /** Tool name */
+  name: string;
+  /** Tool description */
+  description: string;
+  /** JSON Schema for tool parameters */
+  inputSchema: Record<string, any>;
+  /** Whether tool requires confirmation */
+  requiresConfirmation: boolean;
+}
+
+/**
+ * MCP Prompt template - reusable prompt pattern
+ */
+export interface MCPPrompt {
+  /** Prompt identifier */
+  id: string;
+  /** Prompt name */
+  name: string;
+  /** Prompt description */
+  description?: string;
+  /** Prompt template text */
+  template: string;
+  /** Template variables */
+  variables?: string[];
+  /** Default arguments */
+  defaultArgs?: Record<string, any>;
+}
+
+/**
+ * MCP Connection profile - saved configuration
+ */
+export interface MCPConnectionProfile {
+  /** Profile identifier */
+  id: string;
+  /** Profile name */
+  name: string;
+  /** Connected servers */
+  servers: string[];
+  /** Authentication credentials (encrypted) */
+  credentials?: Record<string, string>;
+  /** Rate limiting settings */
+  rateLimits?: {
+    requestsPerMinute: number;
+    requestsPerHour: number;
+  };
+  /** Whether profile is active */
+  active: boolean;
+}
