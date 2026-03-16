@@ -15,6 +15,8 @@ build/
 .pnpm-store/
 .pnpm-debug.log
 .shadow/
-.next/
-out/
-.firebase/
+
+# Playwright
+playwright-report/
+test-results/
+e2e-results/
