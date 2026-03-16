@@ -9,10 +9,12 @@ interface ForgeChamberProps {
 const FORGE_STEPS = [
   { id: 'init', text: 'Calibrating Aetherial Frequencies...', icon: Sparkles, duration: 2000 },
   { id: 'soul', text: 'Synthesizing Neural Persona Matrix...', icon: Brain, duration: 3000 },
-  { id: 'limbs', text: 'Mapping Occupational Skill Directives...', icon: Cpu, duration: 2500 },
-  { id: 'memory', text: 'Constructing Vectorized Cognitive Relays...', icon: Database, duration: 3500 },
+  { id: 'persona', text: 'Injecting Cognitive Archetype...', icon: Fingerprint, duration: 2000 },
+  { id: 'skills', text: 'Activating Occupational Skill Directives...', icon: Cpu, duration: 2500 },
+  { id: 'memory', text: 'Initializing Semantic Memory Networks...', icon: Database, duration: 3500 },
   { id: 'identity', text: 'Inscribing Sovereign Digital Signature...', icon: Fingerprint, duration: 2000 },
   { id: 'package', text: 'Materializing .ath Entity...', icon: Package, duration: 2000 },
+  { id: 'heartbeat', text: 'Initiating Vital Signs Monitor...', icon: Sparkles, duration: 1500 },
 ];
 
 // Forge Chamber internal imports
@@ -198,14 +200,32 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
                 <DeployAgentButton
                   agent={{
                     id: agentId || 'agent',
-                    aetherId: `ath://${agentId}`,
-                    name: pendingManifest.name,
-                    role: pendingManifest.description,
-                    seed: pendingManifest.soul,
-                    voiceName: pendingManifest.voiceName,
-                    soul: pendingManifest.soul,
+                    aetherId: `ath://${agentId || 'agent'}`,
+                    name: pendingManifest.name || 'Agent',
+                    role: (pendingManifest as any).description || 'Assistant',
+                    users: '0',
+                    seed: pendingManifest.soul || 'analytical',
+                    systemPrompt: (pendingManifest as any).systemPrompt || 'You are a helpful assistant.',
+                    voiceName: pendingManifest.voiceName || 'Zephyr',
+                    soul: pendingManifest.soul || 'Analytical',
+                    memory: 'Sovereign memory initialized',
+                    skills_desc: 'Configured skills',
+                    rules: '',
+                    tools: {
+                      googleSearch: true,
+                      googleMaps: false,
+                      weather: true,
+                      news: false,
+                      crypto: false,
+                      calculator: true,
+                      semanticMemory: true,
+                    },
+                    skills: {
+                      gmail: false,
+                      calendar: false,
+                      drive: false,
+                    }
                   }}
-                  variant="primary"
                 />
                 
                 {/* Continue to Workspace Button */}

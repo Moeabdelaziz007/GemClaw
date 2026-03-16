@@ -7,7 +7,8 @@ import {
   CheckCircle, AlertCircle, Radio
 } from 'lucide-react';
 import { Agent } from '@/lib/store/useAetherStore';
-import { useLiveAPI } from '@/hooks/useLiveAPI';
+import { getRecommendedSkills, generateSkillsConfirmation } from '@/lib/agents/skills-assignment';
+import { getPersonaPrompt, matchPersonaFromDescription, enhanceSystemPromptWithPersona } from '@/lib/persona/persona-templates';
 
 interface VoiceState {
   isListening: boolean;
@@ -24,6 +25,8 @@ interface AgentFormData {
   voiceName: string;
   soul: string;
   rules: string;
+  persona?: string;
+  memoryDecay?: number;
   tools: any;
   skills: any;
 }
@@ -66,32 +69,9 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
     confidence: 1.0,
     status: 'idle'
   });
-  
-  // Initialize voice interaction with Gemini Live API
-  const {
-    isConnected,
-    isSpeaking: geminiSpeaking,
-    startSession,
-    sendAudio,
-    disconnect
-  } = useLiveAPI({
-    onMessage: handleGeminiResponse,
-    onError: handleVoiceError
-  });
 
-  useEffect(() => {
-    // Auto-start voice session on mount
-    startSession();
-    speakIntroduction();
-    
-    return () => {
-      disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    setVoiceState(prev => ({ ...prev, isSpeaking: geminiSpeaking, status: geminiSpeaking ? 'speaking' : 'idle' }));
-  }, [geminiSpeaking]);
+  // Connection status for UI display only (not using Gemini Live API here)
+  const isConnected = true;
 
   const speakIntroduction = () => {
     const introduction = `
@@ -140,38 +120,50 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
       
       recognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
-        setVoiceState(prev => ({ ...prev, isListening: false, status: 'processing' }));
+        const confidence = event.results[0][0].confidence;
+        setVoiceState(prev => ({ 
+          ...prev, 
+          isListening: false, 
+          status: 'processing',
+          confidence 
+        }));
         handleVoiceInput(transcript);
       };
       
       recognition.onerror = (event: any) => {
         console.error('[ForgeArchitect] Speech recognition error:', event.error);
         setVoiceState(prev => ({ ...prev, isListening: false, status: 'idle', confidence: 0.5 }));
+        // Retry on error
+        setTimeout(() => startListening(), 1000);
       };
       
       recognition.start();
     } else {
       console.warn('[ForgeArchitect] Speech recognition not supported');
-      // Fallback: proceed with low confidence
       handleVoiceInput('');
     }
   };
 
-  const handleGeminiResponse = (response: any) => {
-    const understoodText = response.text || '';
-    const confidence = response.confidence || 0.9;
-    
-    setVoiceState(prev => ({ ...prev, confidence }));
-    fillFormField(voiceState.currentStep, understoodText);
-  };
-
-  const handleVoiceError = (error: Error) => {
-    console.error('[ForgeArchitect] Voice error:', error);
-    setVoiceState(prev => ({ ...prev, confidence: 0.5 }));
-  };
-
   const handleVoiceInput = (transcript: string) => {
-    fillFormField(voiceState.currentStep, transcript);
+    if (!transcript) return;
+    
+    // Auto-detect skills from description when user provides it
+    if (voiceState.currentStep === 'description') {
+      const detectedSkills = getRecommendedSkills(transcript, transcript, formData.soul);
+      setFormData(prev => ({ 
+        ...prev, 
+        description: transcript,
+        skills: { ...prev.skills, ...detectedSkills }
+      }));
+      
+      // Auto-detect persona from description
+      const detectedPersona = matchPersonaFromDescription(transcript);
+      if (detectedPersona) {
+        setFormData(prev => ({ ...prev, persona: detectedPersona }));
+      }
+    } else {
+      fillFormField(voiceState.currentStep, transcript);
+    }
   };
 
   const fillFormField = (field: string, value: string) => {
@@ -188,7 +180,16 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
     if (currentIndex < steps.length - 1) {
       const nextStep = steps[currentIndex + 1];
       setVoiceState(prev => ({ ...prev, currentStep: nextStep }));
-      promptForStep(nextStep);
+      
+      // After soul selection, ask for persona
+      if (completedField === 'soul') {
+        setTimeout(() => {
+          setVoiceState(prev => ({ ...prev, currentStep: 'persona' }));
+          promptForStep('persona');
+        }, 1000);
+      } else {
+        promptForStep(nextStep);
+      }
     } else {
       finalizeCreation();
     }
@@ -197,29 +198,53 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
   const promptForStep = (step: string) => {
     const prompts: Record<string, string> = {
       name: 'What shall we call this entity?',
-      description: 'What is its core purpose or role?',
-      systemPrompt: 'How should it behave? Describe its personality.',
-      soul: 'What essence drives it? Analytical, creative, mystical, or warrior?',
+      description: 'What is its core purpose or role? Describe what it should do.',
+      systemPrompt: 'How should it behave? Describe its personality and communication style.',
+      soul: 'What essence drives it? Choose: Analytical (logical), Creative (artistic), Mystical (philosophical), Warrior (bold), or Empathetic (caring)?',
       voiceName: `Choose its voice: ${VOICES.join(', ')}.`,
-      rules: 'Any final directives or constraints?'
+      rules: 'Any final directives, constraints, or special instructions?'
     };
+    
+    // Add persona question after soul step
+    if (step === 'persona' && formData.soul) {
+      const personaPrompt = getPersonaPrompt();
+      speak(personaPrompt);
+      return;
+    }
     
     speak(prompts[step] || 'Continue...');
   };
 
   const finalizeCreation = () => {
-    speak(
-      `Excellent. ${formData.name} is now configured.
-       All parameters are set.
-       Initiating materialization sequence...
-       Prepare for manifestation.`
-    );
+    // Enhance system prompt with persona if available
+    let finalSystemPrompt = formData.systemPrompt;
+    if (formData.persona) {
+      finalSystemPrompt = enhanceSystemPromptWithPersona(formData.systemPrompt, formData.persona);
+    }
+    
+    const finalData = {
+      ...formData,
+      systemPrompt: finalSystemPrompt
+    };
+    
+    // Generate skills confirmation if skills were auto-detected
+    const enabledSkills = Object.entries(formData.skills).filter(([_, enabled]) => enabled);
+    let skillsMessage = '';
+    if (enabledSkills.length > 0) {
+      skillsMessage = generateSkillsConfirmation(formData.skills);
+    }
+    
+    const finalMessage = skillsMessage 
+      ? `${skillsMessage} System prompt enhanced with ${formData.persona || 'default'} persona. ${formData.name} is now configured. All parameters are set. Initiating materialization sequence... Prepare for manifestation.`
+      : `System prompt enhanced with ${formData.persona || 'default'} persona. ${formData.name} is now configured. All parameters are set. Initiating materialization sequence... Prepare for manifestation.`;
+    
+    speak(finalMessage);
     
     setVoiceState(prev => ({ ...prev, status: 'complete' }));
     
     setTimeout(() => {
-      onComplete(formData);
-    }, 3000);
+      onComplete(finalData);
+    }, 4000);
   };
 
   const getStatusColor = () => {
@@ -354,8 +379,8 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
         {/* Progress Steps */}
         <div className="px-10 py-6 border-t border-white/5 bg-black/40">
           <div className="flex items-center justify-between">
-            {['name', 'description', 'soul', 'voice', 'rules'].map((step, index) => {
-              const steps = ['name', 'description', 'systemPrompt', 'soul', 'voiceName', 'rules'];
+            {['name', 'description', 'soul', 'persona', 'voice', 'rules'].map((step, index) => {
+              const steps = ['name', 'description', 'systemPrompt', 'soul', 'persona', 'voiceName', 'rules'];
               const currentStepIndex = steps.indexOf(voiceState.currentStep);
               const stepIndex = steps.indexOf(step === 'voice' ? 'voiceName' : step);
               const isComplete = stepIndex < currentStepIndex;

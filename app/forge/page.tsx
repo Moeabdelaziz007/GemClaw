@@ -9,6 +9,8 @@ import { useRouter } from 'next/navigation';
 import { nanoid } from 'nanoid';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '@/firebase';
+import { createMemory } from '@/lib/memory/memory-store';
+import { startAgentHeartbeat } from '@/lib/agents/heartbeat';
 
 export default function ForgePage() {
   const { user } = useAuth();
@@ -63,6 +65,49 @@ export default function ForgePage() {
         ...newAgent,
         createdAt: serverTimestamp()
       });
+      
+      // Initialize agent's memory system with core memories
+      console.log('[ForgePage] Initializing memory system for agent:', agentId);
+      await createMemory({
+        agentId: agentId,
+        userId: user.uid,
+        type: 'semantic',
+        content: `Agent ${data.name} created with purpose: ${data.description}`,
+        importance: 1.0,
+        decay: data.memoryDecay || 0.01, // Default slow decay
+        accessCount: 0,
+        tags: ['creation', 'origin', 'core_directive', 'identity'],
+        metadata: {
+          source: 'agent_learning',
+          context: 'Initial memory imprint during forging',
+          soulType: data.soul,
+          personaType: data.persona || 'default'
+        }
+      });
+      
+      // Create second core memory for skills/purpose
+      await createMemory({
+        agentId: agentId,
+        userId: user.uid,
+        type: 'procedural',
+        content: `Primary operational directive: ${data.description}. Configured with tools and skills as specified.`,
+        importance: 0.95,
+        decay: 0.005, // Very slow decay for procedural knowledge
+        accessCount: 0,
+        tags: ['skills', 'directives', 'operational'],
+        metadata: {
+          source: 'agent_learning',
+          context: 'Skill and tool configuration during creation',
+          configuredTools: data.tools,
+          configuredSkills: data.skills
+        }
+      });
+      
+      console.log('[ForgePage] Memory system initialized successfully');
+      
+      // Start heartbeat monitoring for this agent
+      console.log('[ForgePage] Starting heartbeat monitor for:', agentId);
+      startAgentHeartbeat(agentId);
       
       setPendingAgentData(null);
       setPendingManifest(null);
