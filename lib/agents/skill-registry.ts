@@ -23,6 +23,49 @@ class SkillRegistry {
   /**
    * Private constructor to enforce singleton pattern
    */
+  /**
+   * Register a skill bundle
+   * @param bundle - Skill bundle definition
+   * @throws Error if bundle ID already exists
+   */
+  registerBundle(bundle: SkillBundle): void {
+    if (this.bundles.has(bundle.id)) {
+      throw new Error(`Bundle "${bundle.id}" is already registered.`);
+    }
+    this.bundles.set(bundle.id, bundle);
+  }
+  
+  /**
+   * Get a bundle by its ID
+   * @param id - Bundle identifier
+   * @returns Bundle definition or undefined if not found
+   */
+  getBundle(id: string): SkillBundle | undefined {
+    return this.bundles.get(id);
+  }
+  
+  /**
+   * Get all registered bundles
+   * @returns Array of all skill bundles
+   */
+  getAllBundles(): SkillBundle[] {
+    return Array.from(this.bundles.values());
+  }
+  
+  /**
+   * Get skills from a specific bundle
+   * @param bundleId - Bundle identifier
+   * @returns Array of skill definitions in the bundle
+   */
+  getBundleSkills(bundleId: string): SkillDefinition[] {
+    const bundle = this.bundles.get(bundleId);
+    if (!bundle) return [];
+    
+    return bundle.skills
+      .map(skillId => this.skills.get(skillId))
+      .filter((skill): skill is SkillDefinition => skill !== undefined);
+  }
+  
   private constructor() {}
   
   /**
@@ -372,6 +415,165 @@ class SkillRegistry {
   count(): number {
     return this.skills.size;
   }
+}
+
+/**
+ * Pre-configured skill bundles for common use cases
+ */
+const SKILL_BUNDLES: SkillBundle[] = [
+  // Self-Improvement Bundle
+  {
+    id: 'self_improver',
+    name: 'Self-Improver',
+    description: 'Enable agents to analyze performance and continuously improve',
+    skills: ['self_analysis', 'continuous_learning', 'performance_optimizer'],
+    targetPersona: 'Autonomous learning agents'
+  },
+  
+  // Proactive Agent Bundle
+  {
+    id: 'proactive_agent',
+    name: 'Proactive Assistant',
+    description: 'Anticipate needs and take autonomous actions with confirmation',
+    skills: ['proactive_tasks', 'intelligent_monitoring', 'event_driven_actions'],
+    targetPersona: 'Proactive personal assistants'
+  },
+  
+  // Creative Innovator Bundle
+  {
+    id: 'creative_innovator',
+    name: 'Creative Innovator',
+    description: 'Generate breakthrough ideas with advanced brainstorming techniques',
+    skills: ['creative_brainstorming', 'lateral_thinking', 'design_thinking', 'triz_innovation'],
+    targetPersona: 'Innovation consultants and creative professionals'
+  },
+  
+  // Full-Stack Developer Bundle
+  {
+    id: 'fullstack_developer',
+    name: 'Full-Stack Developer',
+    description: 'Complete development stack from frontend to cloud deployment',
+    skills: [
+      'frontend_development',
+      'backend_development',
+      'database_architect',
+      'devops_cicd',
+      'api_designer'
+    ],
+    targetPersona: 'Full-stack software developers'
+  },
+  
+  // Software Engineer Bundle
+  {
+    id: 'software_engineer',
+    name: 'Software Engineer',
+    description: 'Professional engineering practices and system architecture',
+    skills: [
+      'system_architect',
+      'code_quality',
+      'security_engineering',
+      'technical_writing',
+      'agile_project_management'
+    ],
+    targetPersona: 'Professional software engineers'
+  },
+  
+  // Polyglot Programmer Bundle
+  {
+    id: 'polyglot_programmer',
+    name: 'Polyglot Programmer',
+    description: 'Multi-language programming expertise across popular stacks',
+    skills: [
+      'python_expert',
+      'javascript_typescript',
+      'rust_programming',
+      'go_programming',
+      'java_enterprise'
+    ],
+    targetPersona: 'Versatile programmers'
+  },
+  
+  // Content Creator Pro Bundle
+  {
+    id: 'content_creator_pro',
+    name: 'Content Creator Pro',
+    description: 'Professional multimedia content creation suite',
+    skills: [
+      'video_production',
+      'podcast_production',
+      'graphic_design',
+      'copywriting_strategy'
+    ],
+    targetPersona: 'Digital content creators'
+  },
+  
+  // Ultimate AI Agent Bundle (All Skills)
+  {
+    id: 'ultimate_ai_agent',
+    name: 'Ultimate AI Agent',
+    description: 'Maximum capability agent with all advanced skills',
+    skills: [
+      // Self-improvement
+      'self_analysis',
+      'continuous_learning',
+      'performance_optimizer',
+      'error_recovery',
+      'quality_assurance',
+      // Proactive
+      'proactive_tasks',
+      'intelligent_monitoring',
+      'event_driven_actions',
+      'predictive_engagement',
+      // Brainstorming
+      'creative_brainstorming',
+      'lateral_thinking',
+      'design_thinking',
+      'triz_innovation',
+      'scenario_planning',
+      // Development
+      'frontend_development',
+      'backend_development',
+      'database_architect',
+      'devops_cicd',
+      'mobile_development',
+      'api_designer',
+      'cloud_infrastructure',
+      // Engineering
+      'system_architect',
+      'code_quality',
+      'security_engineering',
+      'technical_writing',
+      'agile_project_management',
+      // Polyglot
+      'python_expert',
+      'javascript_typescript',
+      'rust_programming',
+      'go_programming',
+      'java_enterprise',
+      'cpp_programming',
+      // Content Creation
+      'video_production',
+      'podcast_production',
+      'graphic_design',
+      'copywriting_strategy',
+      'three_d_animation',
+      'music_composition'
+    ],
+    targetPersona: 'Advanced autonomous AI entities'
+  }
+];
+
+/**
+ * Register all pre-configured skill bundles
+ */
+export function registerSkillBundles(): void {
+  SKILL_BUNDLES.forEach(bundle => {
+    try {
+      skillRegistry.registerBundle(bundle);
+    } catch (error) {
+      console.warn(`Failed to register bundle ${bundle.id}:`, error);
+    }
+  });
 }
 
 // Export singleton instance

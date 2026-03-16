@@ -18,7 +18,11 @@ export type SkillCategory =
   | 'social'
   | 'data'
   | 'integration'
-  | 'utility';
+  | 'utility'
+  | 'development'        // NEW: Development skills
+  | 'engineering'        // NEW: Software engineering skills
+  | 'meta_cognition'     // NEW: Self-improvement skills
+  | 'mcp_integration';   // NEW: MCP & external integrations
 
 /**
  * Permission types for security and access control
@@ -29,7 +33,10 @@ export type Permission =
   | 'execute'
   | 'network'
   | 'storage'
-  | 'api_access';
+  | 'api_access'
+  | 'autonomous_action'   // NEW: For proactive skills requiring user confirmation
+  | 'system_modification' // NEW: For self-improvement capabilities
+  | 'mcp_access';         // NEW: For MCP protocol-level access
 
 /**
  * Difficulty levels for skill complexity rating
