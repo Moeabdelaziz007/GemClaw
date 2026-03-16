@@ -18,19 +18,71 @@ export function DeployAgentButton({ agent, className }: DeployAgentButtonProps) 
   const [isInstalling, setIsInstalling] = useState(false);
   const [installSuccess, setInstallSuccess] = useState(false);
   const [installError, setInstallError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
+
+  // Validate agent before deployment
+  const validateAgent = (): boolean => {
+    const errors: string[] = [];
+    
+    if (!agent.name || agent.name.trim().length === 0) {
+      errors.push('Agent name is required');
+    }
+    
+    if (!agent.voiceName) {
+      errors.push('Voice configuration is missing');
+    }
+    
+    if (!agent.soul) {
+      errors.push('Soul/personality matrix is not configured');
+    }
+    
+    setValidationErrors(errors);
+    return errors.length === 0;
+  };
 
   const handleDeploy = async () => {
+    // Pre-deployment validation
+    if (!validateAgent()) {
+      setInstallError('Please complete all agent configuration fields');
+      return;
+    }
+    
     setIsInstalling(true);
     setInstallError(null);
+    setIsGeneratingAvatar(true);
     
     try {
-      // Generate avatar if not exists
+      // Step 1: Generate and validate avatar
+      console.log('[DeployAgent] Generating avatar...');
       const avatarUrl = await generateAgentAvatar({ agent });
       
-      // Save to Firebase Storage
-      const storedAvatarUrl = await saveAgentAvatar(agent.id || 'unknown', avatarUrl);
+      if (!avatarUrl || !avatarUrl.startsWith('data:image/')) {
+        throw new Error('Failed to generate valid avatar image');
+      }
       
-      // Install as PWA
+      setIsGeneratingAvatar(false);
+      console.log('[DeployAgent] Avatar generated successfully');
+      
+      // Step 2: Save to Firebase Storage with retry logic
+      let storedAvatarUrl: string;
+      let retries = 3;
+      
+      while (retries > 0) {
+        try {
+          storedAvatarUrl = await saveAgentAvatar(agent.id || 'unknown', avatarUrl);
+          break;
+        } catch (storageError) {
+          retries--;
+          if (retries === 0) throw storageError;
+          console.log(`[DeployAgent] Retrying avatar upload... (${retries} attempts left)`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+      
+      console.log('[DeployAgent] Avatar saved to Firebase Storage:', storedAvatarUrl);
+      
+      // Step 3: Install as PWA
       const success = await installAgentAsPWA({
         agent,
         avatarUrl: storedAvatarUrl,
@@ -50,10 +102,19 @@ export function DeployAgentButton({ agent, className }: DeployAgentButtonProps) 
         }, 5000);
       }
     } catch (error) {
-      console.error('Deploy failed:', error);
-      setInstallError(error instanceof Error ? error.message : 'Installation failed');
+      console.error('[DeployAgent] Deployment failed:', error);
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Installation failed. Please try again.';
+      setInstallError(errorMessage);
+      
+      // Auto-dismiss error after 10 seconds
+      setTimeout(() => {
+        setInstallError(null);
+      }, 10000);
     } finally {
       setIsInstalling(false);
+      setIsGeneratingAvatar(false);
     }
   };
 
@@ -70,11 +131,14 @@ export function DeployAgentButton({ agent, className }: DeployAgentButtonProps) 
         
         <Button
           onClick={handleDeploy}
-          disabled={isInstalling || installSuccess}
-          isLoading={isInstalling}
+          disabled={isInstalling || installSuccess || validationErrors.length > 0}
+          isLoading={isInstalling || isGeneratingAvatar}
+          loadingText={isGeneratingAvatar ? 'Generating Avatar...' : 'Deploying...'}
           leftIcon={
             installSuccess ? (
               <CheckCircle className="w-4 h-4 text-green-400" />
+            ) : isGeneratingAvatar ? (
+              <Monitor className="w-4 h-4 animate-pulse" />
             ) : (
               <Download className="w-4 h-4" />
             )
@@ -83,8 +147,29 @@ export function DeployAgentButton({ agent, className }: DeployAgentButtonProps) 
           size="lg"
           className="w-full mb-4"
         >
-          {installSuccess ? 'Deployed Successfully!' : 'Deploy to Device'}
+          {installSuccess ? 'Deployed Successfully!' : validationErrors.length > 0 ? 'Configuration Required' : 'Deploy to Device'}
         </Button>
+
+        {/* Validation Errors */}
+        {validationErrors.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl mb-4"
+          >
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+              <div className="space-y-1">
+                <p className="text-xs text-yellow-300 font-semibold">Missing Configuration:</p>
+                <ul className="text-xs text-yellow-200/80 list-disc list-inside space-y-0.5">
+                  {validationErrors.map((error, idx) => (
+                    <li key={idx}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Platform Info */}
         <div className="flex items-center justify-center gap-4 text-xs text-white/40 mb-4">
