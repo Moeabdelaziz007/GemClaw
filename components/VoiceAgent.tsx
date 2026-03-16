@@ -123,10 +123,9 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: VoiceAgentProps) 
         });
       }
 
-      // Universal ADK Project Tools
       functionDeclarations.push({
         name: "listProjects",
-        description: "List all Google Cloud/Firebase projects the user has access to.",
+        description: "List all Firebase projects the user has access to.",
         parameters: { type: "OBJECT", properties: {} }
       });
 
