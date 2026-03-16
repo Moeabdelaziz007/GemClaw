@@ -48,8 +48,8 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-lg md:text-xl text-white/30 max-w-2xl mx-auto mb-16 leading-relaxed font-medium"
           >
-            Deploy enterprise neural entities with sovereign data privacy. 
-            Native Gemini 1.5 Pro integration on a carbon-fiber secure spine.
+            Deploy enterprise neural entities with absolute sovereignty. 
+            Native <span className="text-white/60">Gemini 2.5 Flash</span> orchestration on a zero-latency carbon spine.
           </motion.p>
 
           <motion.div 

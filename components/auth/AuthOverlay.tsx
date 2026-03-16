@@ -50,10 +50,16 @@ export function AuthOverlay({ isOpen, onClose }: { isOpen: boolean, onClose: () 
             </button>
 
             <div className="text-center mb-12 relative z-10">
-              <div className="w-20 h-20 cyber-button rounded-3xl flex items-center justify-center mx-auto mb-8 border-carbon-neon/20 shadow-[0_0_30px_rgba(57,255,20,0.05)]">
+              <div className="w-20 h-20 cyber-button rounded-3xl flex items-center justify-center mx-auto mb-8 border-carbon-neon/20 shadow-[0_0_30px_rgba(57,255,20,0.05)] relative overflow-hidden">
                 <Fingerprint className="w-10 h-10 text-carbon-neon" />
+                {/* Industrial Scanning Bar */}
+                <motion.div 
+                  className="absolute left-0 right-0 h-0.5 bg-carbon-neon/50 shadow-[0_0_10px_#39ff14]"
+                  animate={{ top: ['0%', '100%', '0%'] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                />
               </div>
-              <h2 className="text-4xl font-black mb-3 tracking-tighter uppercase">Access Node</h2>
+              <h2 className="text-4xl font-black mb-3 tracking-tighter uppercase glitch-text">Access Node</h2>
               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">Authorized Biometric Protocol</p>
             </div>
 

@@ -31,8 +31,8 @@ export function BentoFeatures() {
       className: 'md:col-span-1 md:row-span-2 border-carbon-neon/10',
     },
     {
-      title: 'Graph Memory',
-      description: 'Persistent associative memory structures for long-term intelligence.',
+      title: 'Neural Spine',
+      description: 'Zero-latency Bi-Directional PCM streaming for sub-millisecond AI response.',
       icon: Layers,
       className: 'md:col-span-2 md:row-span-1',
     },

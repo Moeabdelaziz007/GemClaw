@@ -28,9 +28,10 @@ export async function handleNeuralTool(name: string, args: any) {
       const markdown = await response.text();
       return { 
         status: "success", 
-        content: markdown.substring(0, 10000), // Cap for context window
+        content: markdown.substring(0, 10000), 
         source: urlToRead,
-        method: "Jina-Stateless-Link"
+        method: "Jina-Stateless-Link",
+        synthesis: "Content extracted and mapped to neural context. Ready for analysis."
       };
     } catch (err) {
       return { status: "error", message: "Failed to read URL via Neural Link." };
@@ -113,7 +114,11 @@ export async function handleNeuralTool(name: string, args: any) {
         timestamp: Timestamp.now(),
         category: args.category || 'general'
       });
-      result = { status: "success", message: "Memory internalized." };
+      result = { 
+        status: "success", 
+        message: "Memory internalized.",
+        synthesis: "Successfully stored in permanent neural substrate. Ready for contextual recall."
+      };
     } catch (err) {
       result = { status: "error", message: "Failed to store memory substrate." };
     }

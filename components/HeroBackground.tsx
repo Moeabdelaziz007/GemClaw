@@ -30,8 +30,8 @@ export default function HeroBackground() {
         style={{ x: x1, y: y1 }}
         className="absolute inset-[-10%] opacity-20"
       >
-        <div className="absolute top-[10%] left-[10%] w-[50vw] h-[50vw] bg-blue-500/10 rounded-full blur-[160px]" />
-        <div className="absolute bottom-[10%] right-[10%] w-[40vw] h-[40vw] bg-white/5 rounded-full blur-[140px]" />
+        <div className="absolute top-[10%] left-[10%] w-[50vw] h-[50vw] bg-carbon-neon/5 rounded-full blur-[160px]" />
+        <div className="absolute bottom-[10%] right-[10%] w-[40vw] h-[40vw] bg-carbon-gray/10 rounded-full blur-[140px]" />
       </motion.div>
 
       {/* Surface Texture */}
