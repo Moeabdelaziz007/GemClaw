@@ -10,6 +10,7 @@ import { useAuth } from './Providers';
 import { usePathname } from 'next/navigation';
 import { useAetherStore } from '../lib/store/useAetherStore';
 import { ThemeToggle } from './ThemeToggle';
+import { useSystemTelemetry } from '../hooks/useSystemTelemetry';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -20,6 +21,7 @@ export default function AppShell({ children }: AppShellProps) {
   const [time, setTime] = useState(new Date());
   const pathname = usePathname();
   const { linkType } = useAetherStore();
+  const telemetry = useSystemTelemetry();
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 60000);
@@ -90,7 +92,9 @@ export default function AppShell({ children }: AppShellProps) {
                 <Cloud className="w-3.5 h-3.5 text-blue-400/50 group-hover:text-blue-400 transition-colors" />
                 <div className="flex flex-col">
                   <span className="text-[9px] font-bold text-white/40 group-hover:text-white transition-colors">Weather</span>
-                  <span className="text-[10px] font-mono font-bold text-white">24°C · Overcast</span>
+                  <span className="text-[10px] font-mono font-bold text-white">
+                    {telemetry.weather.temp}°C · {telemetry.weather.condition}
+                  </span>
                 </div>
               </div>
 
@@ -98,7 +102,7 @@ export default function AppShell({ children }: AppShellProps) {
                 <Activity className="w-3.5 h-3.5 text-gemigram-neon/50 group-hover:text-gemigram-neon transition-colors" />
                 <div className="flex flex-col">
                   <span className="text-[9px] font-bold text-white/40 group-hover:text-white transition-colors">Network</span>
-                  <span className="text-[10px] font-mono font-bold text-gemigram-neon">2.1ms Latency</span>
+                  <span className="text-[10px] font-mono font-bold text-gemigram-neon">{telemetry.latency}ms Latency</span>
                 </div>
               </div>
             </div>

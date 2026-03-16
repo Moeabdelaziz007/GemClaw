@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { Package, Globe, Zap, Search, Download, ExternalLink, Star, ShieldCheck, Terminal } from 'lucide-react';
 
 import { MarketplaceCardSkeleton } from './ui/Skeleton';
+import { apiMarketplaceClient } from '../lib/api-marketplace/marketplace-client';
+import { mcpMarketplaceConnector } from '../lib/mcp/marketplace-connector';
 
 const MARKETPLACE_CATEGORIES = [
   { id: 'mcp', label: 'MCP_Servers', icon: Package, color: 'gemigram-neon', desc: 'Protocol-level integrations for local & cloud services' },
@@ -43,10 +45,26 @@ const MARKET_DATA: Record<string, any[]> = {
 export function MarketplaceHub() {
   const [activeTab, setActiveTab] = useState('mcp');
   const [isLoading, setIsLoading] = React.useState(true);
+  const [marketData, setMarketData] = useState<Record<string, any[]>>({});
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1500);
-    return () => clearTimeout(timer);
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        if (activeTab === 'mcp') {
+          const servers = await mcpMarketplaceConnector.fetchFromOfficialRegistry();
+          setMarketData(prev => ({ ...prev, mcp: servers }));
+        } else if (activeTab === 'api') {
+          const apis = await apiMarketplaceClient.fetchFromRapidAPI();
+          setMarketData(prev => ({ ...prev, api: apis }));
+        }
+      } catch (err) {
+        console.error('Marketplace fetch failed:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
   }, [activeTab]);
 
   return (
@@ -84,7 +102,7 @@ export function MarketplaceHub() {
           </>
         ) : (
           <>
-            {MARKET_DATA[activeTab]?.map((item, i) => (
+            {marketData[activeTab]?.map((item, i) => (
               <MarketplaceCard key={i} item={item} type={activeTab} />
             ))}
           </>
