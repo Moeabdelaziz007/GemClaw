@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Sparkles, Cpu, Brain, Package, Fingerprint, Database } from 'lucide-react';
+import { Loader2, Sparkles, Cpu, Brain, Package, Fingerprint, Database, Rocket } from 'lucide-react';
 
 interface ForgeChamberProps {
   onComplete: () => void;
@@ -17,15 +17,21 @@ const FORGE_STEPS = [
 
 // Forge Chamber internal imports
 import { useAetherStore } from '@/lib/store/useAetherStore';
+import DeployAgentButton from './DeployAgentButton';
 
 export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
   const pendingManifest = useAetherStore(state => state.pendingManifest);
+  const setActiveAgentId = useAetherStore(state => state.setActiveAgentId);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isFlashing, setIsFlashing] = useState(false);
+  const [showDeployOption, setShowDeployOption] = useState(false);
   const [particleConfigs] = useState(() => Array.from({ length: 12 }).map(() => ({
     duration: 2 + Math.random(),
     delay: Math.random() * 2
   })));
+  
+  // Generate agent ID for deployment
+  const agentId = pendingManifest?.name ? pendingManifest.name.toLowerCase().replace(/\s+/g, '-') : null;
 
   const soulColor = React.useMemo(() => {
     if (!pendingManifest?.soul) return 'cyan';
@@ -61,15 +67,15 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
       }, 0);
       
       const flashTimer = setTimeout(() => {
-        onComplete();
-      }, 1000); // Flash duration
+        setShowDeployOption(true);
+      }, 1500); // Show deploy option after flash
       
       return () => {
         clearTimeout(timer);
         clearTimeout(flashTimer);
       };
     }
-  }, [currentStepIndex, onComplete]);
+  }, [currentStepIndex]);
 
   const currentStep = FORGE_STEPS[currentStepIndex];
 
@@ -162,6 +168,59 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
             transition={{ duration: 0.8, ease: "easeIn" }}
             className="absolute inset-0 bg-white z-50 pointer-events-none mix-blend-screen"
           />
+        )}
+      </AnimatePresence>
+      
+      {/* Deployment Option - Show after successful forge */}
+      <AnimatePresence>
+        {showDeployOption && pendingManifest && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-40"
+          >
+            <div className="flex flex-col items-center gap-6">
+              {/* Success Message */}
+              <div className="text-center space-y-2">
+                <h3 className="text-2xl font-bold text-white uppercase tracking-widest">
+                  Materialization Complete
+                </h3>
+                <p className="text-white/60">
+                  {pendingManifest.name} has been successfully forged
+                </p>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex items-center gap-4">
+                {/* Deploy as PWA Button */}
+                <DeployAgentButton
+                  agent={{
+                    id: agentId || 'agent',
+                    aetherId: `ath://${agentId}`,
+                    name: pendingManifest.name,
+                    role: pendingManifest.description,
+                    seed: pendingManifest.soul,
+                    voiceName: pendingManifest.voiceName,
+                    soul: pendingManifest.soul,
+                  }}
+                  variant="primary"
+                />
+                
+                {/* Continue to Workspace Button */}
+                <button
+                  onClick={() => {
+                    setActiveAgentId(agentId || '');
+                    onComplete();
+                  }}
+                  className="px-8 py-4 bg-white/5 border border-white/10 rounded-xl text-white hover:bg-white/10 transition-all uppercase tracking-wider font-semibold"
+                >
+                  Continue to Workspace
+                </button>
+              </div>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
