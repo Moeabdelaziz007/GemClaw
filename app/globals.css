@@ -112,6 +112,16 @@
     }
   }
   
+  /* Hide Scrollbar Utility */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
   /* ============================================
      RESPONSIVE BREAKPOINTS - Mobile First Approach
      sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px

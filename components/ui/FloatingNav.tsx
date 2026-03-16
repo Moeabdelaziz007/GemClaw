@@ -118,7 +118,7 @@ export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNa
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] hidden md:flex items-center gap-2 px-5 py-3 rounded-2xl aether-glass border border-white/5 shadow-2xl shadow-black/50"
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] hidden md:flex items-center gap-2 px-5 py-3 rounded-2xl aether-glass border border-white/5 shadow-2xl shadow-black/50 max-w-[90vw] overflow-x-auto overflow-y-hidden hide-scrollbar"
       >
         {ORBS_CONFIG.map((orb, index) => {
           const isActive = currentView === orb.id;
@@ -153,7 +153,7 @@ export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNa
         })}
 
         {/* User Profile Inline */}
-        <div className="ml-4 pl-4 border-l border-white/10">
+        <div className="ml-4 pl-4 border-l border-white/10 flex-shrink-0">
           {user ? (
             <div className="flex items-center gap-3">
               <div className="flex flex-col items-end">
