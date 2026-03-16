@@ -1,18 +1,26 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '@/components/Providers';
 import { useAetherStore } from '@/lib/store/useAetherStore';
 import { Search, Plus } from 'lucide-react';
 import { AgentCard } from '@/components/ui/AgentCard';
 import { useRouter } from 'next/navigation';
 
+import { AgentCardSkeleton } from '@/components/ui/Skeleton';
+
 export default function HubPage() {
   const { user } = useAuth();
   const { agents, setActiveAgentId, activeAgentId } = useAetherStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<'All' | 'AI Companion' | 'Creative Guide' | 'Specialist'>('All');
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredAgents = useMemo(() => {
     return agents.filter(agent => {
@@ -27,8 +35,8 @@ export default function HubPage() {
     <div className="p-8 max-w-6xl mx-auto h-full flex flex-col">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
-          <h2 className="text-4xl font-black tracking-tighter mb-2 uppercase">Agents Hub</h2>
-          <p className="text-slate-500 font-mono text-[10px] uppercase tracking-[0.2em]">Sovereign Entity Registry & Orchestration</p>
+          <h2 className="text-5xl font-black tracking-tighter mb-2 uppercase text-white bg-clip-text text-transparent bg-gradient-to-r from-white to-white/40">Neural_Hub</h2>
+          <p className="text-gemigram-neon/60 font-mono text-[9px] uppercase tracking-[0.4em]">Integrated_Sovereign_Registry</p>
         </div>
         
         <div className="flex items-center gap-4">
@@ -69,19 +77,27 @@ export default function HubPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 pb-20">
-        {filteredAgents.map((agent, i) => (
-          <AgentCard
-            key={agent.id}
-            name={agent.name}
-            role={agent.role}
-            status={activeAgentId === agent.id ? 'connected' : 'sleeping'}
-            color={i % 3 === 0 ? 'cyan' : i % 3 === 1 ? 'purple' : 'emerald'}
-            onClick={() => {
-              setActiveAgentId(agent.id);
-              router.push('/workspace');
-            }}
-          />
-        ))}
+        {isLoading ? (
+          <>
+            {[...Array(8)].map((_, i) => (
+              <AgentCardSkeleton key={i} />
+            ))}
+          </>
+        ) : (
+          filteredAgents.map((agent, i) => (
+            <AgentCard
+              key={agent.id}
+              name={agent.name}
+              role={agent.role}
+              status={activeAgentId === agent.id ? 'connected' : 'sleeping'}
+              color={i % 3 === 0 ? 'cyan' : i % 3 === 1 ? 'purple' : 'emerald'}
+              onClick={() => {
+                setActiveAgentId(agent.id);
+                router.push('/workspace');
+              }}
+            />
+          ))
+        )}
         
         {filteredAgents.length === 0 && (
           <div className="col-span-full py-20 text-center flex flex-col items-center">

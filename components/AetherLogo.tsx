@@ -17,7 +17,7 @@ export const GemigramLogo = ({ variant = 'icon', size = 48, className = '' }: Ge
       <div className={`relative flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
         {/* Neural Core Glow */}
         <motion.div
-          className="absolute inset-0 bg-aether-neon/10 rounded-full blur-2xl"
+          className="absolute inset-0 bg-gemigram-neon/10 rounded-full blur-2xl"
           animate={{ scale: [1, 1.4, 1], opacity: [0.2, 0.4, 0.2] }}
           transition={{ duration: 4, repeat: Infinity }}
         />
@@ -108,10 +108,10 @@ export const GemigramLogo = ({ variant = 'icon', size = 48, className = '' }: Ge
             GEMIGRAM
           </span>
           <span 
-            className="text-aether-neon font-bold tracking-[0.4em] uppercase leading-none mt-1"
+            className="text-gemigram-neon font-bold tracking-[0.4em] uppercase leading-none mt-1"
             style={{ fontSize: size * 0.12 }}
           >
-            AETHER OS
+            AIOS v3.0
           </span>
         </div>
       </div>
@@ -130,10 +130,10 @@ export const GemigramLogo = ({ variant = 'icon', size = 48, className = '' }: Ge
           GEMIGRAM
         </span>
         <span 
-          className="text-aether-neon font-bold tracking-[0.4em] uppercase leading-none mt-1"
+          className="text-gemigram-neon font-bold tracking-[0.4em] uppercase leading-none mt-1"
           style={{ fontSize: size * 0.1 }}
         >
-          AETHER OS
+          AIOS v3.0
         </span>
       </div>
     </div>

@@ -68,8 +68,8 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden" ref={containerRef}>
-      {/* Background Atmosphere - Aether Void */}
-      <div className="absolute inset-0 bg-aether-black" />
+      {/* Background Atmosphere - Sovereign Void */}
+      <div className="absolute inset-0 bg-theme-primary" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,240,255,0.05)_0%,transparent_70%)]" />
       
       {/* Neural Link Status Decor */}
@@ -81,7 +81,7 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
             exit={{ opacity: 0 }}
             className="absolute top-10 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] backdrop-blur-sm z-20"
           >
-            <ShieldCheck className={`w-3 h-3 ${isLocal ? 'text-purple-400' : 'text-aether-neon'}`} />
+            <ShieldCheck className={`w-3 h-3 ${isLocal ? 'text-purple-400' : 'text-gemigram-neon'}`} />
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
               {isLocal ? 'Local Spine Link Active' : 'Cloud Direct Link Active'}
             </span>
@@ -237,7 +237,7 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
             <div className="flex items-center gap-3 px-4 py-1.5 rounded-full border border-white/5 bg-white/[0.02] backdrop-blur-md">
               <div className={`w-2 h-2 rounded-full shadow-[0_0_8px_currentColor] ${
                 state === 'Disconnected' ? 'text-white/20 bg-white/20' : 
-                state === 'Listening' ? (isLocal ? 'text-purple-400 bg-purple-400 animate-pulse' : 'text-aether-neon bg-aether-neon animate-pulse') :
+                state === 'Listening' ? (isLocal ? 'text-purple-400 bg-purple-400 animate-pulse' : 'text-gemigram-neon bg-gemigram-neon animate-pulse') :
                 state === 'Thinking' ? 'text-purple-500 bg-purple-500 animate-pulse' :
                 (isLocal ? 'text-purple-300 bg-purple-300 animate-bounce' : 'text-emerald-400 bg-emerald-400 animate-bounce')
               }`} />
@@ -263,8 +263,8 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
       <div className="absolute inset-0 pointer-events-none">
         {[
           { label: 'Memory', icon: Brain, color: 'text-purple-400' },
-          { label: 'Neural', icon: Cpu, color: 'text-aether-neon' },
-          { label: 'Aether', icon: Zap, color: 'text-emerald-400' },
+          { label: 'Neural', icon: Cpu, color: 'text-gemigram-neon' },
+          { label: 'Gemi', icon: Zap, color: 'text-emerald-400' },
           { label: 'Identity', icon: ShieldCheck, color: 'text-blue-400' }
         ].map((sys, i) => (
           <motion.div

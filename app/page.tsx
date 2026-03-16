@@ -27,21 +27,19 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen selection:bg-gemigram-neon/20 overflow-x-hidden" style={{ backgroundColor: 'var(--bg-primary)' }}>
-      <HeroBackground />
-      
       <EnterpriseHeader onLogin={() => setIsAuthOpen(true)} />
       
       <main className="relative z-10">
         <EnterpriseHero onLogin={() => setIsAuthOpen(true)} />
         
         {/* Industry Trust Bar */}
-        <section className="py-24 border-y border-white/[0.03] bg-carbon-fiber/10 relative overflow-hidden">
-           <div className="absolute inset-0 opacity-[0.01] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-           <div className="container mx-auto px-6 flex flex-wrap justify-between items-center gap-12 opacity-20 grayscale hover:grayscale-0 transition-all duration-700">
-             <div className="text-xl font-black tracking-[0.4em] text-white uppercase italic">ORACLE.NODE</div>
-             <div className="text-xl font-black tracking-[0.4em] text-white uppercase italic">NEXUS.SPINE</div>
-             <div className="text-xl font-black tracking-[0.4em] text-white uppercase italic">LATTICE.NEON</div>
-             <div className="text-xl font-black tracking-[0.4em] text-white uppercase italic">VERTEX.CARBON</div>
+        <section className="py-24 border-y border-gemigram-neon/10 bg-black/50 relative overflow-hidden">
+           <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+           <div className="container mx-auto px-6 flex flex-wrap justify-between items-center gap-12 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+             <div className="text-2xl font-black tracking-[0.6em] text-white uppercase italic hover:text-gemigram-neon transition-colors cursor-default">ORACLE.NODE</div>
+             <div className="text-2xl font-black tracking-[0.6em] text-white uppercase italic hover:text-gemigram-neon transition-colors cursor-default">NEXUS.SPINE</div>
+             <div className="text-2xl font-black tracking-[0.6em] text-white uppercase italic hover:text-gemigram-neon transition-colors cursor-default">LATTICE.NEON</div>
+             <div className="text-2xl font-black tracking-[0.6em] text-white uppercase italic hover:text-gemigram-neon transition-colors cursor-default">VERTEX.CARBON</div>
           </div>
         </section>
 
@@ -140,25 +138,27 @@ export default function LandingPage() {
         </section>
         
         {/* Final Interactive CTA Section */}
-        <section className="py-32 relative">
+        <section className="py-40 relative">
           <div className="container mx-auto px-6">
-            <div className="max-w-4xl mx-auto cyber-glass p-16 rounded-[3rem] border-gemigram-neon/10 text-center relative overflow-hidden">
-              <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-              <h2 className="text-4xl md:text-6xl font-black mb-8 tracking-tighter uppercase relative z-10">
-                Ready for <span className="text-gemigram-neon">Sovereignty?</span>
+            <div className="max-w-5xl mx-auto sovereign-glass p-20 text-center relative overflow-hidden group">
+              <div className="absolute inset-0 opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+              <div className="absolute -top-24 -left-24 w-64 h-64 bg-gemigram-neon/10 blur-[100px] rounded-full group-hover:bg-gemigram-neon/20 transition-all duration-1000" />
+              
+              <h2 className="text-5xl md:text-8xl font-black mb-10 tracking-tighter uppercase relative z-10 leading-none">
+                Ready for <span className="text-gemigram-neon animate-pulse">Sovereignty?</span>
               </h2>
-              <p className="text-white/30 text-lg mb-12 max-w-xl mx-auto font-medium relative z-10">
-                Join the mainnet and initialize your first neural entity in seconds. 
+              <p className="text-white/40 text-xl mb-16 max-w-2xl mx-auto font-black uppercase tracking-[0.2em] relative z-10">
+                Join the mainnet and initialize your first neural entity in seconds. <br />
                 Experience Zero-Friction intelligence.
               </p>
               <div className="relative z-10">
                 <motion.button
                   onClick={() => setIsAuthOpen(true)}
-                  whileHover={{ scale: 1.05, boxShadow: '0 0 50px rgba(57,255,20,0.15)' }}
+                  whileHover={{ scale: 1.05, boxShadow: '0 0 80px rgba(57,255,20,0.6)' }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-16 py-6 cyber-accent-button rounded-2xl text-xl font-black uppercase tracking-widest"
+                  className="px-24 py-8 bg-gemigram-neon text-black rounded-full text-2xl font-black uppercase tracking-[0.3em] shadow-[0_0_50px_rgba(57,255,20,0.4)] transition-all"
                 >
-                  Launch Terminal
+                  Launch_Terminal
                 </motion.button>
               </div>
             </div>

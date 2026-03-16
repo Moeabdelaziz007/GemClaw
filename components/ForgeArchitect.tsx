@@ -1,20 +1,20 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, Mic, MicOff, Brain, Zap, Activity,
-  CheckCircle, AlertCircle, Radio
+  CheckCircle, AlertCircle, Radio, Terminal, Shield, Cpu
 } from 'lucide-react';
 import { Agent } from '@/lib/store/useAetherStore';
-import { getRecommendedSkills, generateSkillsConfirmation } from '@/lib/agents/skills-assignment';
-import { getPersonaPrompt, matchPersonaFromDescription, enhanceSystemPromptWithPersona } from '@/lib/persona/persona-templates';
+import { getRecommendedSkills, synthesizeAgentMetadata } from '@/lib/agents/skills-assignment';
+import { matchPersonaFromDescription, enhanceSystemPromptWithPersona } from '@/lib/persona/persona-templates';
+import { CinematicDeploy } from './ui/CinematicDeploy';
 
 interface VoiceState {
   isListening: boolean;
   isSpeaking: boolean;
-  currentStep: string;
-  confidence: number;
+  currentStep: 'intro' | 'description' | 'synthesis' | 'blueprint' | 'complete';
   status: 'idle' | 'listening' | 'processing' | 'speaking' | 'complete';
 }
 
@@ -24,11 +24,10 @@ interface AgentFormData {
   systemPrompt: string;
   voiceName: string;
   soul: string;
-  rules: string;
-  persona?: string;
-  memoryDecay?: number;
+  role: string;
   tools: any;
   skills: any;
+  persona?: string;
 }
 
 interface ForgeArchitectProps {
@@ -44,63 +43,38 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
     description: '',
     systemPrompt: '',
     voiceName: 'Zephyr',
-    soul: '',
-    rules: '',
-    tools: {
-      googleSearch: true,
-      googleMaps: false,
-      weather: true,
-      news: false,
-      crypto: false,
-      calculator: true,
-      semanticMemory: true,
-    },
-    skills: {
-      gmail: false,
-      calendar: false,
-      drive: false,
-    }
+    soul: 'Analytical',
+    role: '',
+    tools: {},
+    skills: {}
   });
   
   const [voiceState, setVoiceState] = useState<VoiceState>({
     isListening: false,
     isSpeaking: false,
-    currentStep: 'name',
-    confidence: 1.0,
+    currentStep: 'intro',
     status: 'idle'
   });
 
-  // Connection status for UI display only (not using Gemini Live API here)
-  const isConnected = true;
+  const [showDeployment, setShowDeployment] = useState(false);
 
-  const speakIntroduction = () => {
-    const introduction = `
-      Welcome to the Aether Forge. 
-      I am the Architect. 
-      Together, we will materialize a new Sovereign Intelligence.
-      
-      Tell me... what designation shall we bestow upon this entity?
-    `;
-    
-    speak(introduction);
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      speak("Welcome to the Neural Forge. Describe the entity you wish to materialize.");
+      setVoiceState(prev => ({ ...prev, currentStep: 'description' }));
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const speak = (text: string) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.pitch = 0.9;
-      utterance.rate = 1.0;
-      utterance.volume = 1.0;
-      
-      utterance.onstart = () => {
-        setVoiceState(prev => ({ ...prev, isSpeaking: true, status: 'speaking' }));
-      };
-      
+      utterance.onstart = () => setVoiceState(prev => ({ ...prev, isSpeaking: true, status: 'speaking' }));
       utterance.onend = () => {
         setVoiceState(prev => ({ ...prev, isSpeaking: false, status: 'listening' }));
-        startListening();
+        if (voiceState.currentStep === 'description') startListening();
       };
-      
       speechSynthesis.speak(utterance);
     }
   };
@@ -109,306 +83,204 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
-      
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
-      
-      recognition.onstart = () => {
-        setVoiceState(prev => ({ ...prev, isListening: true, status: 'listening' }));
-      };
-      
+      recognition.onstart = () => setVoiceState(prev => ({ ...prev, isListening: true, status: 'listening' }));
       recognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
-        const confidence = event.results[0][0].confidence;
-        setVoiceState(prev => ({ 
-          ...prev, 
-          isListening: false, 
-          status: 'processing',
-          confidence 
-        }));
-        handleVoiceInput(transcript);
+        setVoiceState(prev => ({ ...prev, isListening: false, status: 'processing' }));
+        handleSynthesis(transcript);
       };
-      
-      recognition.onerror = (event: any) => {
-        console.error('[ForgeArchitect] Speech recognition error:', event.error);
-        setVoiceState(prev => ({ ...prev, isListening: false, status: 'idle', confidence: 0.5 }));
-        // Retry on error
-        setTimeout(() => startListening(), 1000);
-      };
-      
+      recognition.onerror = () => setVoiceState(prev => ({ ...prev, isListening: false, status: 'idle' }));
       recognition.start();
-    } else {
-      console.warn('[ForgeArchitect] Speech recognition not supported');
-      handleVoiceInput('');
     }
   };
 
-  const handleVoiceInput = (transcript: string) => {
-    if (!transcript) return;
+  const handleSynthesis = (transcript: string) => {
+    setVoiceState(prev => ({ ...prev, currentStep: 'synthesis' }));
     
-    // Auto-detect skills from description when user provides it
-    if (voiceState.currentStep === 'description') {
-      const detectedSkills = getRecommendedSkills(transcript, transcript, formData.soul);
-      setFormData(prev => ({ 
-        ...prev, 
-        description: transcript,
-        skills: { ...prev.skills, ...detectedSkills }
-      }));
-      
-      // Auto-detect persona from description
-      const detectedPersona = matchPersonaFromDescription(transcript);
-      if (detectedPersona) {
-        setFormData(prev => ({ ...prev, persona: detectedPersona }));
-      }
-    } else {
-      fillFormField(voiceState.currentStep, transcript);
-    }
-  };
-
-  const fillFormField = (field: string, value: string) => {
-    if (!value) return;
-    
-    setFormData(prev => ({ ...prev, [field]: value }));
-    setTimeout(() => progressToNextStep(field), 800);
-  };
-
-  const progressToNextStep = (completedField: string) => {
-    const steps = ['name', 'description', 'systemPrompt', 'soul', 'voiceName', 'rules'];
-    const currentIndex = steps.indexOf(completedField);
-    
-    if (currentIndex < steps.length - 1) {
-      const nextStep = steps[currentIndex + 1];
-      setVoiceState(prev => ({ ...prev, currentStep: nextStep }));
-      
-      // After soul selection, ask for persona
-      if (completedField === 'soul') {
-        setTimeout(() => {
-          setVoiceState(prev => ({ ...prev, currentStep: 'persona' }));
-          promptForStep('persona');
-        }, 1000);
-      } else {
-        promptForStep(nextStep);
-      }
-    } else {
-      finalizeCreation();
-    }
-  };
-
-  const promptForStep = (step: string) => {
-    const prompts: Record<string, string> = {
-      name: 'What shall we call this entity?',
-      description: 'What is its core purpose or role? Describe what it should do.',
-      systemPrompt: 'How should it behave? Describe its personality and communication style.',
-      soul: 'What essence drives it? Choose: Analytical (logical), Creative (artistic), Mystical (philosophical), Warrior (bold), or Empathetic (caring)?',
-      voiceName: `Choose its voice: ${VOICES.join(', ')}.`,
-      rules: 'Any final directives, constraints, or special instructions?'
-    };
-    
-    // Add persona question after soul step
-    if (step === 'persona' && formData.soul) {
-      const personaPrompt = getPersonaPrompt();
-      speak(personaPrompt);
-      return;
-    }
-    
-    speak(prompts[step] || 'Continue...');
-  };
-
-  const finalizeCreation = () => {
-    // Enhance system prompt with persona if available
-    let finalSystemPrompt = formData.systemPrompt;
-    if (formData.persona) {
-      finalSystemPrompt = enhanceSystemPromptWithPersona(formData.systemPrompt, formData.persona);
-    }
-    
-    const finalData = {
-      ...formData,
-      systemPrompt: finalSystemPrompt
-    };
-    
-    // Generate skills confirmation if skills were auto-detected
-    const enabledSkills = Object.entries(formData.skills).filter(([_, enabled]) => enabled);
-    let skillsMessage = '';
-    if (enabledSkills.length > 0) {
-      skillsMessage = generateSkillsConfirmation(formData.skills);
-    }
-    
-    const finalMessage = skillsMessage 
-      ? `${skillsMessage} System prompt enhanced with ${formData.persona || 'default'} persona. ${formData.name} is now configured. All parameters are set. Initiating materialization sequence... Prepare for manifestation.`
-      : `System prompt enhanced with ${formData.persona || 'default'} persona. ${formData.name} is now configured. All parameters are set. Initiating materialization sequence... Prepare for manifestation.`;
-    
-    speak(finalMessage);
-    
-    setVoiceState(prev => ({ ...prev, status: 'complete' }));
+    // Core Neural Inference
+    const { suggestedName, suggestedRole, tools } = synthesizeAgentMetadata(transcript);
+    const skills = getRecommendedSkills(transcript, suggestedRole);
+    const persona = matchPersonaFromDescription(transcript) || 'ANALYST';
     
     setTimeout(() => {
-      onComplete(finalData);
-    }, 4000);
+      setFormData({
+        ...formData,
+        name: suggestedName,
+        description: transcript,
+        role: suggestedRole,
+        tools,
+        skills,
+        persona,
+        systemPrompt: `You are ${suggestedName}, a ${suggestedRole}. Purpose: ${transcript}`
+      });
+      setVoiceState(prev => ({ ...prev, currentStep: 'blueprint', status: 'idle' }));
+      speak(`Neural Synthesis complete. I have modeled ${suggestedName}. Review the blueprint before materialization.`);
+    }, 2500);
   };
 
-  const getStatusColor = () => {
-    switch (voiceState.status) {
-      case 'listening': return 'text-cyan-400';
-      case 'speaking': return 'text-fuchsia-400';
-      case 'processing': return 'text-yellow-400';
-      case 'complete': return 'text-green-400';
-      default: return 'text-white/40';
-    }
-  };
-
-  const getStatusIcon = () => {
-    switch (voiceState.status) {
-      case 'listening': return <Mic className="w-8 h-8 animate-pulse" />;
-      case 'speaking': return <Radio className="w-8 h-8 animate-pulse" />;
-      case 'processing': return <Brain className="w-8 h-8 animate-spin" />;
-      case 'complete': return <CheckCircle className="w-8 h-8" />;
-      default: return <MicOff className="w-8 h-8" />;
-    }
+  const finalizeMaterialization = () => {
+    const finalSystemPrompt = enhanceSystemPromptWithPersona(formData.systemPrompt, formData.persona || 'ANALYST');
+    const finalData = { ...formData, systemPrompt: finalSystemPrompt };
+    
+    setShowDeployment(true);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/90 backdrop-blur-3xl overflow-hidden">
-      {/* HUD Background Effects */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(0,240,255,0.05),transparent_70%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:40px_40px]" />
-      </div>
-
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-4xl h-[85vh] sm:h-[80vh] bg-[#03070C]/80 border border-white/5 rounded-[32px] sm:rounded-[40px] shadow-2xl relative flex flex-col overflow-hidden mx-2 sm:mx-4"
-      >
-        {/* Header HUD */}
-        <div className="px-4 sm:px-6 md:px-10 py-4 sm:py-6 md:py-8 border-b border-white/5 flex items-center justify-between bg-black/40">
-          <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-aether-neon/10 border border-aether-neon/30 flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-aether-neon animate-pulse" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-lg sm:text-xl md:text-2xl font-black uppercase tracking-widest text-white truncate">Aether Forge</h1>
-              <p className="text-hud text-white/40 text-xs sm:text-sm hidden xs:block">Voice-Only Interface</p>
-            </div>
-          </div>
-          
-          {/* Connection Status */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            <Activity className={`w-3 h-3 sm:w-4 sm:h-4 ${isConnected ? 'text-green-400' : 'text-red-400'}`} />
-            <span className="text-hud text-white/40 text-xs sm:text-sm hidden sm:inline">{isConnected ? 'LINKED' : 'DISCONNECTED'}</span>
-          </div>
-        </div>
-
-        {/* Main Voice Interface */}
-        <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 lg:p-12 relative overflow-y-auto">
-          {/* Central Voice Orb */}
-          <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mb-6 sm:mb-8 md:mb-12">
-            {/* Pulsing Core */}
-            <motion.div 
-              className={`absolute inset-0 rounded-full blur-[30px] sm:blur-[40px] ${getStatusColor()}`}
-              animate={{ 
-                scale: voiceState.isSpeaking ? [1, 1.3, 1] : [1, 1.05, 1],
-                opacity: voiceState.isSpeaking ? [0.6, 1, 0.6] : 0.4
-              }}
-              transition={{ duration: voiceState.isSpeaking ? 1.5 : 3, repeat: Infinity }}
-            />
-            
-            {/* Icon Container */}
-            <div className="relative w-full h-full flex items-center justify-center">
-              <div className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full bg-white/5 border-2 border-white/20 flex items-center justify-center ${getStatusColor()}`}>
-                <div className="text-center">
-                  <div className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-widest">
-                    ORD
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-3xl overflow-hidden selection:bg-gemigram-neon/30">
+      <AnimatePresence>
+        {!showDeployment ? (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.1 }}
+            className="w-full max-w-5xl aspect-video sovereign-glass border border-white/10 rounded-[40px] shadow-2xl relative flex flex-col overflow-hidden mx-4"
+          >
+            {/* HUD Content Mapping to reference image style */}
+            <div className="p-8 pb-0 flex items-center justify-between">
+               <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-gemigram-neon/10 border border-gemigram-neon/20 flex items-center justify-center">
+                    <Brain className="w-5 h-5 text-gemigram-neon animate-pulse" />
                   </div>
-                  <div className="text-[8px] sm:text-[9px] md:text-[10px] font-bold text-white/60 uppercase tracking-wider mt-1">
-                    Voice
+                  <div>
+                    <h1 className="text-sm font-black uppercase tracking-[0.3em] text-white">Gemi_Forge_v4</h1>
+                    <p className="text-[8px] font-mono text-white/30 uppercase tracking-[0.2em]">Sovereign_Neural_Synthesis</p>
                   </div>
+               </div>
+               <button onClick={onCancel} className="text-[9px] font-black text-white/20 hover:text-white uppercase tracking-widest transition-colors mb-auto">Abort_Creation</button>
+            </div>
+
+            <div className="flex-1 grid grid-cols-12 gap-8 p-12">
+              {/* Left Column: Synthesis Status */}
+              <div className="col-span-4 flex flex-col gap-6">
+                <div className="sovereign-glass p-8 rounded-[2rem] border-white/5 bg-white/5 space-y-6">
+                   <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gemigram-neon/60">Inference_Streams</h3>
+                   
+                   <InferenceNode label="Audio_Spectrogram" active={voiceState.status === 'listening' || voiceState.status === 'speaking'} />
+                   <InferenceNode label="Semantic_Parsing" active={voiceState.status === 'processing'} />
+                   <InferenceNode label="Identity_Synthesis" active={voiceState.currentStep === 'synthesis'} />
+                   <InferenceNode label="Skill_Mapping" active={voiceState.currentStep === 'synthesis'} />
+                </div>
+
+                <div className="flex-1 flex flex-col items-center justify-center">
+                   <motion.div 
+                     animate={{ 
+                       scale: voiceState.status === 'listening' ? [1, 1.2, 1] : 1,
+                       rotate: voiceState.status === 'processing' ? 360 : 0
+                     }}
+                     transition={{ duration: 2, repeat: Infinity }}
+                     className={`w-32 h-32 rounded-full border-2 flex items-center justify-center ${voiceState.status === 'listening' ? 'border-gemigram-neon text-gemigram-neon shadow-[0_0_20px_rgba(16,255,135,0.4)]' : 'border-white/10 text-white/20'}`}
+                   >
+                      {voiceState.status === 'processing' ? <Brain className="w-12 h-12" /> : <Mic className="w-12 h-12" />}
+                   </motion.div>
+                   <div className="mt-8 sovereign-glass p-4 rounded-2xl border-white/5 bg-gemigram-neon/5">
+                      <h4 className="text-[8px] font-black uppercase tracking-widest text-gemigram-neon mb-3">Neural_Spectral_Analysis</h4>
+                      <div className="flex items-end gap-1 h-12">
+                         {[...Array(12)].map((_, i) => (
+                           <motion.div 
+                             key={i}
+                             animate={{ 
+                               height: voiceState.status === 'listening' ? [10, 40, 15, 30, 10] : 8,
+                               opacity: [0.3, 0.6, 0.3]
+                             }}
+                             transition={{ 
+                               duration: 1.5, 
+                               repeat: Infinity, 
+                               delay: i * 0.1,
+                               ease: "easeInOut"
+                             }}
+                             className="flex-1 bg-gemigram-neon/30 rounded-t-sm"
+                           />
+                         ))}
+                      </div>
+                   </div>
+                   <p className="mt-6 text-[10px] font-black uppercase tracking-[0.5em] text-white/20 text-center">Link_Status::Synchronized</p>
                 </div>
               </div>
-            </div>
-            
-            {/* Confidence Ring */}
-            <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 256 256">
-              <circle
-                cx="128"
-                cy="128"
-                r="120"
-                fill="none"
-                stroke="rgba(255,255,255,0.1)"
-                strokeWidth="2"
-              />
-              <motion.circle
-                cx="128"
-                cy="128"
-                r="120"
-                fill="none"
-                stroke={voiceState.confidence > 0.8 ? '#10ff87' : '#f59e0b'}
-                strokeWidth="2"
-                strokeDasharray={2 * Math.PI * 120}
-                initial={{ strokeDashoffset: 2 * Math.PI * 120 }}
-                animate={{ strokeDashoffset: 2 * Math.PI * 120 * (1 - voiceState.confidence) }}
-                transition={{ duration: 0.5 }}
-              />
-            </svg>
-          </div>
 
-          {/* Status Text */}
-          <div className="text-center space-y-3 sm:space-y-4 w-full max-w-md px-2">
-            <motion.h2 
-              key={voiceState.currentStep}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-lg sm:text-xl md:text-2xl font-bold text-white uppercase tracking-widest px-2"
-            >
-              {voiceState.status === 'listening' && 'Listening...'}
-              {voiceState.status === 'speaking' && 'Speaking...'}
-              {voiceState.status === 'processing' && 'Processing...'}
-              {voiceState.status === 'complete' && 'Configuration Complete'}
-            </motion.h2>
-            
-            <p className="text-white/60 text-sm sm:text-base max-w-md px-4">
-              {voiceState.status === 'listening' && 'Speak clearly to configure your agent'}
-              {voiceState.status === 'speaking' && 'Please listen to the instructions'}
-              {voiceState.status === 'processing' && 'Analyzing voice input...'}
-              {voiceState.status === 'complete' && 'Ready for materialization'}
-            </p>
-            
-            {/* Confidence Indicator */}
-            {voiceState.confidence < 0.8 && (
-              <div className="flex items-center justify-center gap-2 text-yellow-400 px-4">
-                <AlertCircle className="w-4 h-4" />
-                <span className="text-xs sm:text-sm">Low confidence - please repeat</span>
+              {/* Center Column: Live Transcription / Synthesis Results */}
+              <div className="col-span-8 overflow-hidden flex flex-col pt-4">
+                 <AnimatePresence mode="wait">
+                    {voiceState.currentStep === 'description' && (
+                      <motion.div 
+                        key="desc"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="space-y-8"
+                      >
+                         <h2 className="text-4xl font-black text-white uppercase tracking-tighter leading-none">Describe the_Entity</h2>
+                         <div className="h-40 bg-white/5 rounded-[2rem] border border-white/5 p-8 font-mono text-sm text-gemigram-neon/80 italic leading-relaxed">
+                            {voiceState.status === 'listening' ? 'Materializing voice buffer...' : 'Awaiting initialization command...'}
+                         </div>
+                      </motion.div>
+                    )}
+
+                    {(voiceState.currentStep === 'synthesis' || voiceState.currentStep === 'blueprint') && (
+                      <motion.div 
+                        key="blueprint"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="space-y-8"
+                      >
+                         <div className="flex items-end justify-between border-b border-white/10 pb-4">
+                            <div>
+                               <p className="text-[10px] font-black text-gemigram-neon uppercase tracking-widest mb-1">Entity_Designation</p>
+                               <h2 className="text-5xl font-black text-white uppercase tracking-tighter">{formData.name}</h2>
+                            </div>
+                            <div className="text-right">
+                               <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Sector_Role</p>
+                               <p className="text-xl font-bold text-white/80 uppercase tracking-widest">{formData.role}</p>
+                            </div>
+                         </div>
+
+                         <div className="grid grid-cols-2 gap-8">
+                            <div className="space-y-4">
+                               <h4 className="text-[10px] font-black uppercase tracking-widest text-white/40">Neural_Capabilities</h4>
+                               <div className="flex flex-wrap gap-2">
+                                  {Object.entries(formData.tools).filter(([_, v]) => v).map(([t]) => (
+                                    <span key={t} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[9px] font-bold text-gemigram-neon uppercase tracking-widest">{t}</span>
+                                  ))}
+                               </div>
+                            </div>
+                            <div className="space-y-4">
+                               <h4 className="text-[10px] font-black uppercase tracking-widest text-white/40">Cognitive_Persona</h4>
+                               <div className="p-4 bg-gemigram-neon/5 border border-gemigram-neon/20 rounded-2xl flex items-center gap-4">
+                                  <Shield className="w-5 h-5 text-gemigram-neon" />
+                                  <span className="text-xs font-black text-white uppercase tracking-[0.2em]">{formData.persona}</span>
+                               </div>
+                            </div>
+                         </div>
+
+                         <motion.button
+                           whileHover={{ scale: 1.02 }}
+                           whileTap={{ scale: 0.98 }}
+                           onClick={finalizeMaterialization}
+                           className="w-full py-6 mt-4 bg-gemigram-neon text-black font-black uppercase tracking-[0.5em] text-sm rounded-[2rem] shadow-[0_0_30px_rgba(16,255,135,0.4)] hover:shadow-[0_0_50px_rgba(16,255,135,0.6)] transition-all"
+                         >
+                            Initiate_Materialization
+                         </motion.button>
+                      </motion.div>
+                    )}
+                 </AnimatePresence>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
+          </motion.div>
+        ) : (
+          <CinematicDeploy 
+            agentName={formData.name} 
+            onComplete={() => onComplete(formData)} 
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
-        {/* Progress Steps */}
-        <div className="px-4 sm:px-6 md:px-10 py-4 sm:py-6 border-t border-white/5 bg-black/40 overflow-x-auto">
-          <div className="flex items-center justify-start sm:justify-between min-w-max sm:min-w-0 gap-4 sm:gap-0">
-            {['name', 'description', 'soul', 'persona', 'voice', 'rules'].map((step, index) => {
-              const steps = ['name', 'description', 'systemPrompt', 'soul', 'persona', 'voiceName', 'rules'];
-              const currentStepIndex = steps.indexOf(voiceState.currentStep);
-              const stepIndex = steps.indexOf(step === 'voice' ? 'voiceName' : step);
-              const isComplete = stepIndex < currentStepIndex;
-              const isCurrent = stepIndex === currentStepIndex;
-              
-              return (
-                <div key={step} className="flex items-center gap-2">
-                  <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${
-                    isComplete ? 'bg-green-400' : isCurrent ? getStatusColor() : 'bg-white/20'
-                  }`} />
-                  <span className={`text-[10px] sm:text-xs uppercase tracking-wider whitespace-nowrap ${
-                    isCurrent ? 'text-white' : 'text-white/40'
-                  }`}>
-                    {step}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </motion.div>
+function InferenceNode({ label, active }: { label: string; active: boolean }) {
+  return (
+    <div className="flex items-center justify-between group">
+       <span className={`text-[10px] font-bold uppercase tracking-wider transition-colors ${active ? 'text-gemigram-neon' : 'text-white/20'}`}>{label}</span>
+       <div className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-gemigram-neon animate-pulse shadow-[0_0_8px_#10ff87]' : 'bg-white/5'}`} />
     </div>
   );
 }

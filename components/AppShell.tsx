@@ -37,16 +37,26 @@ export default function AppShell({ children }: AppShellProps) {
     return 'home';
   };
 
+  const isLandingPage = pathname === '/';
   const currentView = getCurrentView();
 
   const viewLabels: Record<string, string> = {
     home: 'Sovereign Core',
     workspace: 'Neural Workspace',
-    hub: 'Context Hub',
+    hub: 'Neural Hub',
     settings: 'Config Matrix',
-    forge: 'Aether Forge',
-    galaxy: 'Aether Galaxy'
+    forge: 'Gemi Forge',
+    galaxy: 'Gemigalaxy'
   };
+
+  // For landing page, we want a clean full-screen experience without the app sidebar/header
+  if (isLandingPage) {
+    return (
+      <div className="min-h-screen w-full bg-black overflow-x-hidden">
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-[100dvh] w-full bg-theme-primary text-white overflow-hidden selection:bg-gemigram-neon/30 font-sans">
@@ -68,7 +78,7 @@ export default function AppShell({ children }: AppShellProps) {
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gemigram-neon leading-none">Gemigram</span>
-                <span className="text-[8px] font-mono text-white/30 uppercase tracking-[0.1em]">OS_Sovereign.v2.4</span>
+                <span className="text-[8px] font-mono text-white/30 uppercase tracking-[0.1em]">OS_Sovereign.v3.0</span>
               </div>
             </div>
 
@@ -167,8 +177,8 @@ export default function AppShell({ children }: AppShellProps) {
             </div>
             
             <div className="flex flex-col items-center">
-              <span className="text-[10px] font-bold text-white/80 tracking-[0.3em]">AETHER HUD V3</span>
-              <span className="text-hud">GENESIS_RUNTIME_ACTIVE</span>
+              <span className="text-[10px] font-bold text-white/80 tracking-[0.3em]">GEMIGRAM_HUD_V4</span>
+              <span className="text-hud">SOVEREIGN_ENGINE_ACTIVE</span>
             </div>
 
             <div className="flex items-center gap-2 pl-5 border-l border-white/10">

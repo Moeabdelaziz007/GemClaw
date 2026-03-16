@@ -43,11 +43,11 @@ export function AgentCard({ name, status, role = 'General Intelligence', color =
       whileHover={{ scale: 1.02, y: -5 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className="relative group cursor-pointer aspect-[3/4] rounded-[2.5rem] quantum-glass overflow-hidden flex flex-col p-8 transition-all duration-700 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(0,240,255,0.1)] border border-white/5 hover:border-white/20"
+      className="relative group cursor-pointer aspect-[3/4] rounded-[3rem] sovereign-glass overflow-hidden flex flex-col p-8 transition-all duration-700 hover:shadow-[0_40px_80px_rgba(0,0,0,0.6),0_0_50px_rgba(16,255,135,0.1)] border border-white/5 hover:border-gemigram-neon/20"
     >
       {/* Background Decor */}
-      <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-30 transition-opacity">
-        <Cpu className="w-12 h-12" />
+      <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-10 transition-opacity">
+        <Cpu className="w-24 h-24 text-gemigram-neon" />
       </div>
 
       {/* The Core (Hex Pulse) */}

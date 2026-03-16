@@ -39,9 +39,9 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
       
       {/* Ambient Depth Background - Enhanced with Neon Green */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[10%] left-[15%] w-[40vw] h-[40vw] bg-gradient-to-br from-neon-green/10 to-aether-neon/5 rounded-full blur-[180px] animate-pulse" />
-        <div className="absolute bottom-[10%] right-[15%] w-[35vw] h-[35vw] bg-gradient-to-tl from-electric-purple/10 to-neon-blue/5 rounded-full blur-[130px]" />
-        <div className="absolute top-[50%] left-[50%] w-[30vw] h-[30vw] bg-cyber-lime/5 rounded-full blur-[100px]" />
+        <div className="absolute top-[10%] left-[15%] w-[40vw] h-[40vw] bg-gradient-to-br from-gemigram-neon/20 to-gemigram-neon/5 rounded-full blur-[180px] animate-pulse" />
+        <div className="absolute bottom-[10%] right-[15%] w-[35vw] h-[35vw] bg-gradient-to-tl from-gemigram-neon/10 to-transparent rounded-full blur-[130px]" />
+        <div className="absolute top-[50%] left-[50%] w-[30vw] h-[30vw] bg-gemigram-neon/10 rounded-full blur-[100px]" />
       </div>
 
       <div className="container mx-auto px-6 relative z-10 flex flex-col items-center">
@@ -67,17 +67,19 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
           
           {/* Internal Neural Hub (Glassy Center) */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-64 h-64 md:w-80 md:h-80 rounded-full glass-strong border border-gemigram-neon/40 flex items-center justify-center p-8 overflow-hidden">
+            <div className="w-64 h-64 md:w-80 md:h-80 rounded-full glass-strong border border-gemigram-neon/40 flex items-center justify-center p-8 overflow-hidden relative group">
                <motion.div 
                  animate={{ 
-                    filter: ['hue-rotate(0deg)', 'hue-rotate(45deg)', 'hue-rotate(0deg)'],
-                    boxShadow: ['0 0 50px rgba(16,255,135,0.5)', '0 0 100px rgba(16,255,135,0.8)', '0 0 50px rgba(16,255,135,0.5)']
+                    scale: [0.9, 1.1, 0.9],
+                    filter: ['hue-rotate(0deg)', 'hue-rotate(90deg)', 'hue-rotate(0deg)'],
+                    boxShadow: ['0 0 50px rgba(57,255,20,0.5)', '0 0 150px rgba(57,255,20,0.8)', '0 0 50px rgba(57,255,20,0.5)']
                  }}
-                 transition={{ duration: 4, repeat: Infinity }}
-                 className="w-full h-full rounded-full bg-gradient-to-br from-gemigram-neon to-fuchsia-500/20 mix-blend-screen opacity-80" 
+                 transition={{ duration: 3, repeat: Infinity }}
+                 className="w-full h-full rounded-full bg-gradient-to-br from-gemigram-neon to-gemigram-mint mix-blend-screen opacity-90 shadow-[0_0_100px_rgba(57,255,20,0.4)]" 
                />
-               {/* Mascot Silhouette */}
-               <img src="/avatars/mascot_silhouette.png" className="absolute w-40 h-40 opacity-40 mix-blend-overlay" alt="" />
+               <div className="absolute inset-0 bg-black/40 backdrop-blur-3xl rounded-full" />
+               {/* Mascot Silhouette - Sharpened */}
+               <Fingerprint className="absolute w-40 h-40 text-white/10 group-hover:text-gemigram-neon transition-colors duration-1000 z-10" />
             </div>
           </div>
         </div>
@@ -102,14 +104,22 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-center gap-8"
+            className="flex flex-col md:flex-row items-center justify-center gap-8"
           >
             <motion.button
-              whileHover={{ scale: 1.05, boxShadow: '0 0 60px rgba(16,255,135,0.4)' }}
+              whileHover={{ scale: 1.05, boxShadow: '0 0 80px rgba(57,255,20,0.5)' }}
+              whileTap={{ scale: 0.95 }}
               onClick={onLogin}
-              className="px-16 py-6 bg-gemigram-neon text-black rounded-full text-xl font-black uppercase tracking-widest shadow-[0_0_30px_rgba(16,255,135,0.2)]"
+              className="px-20 py-8 bg-gemigram-neon text-black rounded-full text-2xl font-black uppercase tracking-[0.2em] shadow-[0_0_50px_rgba(57,255,20,0.4)] transition-all"
             >
-              Construct_Self
+              Initialize_System
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.05)' }}
+              whileTap={{ scale: 0.95 }}
+              className="px-16 py-8 border border-white/10 text-white rounded-full text-xl font-black uppercase tracking-[0.2em] transition-all backdrop-blur-xl"
+            >
+              Explore_Mainnet
             </motion.button>
           </motion.div>
         </div>
@@ -142,68 +152,35 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
             ))}
           </div>
         </motion.div>
-            {[
-              { icon: Shield, label: 'Carbon Secure', value: 'AES-256', color: 'text-neon-green' },
-              { icon: Activity, label: 'L1 Latency', value: `${stats.latency}ms`, color: 'text-neon-blue' },
-              { icon: Zap, label: 'Neon Realtime', value: '12ms', color: 'text-cyber-lime' },
-              { icon: Globe, label: 'Edge Distributed', value: '14 PoPs', color: 'text-electric-purple' },
-            ].map((item, idx) => (
-              <motion.div 
-                key={idx} 
-                className="flex flex-col items-center gap-3 group cursor-default"
-                whileHover={{ scale: 1.05, y: -5 }}
-              >
-                <div className={`p-3 rounded-xl bg-gradient-to-br from-white/5 to-transparent border border-white/10 group-hover:border-${item.color.split('-')[1]}-500/50 transition-all`}>
-                  <item.icon className={`w-5 h-5 ${item.color} opacity-60 group-hover:opacity-100 transition-opacity`} />
-                </div>
-                <span className="text-sm font-bold text-white">{item.value}</span>
-                <span className="text-[8px] font-black uppercase tracking-[0.25em] text-white/20 group-hover:text-white/50 transition-colors">
-                  {item.label}
-                </span>
-              </motion.div>
-            ))}
-          </motion.div>
 
-          {/* Active Agents Counter */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 1.2 }}
-            className="mt-16 p-6 cyber-panel rounded-2xl border border-neon-green/20 bg-gradient-to-br from-neon-green/5 to-transparent"
-          >
-            <div className="flex items-center justify-center gap-8">
-              <div className="text-center">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users className="w-4 h-4 text-neon-green" />
-                  <span className="text-xs font-black uppercase tracking-widest text-white/40">Active Agents</span>
-                </div>
-                <div className="text-4xl md:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-neon-green to-mint-chip">
-                  {mounted ? stats.agents.toLocaleString() : '0'}
-                </div>
+        {/* Global Trust Indicators */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.8 }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mt-32 max-w-6xl mx-auto border-t border-white/[0.03] pt-16"
+        >
+          {[
+            { icon: Shield, label: 'Carbon Secure', value: 'AES-256', color: 'text-neon-green' },
+            { icon: Activity, label: 'L1 Latency', value: `${stats.latency}ms`, color: 'text-neon-blue' },
+            { icon: Zap, label: 'Neon Realtime', value: '12ms', color: 'text-cyber-lime' },
+            { icon: Globe, label: 'Edge Distributed', value: '14 PoPs', color: 'text-electric-purple' },
+          ].map((item, idx) => (
+            <motion.div 
+              key={idx} 
+              className="flex flex-col items-center gap-3 group cursor-default"
+              whileHover={{ scale: 1.05, y: -5 }}
+            >
+              <div className={`p-3 rounded-xl bg-gradient-to-br from-white/5 to-transparent border border-white/10 group-hover:border-gemigram-neon/50 transition-all`}>
+                <item.icon className={`w-5 h-5 ${item.color} opacity-60 group-hover:opacity-100 transition-opacity`} />
               </div>
-              <div className="w-px h-16 bg-gradient-to-b from-transparent via-neon-green/50 to-transparent" />
-              <div className="text-center">
-                <div className="flex items-center gap-2 mb-2">
-                  <Cpu className="w-4 h-4 text-neon-blue" />
-                  <span className="text-xs font-black uppercase tracking-widest text-white/40">Network Load</span>
-                </div>
-                <div className="text-4xl md:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-neon-blue to-electric-purple">
-                  2.4K
-                </div>
-              </div>
-              <div className="w-px h-16 bg-gradient-to-b from-transparent via-neon-blue/50 to-transparent" />
-              <div className="text-center">
-                <div className="flex items-center gap-2 mb-2">
-                  <Network className="w-4 h-4 text-electric-purple" />
-                  <span className="text-xs font-black uppercase tracking-widest text-white/40">Uptime</span>
-                </div>
-                <div className="text-4xl md:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-electric-purple to-pink-500">
-                  {mounted ? stats.uptime.toFixed(2) : '0'}%
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
+              <span className="text-sm font-bold text-white uppercase">{item.value}</span>
+              <span className="text-[8px] font-black uppercase tracking-[0.25em] text-white/20 group-hover:text-white/50 transition-colors">
+                {item.label}
+              </span>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

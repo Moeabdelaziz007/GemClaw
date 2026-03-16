@@ -22,7 +22,7 @@ const ORBS_CONFIG = [
     path: '/galaxy',
     color: 'bg-gemigram-neon',
     icon: <Globe className="w-5 h-5" />,
-    label: 'AETHER_GALAXY'
+    label: 'GEMIGALAXY'
   },
   {
     id: 'hub',
@@ -36,7 +36,7 @@ const ORBS_CONFIG = [
     path: '/forge',
     color: 'bg-gemigram-neon',
     icon: <Plus className="w-5 h-5" />,
-    label: 'AETHER_FORGE'
+    label: 'GEMI_FORGE'
   },
   {
     id: 'workspace',
@@ -44,6 +44,13 @@ const ORBS_CONFIG = [
     color: 'bg-gemigram-neon',
     icon: <LayoutDashboard className="w-5 h-5" />,
     label: 'WORKSPACE'
+  },
+  {
+    id: 'marketplace',
+    path: '/marketplace',
+    color: 'bg-gemigram-neon',
+    icon: <Globe className="w-5 h-5" />,
+    label: 'GEMIGRAM_MARKET'
   },
   {
     id: 'settings',
@@ -201,9 +208,6 @@ export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNa
           );
         })}
       </motion.nav>
-    </>
-  );
-}
     </>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useAetherStore } from '@/lib/store/useAetherStore';
-import { Brain, Globe, ZoomIn, ZoomOut, Move, Network } from 'lucide-react';
+import { Brain, Globe, ZoomIn, ZoomOut, Move, Network, Radio } from 'lucide-react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
@@ -70,7 +70,7 @@ export default function GalaxyPage() {
           transition={{ duration: 0.8 }}
         >
           <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-2 uppercase bg-clip-text text-transparent bg-gradient-to-r from-gemigram-neon via-white to-gemigram-neon drop-shadow-[0_0_30px_rgba(16,255,135,0.3)]">
-            Aether Galaxy
+            Gemigalaxy
           </h2>
           <p className="text-slate-500 font-mono text-[10px] uppercase tracking-[0.2em]">Sovereign Planet Architecture // Live Orchestration</p>
         </motion.div>
@@ -112,8 +112,16 @@ export default function GalaxyPage() {
           />
           
           
-          <div className="w-24 h-24 rounded-full bg-black border border-gemigram-neon/30 flex items-center justify-center relative z-10 shadow-[0_0_80px_rgba(16,255,135,0.1),inset_0_0_40px_rgba(16,255,135,0.05)] group-hover:scale-110 group-hover:border-gemigram-neon/50 transition-all duration-700">
-            <Brain className="w-10 h-10 text-gemigram-neon drop-shadow-[0_0_10px_rgba(16,255,135,0.5)]" />
+          <div className="w-24 h-24 rounded-full bg-black border border-gemigram-neon/50 flex items-center justify-center relative z-10 shadow-[0_0_100px_rgba(16,255,135,0.2),inset_0_0_40px_rgba(16,255,135,0.1)] group-hover:scale-110 group-hover:border-gemigram-neon transition-all duration-700">
+            <motion.div
+              animate={{ 
+                rotate: 360,
+                boxShadow: ['0 0 20px rgba(16,255,135,0.2)', '0 0 50px rgba(16,255,135,0.4)', '0 0 20px rgba(16,255,135,0.2)']
+              }}
+              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 rounded-full border border-gemigram-neon/20 border-dashed"
+            />
+            <Brain className="w-10 h-10 text-gemigram-neon drop-shadow-[0_0_15px_rgba(16,255,135,0.6)]" />
           </div>
           
           {/* Core Labels */}
@@ -299,6 +307,38 @@ export default function GalaxyPage() {
           </div>
         </div>
       </motion.div>
+
+      {/* 🌠 Cosmic Activity Stream - NEW SMART ADD */}
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 1.2 }}
+        className="absolute bottom-12 left-12 z-20 hidden lg:block"
+      >
+        <div className="glass-medium p-6 border border-white/5 bg-black/40 rounded-[2rem] w-80 backdrop-blur-xl">
+          <div className="flex items-center gap-2 mb-6">
+            <Radio className="w-4 h-4 text-gemigram-neon animate-pulse" />
+            <div className="text-[10px] font-black uppercase tracking-widest text-white/60">Cosmic_Pulse</div>
+          </div>
+          
+          <div className="space-y-4 font-mono">
+            <ActivityItem time="01:28" text="Entity_Sovereign materialized in Alpha_Sector" />
+            <ActivityItem time="01:25" text="Neural sync optimized for 12/12 agents" />
+            <ActivityItem time="01:12" text="Memory pruning complete across Gemigalaxy" />
+            <ActivityItem time="00:58" text="MCP Bridge: GitHub_v3 successfully linked" />
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }
+
+function ActivityItem({ time, text }: { time: string; text: string }) {
+  return (
+    <div className="flex gap-3 items-start border-l border-white/5 pl-3">
+      <span className="text-[8px] text-gemigram-neon font-black mt-1">{time}</span>
+      <span className="text-[9px] text-white/40 leading-relaxed uppercase tracking-wider">{text}</span>
+    </div>
+  );
+}
+

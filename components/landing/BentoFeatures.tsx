@@ -60,23 +60,27 @@ export function BentoFeatures() {
           {features.map((feature, idx) => (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className={`cyber-glass p-12 rounded-[2rem] flex flex-col justify-between group hover:bg-gemigram-neon/[0.02] transition-colors border-white/[0.03] ${feature.className}`}
+              transition={{ duration: 0.7, delay: idx * 0.1 }}
+              className={`sovereign-glass p-12 flex flex-col justify-between group hover:border-gemigram-neon/40 transition-all duration-700 ${feature.className}`}
             >
               <div>
-                <div className="w-14 h-14 rounded-2xl cyber-panel flex items-center justify-center mb-10 border-white/5 group-hover:border-gemigram-neon/30 group-hover:bg-gemigram-neon/5 transition-all">
-                  <feature.icon className="w-6 h-6 text-white/40 group-hover:text-gemigram-neon" />
+                <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center mb-10 group-hover:bg-gemigram-neon group-hover:text-black transition-all duration-500 shadow-[0_0_20px_rgba(57,255,20,0)] group-hover:shadow-[0_0_30px_rgba(57,255,20,0.4)]">
+                  <feature.icon className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl font-black mb-4 text-white/90 uppercase tracking-tight">{feature.title}</h3>
-                <p className="text-white/30 leading-relaxed font-medium">{feature.description}</p>
+                <h3 className="text-3xl font-black mb-4 text-white uppercase tracking-tighter group-hover:text-gemigram-neon transition-colors duration-500">
+                  {feature.title}
+                </h3>
+                <p className="text-white/40 leading-relaxed font-bold uppercase text-xs tracking-widest group-hover:text-white/60 transition-colors">
+                  {feature.description}
+                </p>
               </div>
               
-              <div className="mt-12 flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.3em] text-white/10 group-hover:text-gemigram-neon/60 transition-colors">
-                <span>Core Specs</span>
-                <div className="h-[1px] flex-1 bg-white/5 group-hover:bg-gemigram-neon/20 transition-colors" />
+              <div className="mt-12 flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-white/5 group-hover:text-gemigram-neon/40 transition-colors">
+                <span>Access_Status::Enabled</span>
+                <div className="h-px flex-1 bg-white/5 group-hover:bg-gemigram-neon/10 transition-colors" />
               </div>
             </motion.div>
           ))}

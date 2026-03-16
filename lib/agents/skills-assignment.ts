@@ -247,6 +247,52 @@ export function getRecommendedSkills(
 }
 
 /**
+ * 🛠️ Neural Core Inference
+ * 
+ * Extracts name, role, and tools from description
+ */
+export function synthesizeAgentMetadata(description: string) {
+  const descLower = description.toLowerCase();
+  
+  // 1. Suggest Name
+  let suggestedName = "Sovereign_Alpha";
+  const namePatterns = [
+    /call (?:it|him|her|them|the agent|the entity) ([\w\s]+)/i,
+    /name (?:it|him|her|them|the agent|the entity) ([\w\s]+)/i,
+    /(?:designation|identifier) (?:is|shall be) ([\w\s]+)/i,
+    /([\w\s]+) is the name/i
+  ];
+  
+  for (const pattern of namePatterns) {
+    const match = description.match(pattern);
+    if (match && match[1]) {
+      suggestedName = match[1].trim().replace(/\s+/g, '_');
+      break;
+    }
+  }
+
+  // 2. Derive Role
+  let suggestedRole = "Advanced_AI_Entity";
+  if (descLower.includes("assistant")) suggestedRole = "Personal_Assistant";
+  if (descLower.includes("research")) suggestedRole = "Neural_Researcher";
+  if (descLower.includes("code") || descLower.includes("program")) suggestedRole = "Systems_Architect";
+  if (descLower.includes("creative") || descLower.includes("art")) suggestedRole = "Creative_Engine";
+
+  // 3. Detect Tools
+  const tools = {
+    googleSearch: descLower.includes("search") || descLower.includes("find") || descLower.includes("web"),
+    googleMaps: descLower.includes("map") || descLower.includes("location") || descLower.includes("place"),
+    weather: descLower.includes("weather") || descLower.includes("forecast") || descLower.includes("temperature"),
+    news: descLower.includes("news") || descLower.includes("current events"),
+    crypto: descLower.includes("crypto") || descLower.includes("bitcoin") || descLower.includes("price") || descLower.includes("token"),
+    calculator: descLower.includes("math") || descLower.includes("calculate") || descLower.includes("compute"),
+    semanticMemory: true, // Always on for Sovereign agents
+  };
+
+  return { suggestedName, suggestedRole, tools };
+}
+
+/**
  * Generate voice confirmation message for detected skills
  */
 export function generateSkillsConfirmation(skills: Partial<SkillsConfig>): string {

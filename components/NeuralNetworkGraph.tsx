@@ -31,7 +31,7 @@ export default function NeuralNetworkGraph() {
       className="p-6 rounded-[24px] bg-white/[0.02] border border-white/5 backdrop-blur-xl relative group hover:border-aether-neon/30 transition-all duration-500 overflow-hidden"
     >
       <div className="relative z-10 mb-4">
-        <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white/60 mb-1">Aether Neural Net</h3>
+        <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white/60 mb-1">Gemigram Neural Net</h3>
         <div className="flex gap-4">
           <p className="text-[8px] font-mono text-aether-neon/60 uppercase">Nodes: 14.7B</p>
           <p className="text-[8px] font-mono text-aether-neon/60 uppercase">Latency: 2.1ms</p>

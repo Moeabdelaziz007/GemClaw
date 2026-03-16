@@ -2,11 +2,17 @@
 
 import React, { useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Fingerprint, Menu, X, ChevronRight } from 'lucide-react';
+import { Fingerprint, Menu, X, Cloud, Activity, Bell, History } from 'lucide-react';
 import Link from 'next/link';
 
 export function EnterpriseHeader({ onLogin }: { onLogin: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
   const { scrollY } = useScroll();
   
   const headerBg = useTransform(
@@ -18,7 +24,7 @@ export function EnterpriseHeader({ onLogin }: { onLogin: () => void }) {
   const headerBorder = useTransform(
     scrollY,
     [0, 50],
-    ['rgba(255, 255, 255, 0)', 'rgba(57, 255, 20, 0.1)']
+    ['rgba(255, 255, 255, 0)', 'rgba(57, 255, 20, 0.2)']
   );
 
   const navLinks = [
@@ -40,41 +46,77 @@ export function EnterpriseHeader({ onLogin }: { onLogin: () => void }) {
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <Fingerprint className="w-8 h-8 text-gemigram-neon" />
-          <span className="text-xl font-bold tracking-tight text-white uppercase">
-            Gemigram
+        <Link href="/" className="flex items-center gap-3 group relative">
+          <div className="relative">
+            <Fingerprint className="w-10 h-10 text-gemigram-neon group-hover:scale-110 transition-transform duration-500" />
+            <motion.div 
+              className="absolute inset-0 bg-gemigram-neon/20 blur-lg rounded-full"
+              animate={{ opacity: [0.2, 0.5, 0.2] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+          </div>
+          <span className="text-2xl font-black tracking-[-0.05em] text-white uppercase group-hover:tracking-wider transition-all duration-500">
+            GEMIGRAM<span className="text-gemigram-neon animate-pulse">_</span>
           </span>
-        </motion.div>
+        </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-10">
+        <nav className="hidden xl:flex items-center gap-10">
           {navLinks.map((link) => (
             <Link 
               key={link.name} 
               href={link.href}
-              className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-gemigram-neon transition-colors"
+              className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 hover:text-gemigram-neon transition-all hover:scale-105"
             >
               {link.name}
             </Link>
           ))}
         </nav>
 
+        {/* Smart Telemetry Tray */}
+        <div className="hidden lg:flex items-center gap-8 border-x border-white/5 px-10 mx-6">
+           <div className="flex items-center gap-4">
+              <div className="flex flex-col items-end">
+                <span className="text-[12px] font-mono font-black tabular-nums text-white">
+                  {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                </span>
+                <span className="text-[8px] font-mono font-black text-white/20 uppercase tracking-widest leading-none">
+                  {time.toLocaleDateString([], { day: '2-digit', month: 'short' })}
+                </span>
+              </div>
+              <div className="h-4 w-[1px] bg-white/10" />
+              <div className="flex items-center gap-2 group cursor-default">
+                <Cloud size={14} className="text-gemigram-neon/40" />
+                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">24°C_NYC</span>
+              </div>
+           </div>
+           
+           <div className="flex items-center gap-4 text-white/20">
+              <button className="hover:text-gemigram-neon transition-colors"><Bell size={14} /></button>
+              <button className="hover:text-gemigram-neon transition-colors"><History size={14} /></button>
+           </div>
+
+           <div className="flex items-center gap-2 bg-gemigram-neon/5 border border-gemigram-neon/20 px-4 py-1.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-gemigram-neon animate-pulse shadow-[0_0_8px_rgba(57,255,20,0.5)]" />
+              <span className="text-[9px] font-black text-gemigram-neon uppercase tracking-[0.2em]">Neural_Pulse_Active</span>
+           </div>
+        </div>
+
         {/* Action Buttons */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-8">
           <button 
             onClick={onLogin}
-            className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors"
+            className="text-[11px] font-black uppercase tracking-[0.3em] text-white/30 hover:text-white transition-all hover:translate-y-[-1px]"
           >
-            Access Node
+            Access_Node
           </button>
           <motion.button
-            whileHover={{ scale: 1.02, boxShadow: '0 0 20px rgba(57,255,20,0.1)' }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(57,255,20,0.3)' }}
+            whileTap={{ scale: 0.95 }}
             onClick={onLogin}
-            className="px-6 py-2 cyber-button rounded-full text-[10px] font-black text-white/80 tracking-[0.2em] uppercase"
+            className="px-8 py-3 bg-gemigram-neon/10 border border-gemigram-neon text-gemigram-neon rounded-full text-[10px] font-black tracking-[0.3em] uppercase hover:bg-gemigram-neon hover:text-black transition-all"
           >
-            Initialize Admin
+            Initialize_Admin
           </motion.button>
         </div>
 

@@ -6,26 +6,30 @@ import Link from 'next/link';
 
 export function EnterpriseFooter() {
   return (
-    <footer className="pt-32 pb-16 bg-carbon-black border-t border-white/[0.03] relative overflow-hidden">
-      <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+    <footer className="pt-40 pb-20 bg-black border-t border-gemigram-neon/10 relative overflow-hidden">
+      {/* Background Matrix Effect */}
+      <div className="absolute inset-0 opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gemigram-neon/5 blur-[150px] rounded-full" />
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
           <div className="md:col-span-1">
-            <Link href="/" className="flex items-center gap-3 mb-10 group">
-              <Fingerprint className="w-10 h-10 text-gemigram-neon" />
-              <span className="text-2xl font-black tracking-tight text-white uppercase">
+            <Link href="/" className="flex items-center gap-4 mb-8 group">
+              <div className="w-12 h-12 rounded-xl bg-gemigram-neon/10 border border-gemigram-neon/20 flex items-center justify-center group-hover:bg-gemigram-neon group-hover:text-black transition-all duration-500">
+                <Fingerprint className="w-7 h-7" />
+              </div>
+              <span className="text-3xl font-black tracking-tighter text-white uppercase">
                 Gemi<span className="text-gemigram-neon">gram</span>
               </span>
             </Link>
-            <p className="text-white/20 text-xs font-bold leading-relaxed mb-10 uppercase tracking-widest">
+            <p className="text-white/40 text-[11px] font-black leading-relaxed mb-10 uppercase tracking-[0.3em]">
               Sovereign neural intelligence. <br />
               Carbon secure. Neon powered.
             </p>
             <div className="flex gap-4">
               {[Github, Twitter, Linkedin].map((Icon, i) => (
-                <Link key={i} href="#" className="p-3 cyber-panel rounded-2xl text-white/20 hover:text-gemigram-neon hover:bg-gemigram-neon/5 transition-all">
-                  <Icon size={18} />
+                <Link key={i} href="#" className="w-12 h-12 flex items-center justify-center border border-white/5 rounded-xl text-white/20 hover:text-gemigram-neon hover:border-gemigram-neon/50 hover:bg-gemigram-neon/5 transition-all group">
+                  <Icon size={20} className="group-hover:scale-110 transition-transform" />
                 </Link>
               ))}
             </div>
@@ -51,14 +55,17 @@ export function EnterpriseFooter() {
           ))}
         </div>
 
-        <div className="pt-12 border-t border-white/[0.02] flex flex-col md:flex-row justify-between items-center gap-10">
-          <div className="flex items-center gap-12">
-            <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20">
-              © 2026 Gemigram AIOS. Developed by Moe_Abdelaziz.
-            </p>
-            <div className="hidden md:flex items-center gap-4">
-               <span className="w-1.5 h-1.5 rounded-full bg-gemigram-neon shadow-[0_0_10px_rgba(16,255,135,0.5)]" />
-               <span className="text-[9px] font-black uppercase tracking-[0.5em] text-gemigram-neon">Sector_Mainnet_Stable</span>
+        <div className="pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10">
+          <div className="flex flex-col md:flex-row items-center gap-12">
+            <div className="flex flex-col gap-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/20">
+                © 2026 Gemigram AIOS. Developed by Moe_Abdelaziz.
+              </p>
+              <p className="text-[8px] font-mono text-white/10 uppercase tracking-[0.2em]">Architecture_v3.2_Omega_Core</p>
+            </div>
+            <div className="flex items-center gap-4 px-6 py-2 rounded-full border border-gemigram-neon/10 bg-gemigram-neon/5">
+               <span className="w-2 h-2 rounded-full bg-gemigram-neon shadow-[0_0_15px_rgba(57,255,20,0.8)] animate-pulse" />
+               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gemigram-neon">Sector_Mainnet_Stable</span>
             </div>
           </div>
           

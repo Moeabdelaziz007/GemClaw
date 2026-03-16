@@ -7,7 +7,7 @@ interface ForgeChamberProps {
 }
 
 const FORGE_STEPS = [
-  { id: 'init', text: 'Calibrating Aetherial Frequencies...', icon: Sparkles, duration: 2000 },
+  { id: 'init', text: 'Calibrating Neural Frequencies...', icon: Sparkles, duration: 2000 },
   { id: 'soul', text: 'Synthesizing Neural Persona Matrix...', icon: Brain, duration: 3000 },
   { id: 'persona', text: 'Injecting Cognitive Archetype...', icon: Fingerprint, duration: 2000 },
   { id: 'skills', text: 'Activating Occupational Skill Directives...', icon: Cpu, duration: 2500 },
