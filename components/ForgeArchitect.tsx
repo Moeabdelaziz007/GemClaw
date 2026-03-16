@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, Mic, MicOff, Brain, Zap, Activity,
-  CheckCircle, AlertCircle, Waveform
+  CheckCircle, AlertCircle, Radio
 } from 'lucide-react';
 import { Agent } from '@/lib/store/useAetherStore';
 import { useLiveAPI } from '@/hooks/useLiveAPI';
@@ -235,7 +235,7 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
   const getStatusIcon = () => {
     switch (voiceState.status) {
       case 'listening': return <Mic className="w-8 h-8 animate-pulse" />;
-      case 'speaking': return <Waveform className="w-8 h-8 animate-pulse" />;
+      case 'speaking': return <Radio className="w-8 h-8 animate-pulse" />;
       case 'processing': return <Brain className="w-8 h-8 animate-spin" />;
       case 'complete': return <CheckCircle className="w-8 h-8" />;
       default: return <MicOff className="w-8 h-8" />;
