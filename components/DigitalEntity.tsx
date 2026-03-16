@@ -185,6 +185,7 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
             {/* Torso - Liquid Obsidian Panel */}
             <div className="relative w-48 h-72 rounded-[60px] bg-white/[0.03] backdrop-blur-2xl border border-white/10 overflow-hidden group">
               {/* The Core Singularity */}
+              <motion.div
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-[40px]"
                 style={{ backgroundColor: stateConfig.accent }}
                 animate={{ 
