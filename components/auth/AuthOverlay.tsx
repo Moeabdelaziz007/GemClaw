@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Fingerprint, Mail, ShieldCheck, Globe, ChevronRight, Loader2, Sparkles, Lock, Shield } from 'lucide-react';
 import { useAuth } from '@/components/Providers';
@@ -12,6 +12,13 @@ export function AuthOverlay({ isOpen, onClose }: { isOpen: boolean, onClose: () 
   const [mode, setMode] = useState<AuthMode>('login');
   const [scanProgress, setScanProgress] = useState(0);
   const [authStatus, setAuthStatus] = useState('Standby');
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
   const handleGoogleLogin = async () => {
     setMode('scanning');
@@ -22,7 +29,9 @@ export function AuthOverlay({ isOpen, onClose }: { isOpen: boolean, onClose: () 
     
     // Immersion animation runs in parallel
     let progress = 0;
-    const interval = setInterval(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    
+    intervalRef.current = setInterval(() => {
       progress += 5; // Faster progress
       setScanProgress(Math.min(progress, 99));
       if (progress === 30) setAuthStatus('Analyzing Neural Signature...');
@@ -32,12 +41,12 @@ export function AuthOverlay({ isOpen, onClose }: { isOpen: boolean, onClose: () 
 
     try {
       await loginPromise;
+      if (intervalRef.current) clearInterval(intervalRef.current);
       setScanProgress(100);
       setAuthStatus('Sovereign Link Established.');
-      clearInterval(interval);
       setTimeout(() => onClose(), 300);
     } catch (err) {
-      clearInterval(interval);
+      if (intervalRef.current) clearInterval(intervalRef.current);
       setMode('login');
       setAuthStatus('Authentication Failed');
     }

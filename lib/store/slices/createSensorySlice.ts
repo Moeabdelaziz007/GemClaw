@@ -34,17 +34,19 @@ export const createSensorySlice: StateCreator<SensorySlice> = (set) => ({
   volume: 0,
   contextUsage: 0,
   addTranscriptMessage: (role, content) =>
-    set((state) => ({
-      transcript: [
-        ...state.transcript,
-        {
-          id: Math.random().toString(36).substring(7),
-          role,
-          content,
-          timestamp: Date.now(),
-        },
-      ],
-    })),
+    set((state) => {
+      const newMessage = {
+        id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(7),
+        role,
+        content,
+        timestamp: Date.now(),
+      };
+      
+      // Limit transcript to last 100 messages to prevent memory bloat
+      const newTranscript = [...state.transcript, newMessage].slice(-100);
+      
+      return { transcript: newTranscript };
+    }),
   setStreamingBuffer: (buffer) => set({ streamingBuffer: buffer }),
   setInterrupted: (interrupted) => set({ isInterrupted: interrupted }),
   setIsThinking: (thinking) => set({ isThinking: thinking }),

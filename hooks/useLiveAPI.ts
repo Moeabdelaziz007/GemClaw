@@ -133,14 +133,9 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
         addLog(`Synchronizing neural context (${transcript.length} nodes)...`, "system");
         setLinkType('hibernating');
         
-        // Map history to model turns
-        const historyParts = transcript.slice(-10).map(msg => ({
-          text: msg.content
-        }));
-
         // We send a clientContent message to catch up the model
-        // Note: In real-world bidi, we might need to send this after setup confirmation
-        setTimeout(() => {
+        // Using a ref-safe guard for the timeout
+        const hibernateTimer = setTimeout(() => {
           if (ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({
               clientContent: {
@@ -154,15 +149,21 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
             setLinkType('stateless');
           }
         }, 1000);
+
+        return () => clearTimeout(hibernateTimer);
       }
     };
 
     ws.onmessage = async (event) => {
+      if (!wsRef.current || wsRef.current !== ws) return;
+
       try {
         let data = event.data;
         if (data instanceof Blob) {
           data = await data.text();
         }
+        
+        if (typeof data !== 'string') return;
         const message = JSON.parse(data);
         
         if (message.toolCall) {
@@ -170,7 +171,11 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
           if (functionCalls) {
             for (const call of functionCalls) {
               addLog(`Executing tool: ${call.name}`, "tool");
-              if (audioContextRef.current) audioContextRef.current.suspend();
+              
+              const currentAudioCtx = audioContextRef.current;
+              if (currentAudioCtx && currentAudioCtx.state !== 'suspended') {
+                await currentAudioCtx.suspend();
+              }
               
               try {
                 const activeProjectId = useAetherStore.getState().activeProjectId;
@@ -179,20 +184,24 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
                 addLog(`Tool ${call.name} executed successfully.`, "tool");
                 onFunctionCall(result);
 
-                ws.send(JSON.stringify({
-                  toolResponse: {
-                    functionResponses: [{
-                      id: call.id,
-                      name: call.name,
-                      response: result
-                    }]
-                  }
-                }));
+                if (ws.readyState === WebSocket.OPEN) {
+                  ws.send(JSON.stringify({
+                    toolResponse: {
+                      functionResponses: [{
+                        id: call.id,
+                        name: call.name,
+                        response: result
+                      }]
+                    }
+                  }));
+                }
               } catch (err) {
                 console.error("Neural Tool error:", err);
                 addLog(`Error executing tool ${call.name}`, "system");
               } finally {
-                if (audioContextRef.current) audioContextRef.current.resume();
+                if (currentAudioCtx && currentAudioCtx.state === 'suspended') {
+                  await currentAudioCtx.resume();
+                }
               }
             }
           }
@@ -273,20 +282,36 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
     scheduleReconnectRef.current = scheduleReconnect;
   }, [scheduleReconnect]);
 
-  const disconnect = useCallback(() => {
+  const disconnect = useCallback(async () => {
     intentionalDisconnectRef.current = true;
     if (reconnectTimerRef.current) {
       clearTimeout(reconnectTimerRef.current);
       reconnectTimerRef.current = null;
     }
     reconnectAttemptsRef.current = 0;
+    
     if (wsRef.current) {
+      wsRef.current.onopen = null;
+      wsRef.current.onmessage = null;
+      wsRef.current.onerror = null;
+      wsRef.current.onclose = null;
       wsRef.current.close();
       wsRef.current = null;
     }
+
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
     }
+
+    if (audioContextRef.current) {
+        if (audioContextRef.current.state !== 'closed') {
+            await audioContextRef.current.close();
+        }
+        audioContextRef.current = null;
+    }
+
+    analyserRef.current = null;
     setIsConnected(false);
     addLog("Disconnected.", "system");
   }, [addLog]);
