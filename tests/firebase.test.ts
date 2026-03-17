@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { handleFirestoreError, OperationType, auth } from '../firebase';
+import { handleFirestoreError, OperationType, auth } from '../firebase.ts';
 
 test('handleFirestoreError', async (t) => {
   // Suppress console.error
