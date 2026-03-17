@@ -247,11 +247,11 @@ class MCPMarketplaceConnector {
   /**
    * Check server compatibility
    */
-  checkCompatibility(server: MarketplaceServer): {
+  async checkCompatibility(server: MarketplaceServer): Promise<{
     compatible: boolean;
     issues: string[];
     warnings: string[];
-  } {
+  }> {
     const issues: string[] = [];
     const warnings: string[] = [];
     
@@ -268,9 +268,13 @@ class MCPMarketplaceConnector {
     
     // Check required API keys
     if (server.requirements?.apiKeys) {
-      const missingKeys = server.requirements.apiKeys.filter(
-        key => !mcpConfigManager.getCredential('default', 'api_key')
-      );
+      const missingKeys = [];
+      for (const key of server.requirements.apiKeys) {
+        const credential = await mcpConfigManager.getCredential('default', 'api_key');
+        if (!credential) {
+          missingKeys.push(key);
+        }
+      }
       
       if (missingKeys.length > 0) {
         warnings.push(`Requires API keys: ${missingKeys.join(', ')}`);
@@ -314,7 +318,7 @@ class MCPMarketplaceConnector {
       }
       
       // Check compatibility
-      const compatibility = this.checkCompatibility(serverDetails);
+      const compatibility = await this.checkCompatibility(serverDetails);
       
       if (!compatibility.compatible) {
         return {

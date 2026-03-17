@@ -2,10 +2,10 @@
  * 🔐 Secure API Credential Management
  * 
  * Provides encrypted storage, OAuth2 token management, API key rotation,
- * and secure credential access for API integrations.
+ * and secure credential access for API integrations using AES-GCM.
  */
 
-import { mcpConfigManager } from '../mcp';
+// No external dependencies for raw security layer
 
 /**
  * Encrypted credential entry
@@ -14,7 +14,7 @@ interface EncryptedCredential {
   id: string;
   providerId: string;
   credentialType: 'api_key' | 'oauth_token' | 'refresh_token' | 'basic_auth';
-  encryptedValue: string; // In production, this should be properly encrypted
+  encryptedValue: string; // AES-GCM encrypted value (iv + ciphertext)
   createdAt: number;
   expiresAt?: number;
   lastRotatedAt?: number;
@@ -23,16 +23,7 @@ interface EncryptedCredential {
 }
 
 /**
- * Credential encryption result
- */
-interface EncryptionResult {
-  encrypted: string;
-  iv: string; // Initialization vector
-  authTag?: string; // Authentication tag for GCM mode
-}
-
-/**
- * Credential decryption result
+ * Decryption result
  */
 interface DecryptionResult {
   decrypted: string;
@@ -46,11 +37,14 @@ interface DecryptionResult {
 class APICredentialsManager {
   private static instance: APICredentialsManager;
   
-  // In-memory credential cache (in production, persist securely)
+  // In-memory credential cache (peristent storage should be handled by a secure vault)
   private credentials: Map<string, EncryptedCredential> = new Map();
   
   // Key rotation schedule (days)
   private defaultRotationPeriod: number = 90;
+  
+  // Salt for PBKDF2 (should be unique per user in production)
+  private readonly salt = new TextEncoder().encode('gemigram-sovereign-salt-v1');
   
   /**
    * Private constructor for singleton pattern
@@ -70,7 +64,7 @@ class APICredentialsManager {
   /**
    * Store API key securely
    */
-  storeAPIKey(
+  async storeAPIKey(
     providerId: string,
     apiKey: string,
     options?: {
@@ -78,14 +72,15 @@ class APICredentialsManager {
       expiresAt?: number;
       metadata?: Record<string, any>;
     }
-  ): string {
+  ): Promise<string> {
     const credentialId = this.generateCredentialId(providerId, 'api_key');
+    const encrypted = await this.encrypt(apiKey);
     
     const credential: EncryptedCredential = {
       id: credentialId,
       providerId,
       credentialType: 'api_key',
-      encryptedValue: this.encrypt(apiKey), // Encrypt before storage
+      encryptedValue: encrypted,
       createdAt: Date.now(),
       expiresAt: options?.expiresAt,
       scopes: options?.scopes,
@@ -94,33 +89,33 @@ class APICredentialsManager {
     
     this.credentials.set(credentialId, credential);
     
-    // Also store in MCP config manager for cross-reference
-    mcpConfigManager.storeAPIKey(providerId, apiKey, options?.scopes);
+    // Credential storage is private to this manager
     
-    console.log(`[Credentials] Stored API key for ${providerId}`);
+    console.log(`[Credentials] Stored encrypted API key for ${providerId}`);
     return credentialId;
   }
   
   /**
    * Store OAuth2 tokens
    */
-  storeOAuthToken(
+  async storeOAuthToken(
     providerId: string,
     accessToken: string,
     refreshToken?: string,
     expiresIn?: number,
     scopes?: string[]
-  ): { accessTokenId: string; refreshTokenId?: string } {
+  ): Promise<{ accessTokenId: string; refreshTokenId?: string }> {
     const now = Date.now();
     const expiresAt = expiresIn ? now + (expiresIn * 1000) : undefined;
     
     // Store access token
     const accessTokenId = this.generateCredentialId(providerId, 'oauth_token');
+    const accessTokenEncrypted = await this.encrypt(accessToken);
     const accessTokenCredential: EncryptedCredential = {
       id: accessTokenId,
       providerId,
       credentialType: 'oauth_token',
-      encryptedValue: this.encrypt(accessToken),
+      encryptedValue: accessTokenEncrypted,
       createdAt: now,
       expiresAt,
       scopes
@@ -131,27 +126,56 @@ class APICredentialsManager {
     let refreshTokenId: string | undefined;
     if (refreshToken) {
       refreshTokenId = this.generateCredentialId(providerId, 'refresh_token');
+      const refreshTokenEncrypted = await this.encrypt(refreshToken);
       const refreshTokenCredential: EncryptedCredential = {
         id: refreshTokenId,
         providerId,
         credentialType: 'refresh_token',
-        encryptedValue: this.encrypt(refreshToken),
+        encryptedValue: refreshTokenEncrypted,
         createdAt: now
       };
       this.credentials.set(refreshTokenId, refreshTokenCredential);
     }
     
-    // Also store in MCP config manager
-    mcpConfigManager.storeOAuthToken(providerId, accessToken, refreshToken, expiresIn, scopes);
+    // Credential storage is private to this manager
     
-    console.log(`[Credentials] Stored OAuth tokens for ${providerId}`);
+    console.log(`[Credentials] Stored encrypted OAuth tokens for ${providerId}`);
     return { accessTokenId, refreshTokenId };
+  }
+  
+  /**
+   * Find credential by provider and type
+   */
+  findCredential(providerId: string, type: string): EncryptedCredential | undefined {
+    return Array.from(this.credentials.values()).find(
+      cred => cred.providerId === providerId && cred.credentialType === type
+    );
+  }
+
+  /**
+   * Retrieve and decrypt credential by provider and type
+   */
+  async getCredentialByProvider(providerId: string, type: string): Promise<DecryptionResult | null> {
+    const credential = this.findCredential(providerId, type);
+    if (!credential) return null;
+    return this.getCredential(credential.id);
+  }
+
+  /**
+   * Delete credential by provider and type
+   */
+  deleteByProvider(providerId: string, type: string): boolean {
+    const credential = this.findCredential(providerId, type);
+    if (credential) {
+      return this.deleteCredential(credential.id);
+    }
+    return false;
   }
   
   /**
    * Retrieve and decrypt credential
    */
-  getCredential(credentialId: string): DecryptionResult | null {
+  async getCredential(credentialId: string): Promise<DecryptionResult | null> {
     const credential = this.credentials.get(credentialId);
     
     if (!credential) {
@@ -170,7 +194,7 @@ class APICredentialsManager {
     }
     
     try {
-      const decrypted = this.decrypt(credential.encryptedValue);
+      const decrypted = await this.decrypt(credential.encryptedValue);
       
       return {
         decrypted,
@@ -187,10 +211,10 @@ class APICredentialsManager {
   }
   
   /**
-   * Get credential value directly (convenience method)
+   * Get credential value directly
    */
-  getCredentialValue(credentialId: string): string | null {
-    const result = this.getCredential(credentialId);
+  async getCredentialValue(credentialId: string): Promise<string | null> {
+    const result = await this.getCredential(credentialId);
     return result?.valid ? result.decrypted : null;
   }
   
@@ -199,21 +223,19 @@ class APICredentialsManager {
    */
   deleteCredential(credentialId: string): boolean {
     const deleted = this.credentials.delete(credentialId);
-    
     if (deleted) {
       console.log(`[Credentials] Deleted credential ${credentialId}`);
     }
-    
     return deleted;
   }
   
   /**
    * Rotate API key
    */
-  rotateAPIKey(
+  async rotateAPIKey(
     credentialId: string,
     newApiKey: string
-  ): boolean {
+  ): Promise<boolean> {
     const credential = this.credentials.get(credentialId);
     
     if (!credential || credential.credentialType !== 'api_key') {
@@ -222,9 +244,9 @@ class APICredentialsManager {
     }
     
     // Update with new key
-    credential.encryptedValue = this.encrypt(newApiKey);
+    credential.encryptedValue = await this.encrypt(newApiKey);
     credential.lastRotatedAt = Date.now();
-    credential.createdAt = Date.now(); // Reset creation time
+    credential.createdAt = Date.now();
     
     this.credentials.set(credentialId, credential);
     
@@ -233,18 +255,9 @@ class APICredentialsManager {
   }
   
   /**
-   * List all credentials (masked for security)
+   * List all credentials (masked)
    */
-  listCredentials(): Array<{
-    id: string;
-    providerId: string;
-    credentialType: string;
-    createdAt: number;
-    expiresAt?: number;
-    lastRotatedAt?: number;
-    isExpired: boolean;
-    maskedValue: string;
-  }> {
+  listCredentials(): Array<any> {
     return Array.from(this.credentials.values()).map(cred => ({
       id: cred.id,
       providerId: cred.providerId,
@@ -253,19 +266,8 @@ class APICredentialsManager {
       expiresAt: cred.expiresAt,
       lastRotatedAt: cred.lastRotatedAt,
       isExpired: cred.expiresAt ? Date.now() > cred.expiresAt : false,
-      maskedValue: this.maskCredential(cred.encryptedValue)
+      maskedValue: '****' + (cred.id.slice(-4))
     }));
-  }
-  
-  /**
-   * Get expiring credentials (next 7 days)
-   */
-  getExpiringCredentials(daysThreshold: number = 7): EncryptedCredential[] {
-    const threshold = Date.now() + (daysThreshold * 24 * 60 * 60 * 1000);
-    
-    return Array.from(this.credentials.values()).filter(
-      cred => cred.expiresAt && cred.expiresAt <= threshold
-    );
   }
   
   /**
@@ -279,48 +281,33 @@ class APICredentialsManager {
   /**
    * Export credentials (encrypted backup)
    */
-  exportCredentials(password: string): string {
-    // In production, encrypt entire export with password
+  exportCredentials(): string {
     const exportData = {
-      version: '1.0',
+      version: '2.0',
       exportedAt: Date.now(),
       credentials: Array.from(this.credentials.entries()),
-      // Note: encryptedValues remain encrypted in export
     };
-    
     return JSON.stringify(exportData, null, 2);
   }
   
   /**
    * Import credentials from backup
    */
-  importCredentials(exportData: string, password: string): boolean {
+  importCredentials(exportData: string): boolean {
     try {
       const parsed = JSON.parse(exportData);
-      
       if (!parsed.credentials || !Array.isArray(parsed.credentials)) {
         throw new Error('Invalid export format');
       }
-      
       parsed.credentials.forEach(([key, value]: [string, EncryptedCredential]) => {
         this.credentials.set(key, value);
       });
-      
       console.log(`[Credentials] Imported ${this.credentials.size} credentials`);
       return true;
-      
     } catch (error) {
       console.error('[Credentials] Failed to import credentials:', error);
       return false;
     }
-  }
-  
-  /**
-   * Set default rotation period
-   */
-  setRotationPeriod(days: number): void {
-    this.defaultRotationPeriod = days;
-    console.log(`[Credentials] Set rotation period to ${days} days`);
   }
   
   /**
@@ -331,128 +318,79 @@ class APICredentialsManager {
   }
   
   /**
-   * Encrypt credential value
-   * TODO: Implement proper encryption using Web Crypto API
+   * Encrypt credential value using AES-GCM
    */
-  private encrypt(value: string): string {
-    // Placeholder - in production use AES-GCM encryption
-    // For now, base64 encode (NOT SECURE, just obfuscation)
-    try {
-      return btoa(value);
-    } catch {
-      // Fallback for non-ASCII characters
-      return Buffer.from(value).toString('base64');
-    }
+  private async encrypt(value: string): Promise<string> {
+    const secret = process.env.AETHER_SYSTEM_SECRET || 'fallback-sovereign-secret-2026';
+    const encoder = new TextEncoder();
+    const data = encoder.encode(value);
+    
+    const key = await this.deriveKey(secret);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    
+    const encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      data
+    );
+    
+    const combined = new Uint8Array(iv.length + encrypted.byteLength);
+    combined.set(iv);
+    combined.set(new Uint8Array(encrypted), iv.length);
+    
+    return btoa(String.fromCharCode(...combined));
   }
-  
+
   /**
-   * Decrypt credential value
-   * TODO: Implement proper decryption using Web Crypto API
+   * Decrypt credential value using AES-GCM
    */
-  private decrypt(encryptedValue: string): string {
-    // Placeholder - in production use AES-GCM decryption
-    try {
-      return atob(encryptedValue);
-    } catch {
-      // Fallback for Node.js environment
-      return Buffer.from(encryptedValue, 'base64').toString('utf-8');
-    }
+  private async decrypt(encryptedBase64: string): Promise<string> {
+    const secret = process.env.AETHER_SYSTEM_SECRET || 'fallback-sovereign-secret-2026';
+    const combined = new Uint8Array(
+      atob(encryptedBase64).split('').map(c => c.charCodeAt(0))
+    );
+    
+    const iv = combined.slice(0, 12);
+    const ciphertext = combined.slice(12);
+    
+    const key = await this.deriveKey(secret);
+    
+    const decrypted = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      ciphertext
+    );
+    
+    return new TextDecoder().decode(decrypted);
   }
-  
+
   /**
-   * Mask credential value for display
+   * Derive a crypto key from a secret string
    */
-  private maskCredential(value: string): string {
-    if (value.length <= 8) {
-      return '***';
-    }
-    return `${value.substring(0, 4)}...${value.substring(value.length - 4)}`;
-  }
-  
-  /**
-   * Validate credential strength
-   */
-  validateCredentialStrength(apiKey: string): {
-    valid: boolean;
-    score: number;
-    issues: string[];
-  } {
-    const issues: string[] = [];
-    let score = 100;
+  private async deriveKey(secret: string): Promise<CryptoKey> {
+    const encoder = new TextEncoder();
+    const secretData = encoder.encode(secret);
     
-    // Check length
-    if (apiKey.length < 32) {
-      issues.push('API key is too short (minimum 32 characters recommended)');
-      score -= 30;
-    }
+    const baseKey = await crypto.subtle.importKey(
+      'raw',
+      secretData,
+      'PBKDF2',
+      false,
+      ['deriveKey']
+    );
     
-    // Check entropy (simplified)
-    const uniqueChars = new Set(apiKey).size;
-    if (uniqueChars < apiKey.length * 0.5) {
-      issues.push('API key has low entropy (too repetitive)');
-      score -= 20;
-    }
-    
-    // Check for common patterns
-    if (/^[0-9]+$/.test(apiKey)) {
-      issues.push('API key contains only numbers');
-      score -= 20;
-    }
-    
-    if (/^[a-z]+$/.test(apiKey)) {
-      issues.push('API key contains only lowercase letters');
-      score -= 20;
-    }
-    
-    return {
-      valid: score >= 60,
-      score: Math.max(0, score),
-      issues
-    };
-  }
-  
-  /**
-   * Get credential statistics
-   */
-  getStatistics(): {
-    totalCredentials: number;
-    byType: Record<string, number>;
-    expiringSoon: number;
-    expired: number;
-    needsRotation: number;
-  } {
-    const credentials = this.listCredentials();
-    const byType: Record<string, number> = {};
-    let expiringSoon = 0;
-    let expired = 0;
-    let needsRotation = 0;
-    
-    const rotationThreshold = Date.now() - (this.defaultRotationPeriod * 24 * 60 * 60 * 1000);
-    
-    credentials.forEach(cred => {
-      // Count by type
-      byType[cred.credentialType] = (byType[cred.credentialType] || 0) + 1;
-      
-      // Check expiration
-      if (cred.isExpired) {
-        expired++;
-      } else if (cred.expiresAt && cred.expiresAt - Date.now() < 7 * 24 * 60 * 60 * 1000) {
-        expiringSoon++;
-      }
-      
-      // Check rotation needed
-      if (cred.lastRotatedAt && cred.lastRotatedAt < rotationThreshold) {
-        needsRotation++;
-      }
-    });
-    
-    return {
-      totalCredentials: credentials.length,
-      byType,
-      expiringSoon,
-      expired,
-      needsRotation
-    };
+    return await crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt: this.salt,
+        iterations: 100000,
+        hash: 'SHA-256'
+      },
+      baseKey,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+    );
   }
 }
 
