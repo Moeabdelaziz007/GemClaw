@@ -36,8 +36,8 @@ export const GemigramLogo = ({ variant = 'icon', size = 48, className = '' }: Ge
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         >
           <Image
-            src={BRAND.assets.forgeMark.path}
-            alt={`${BRAND.subProducts.forge} mark`}
+            src={BRAND.assets.icon.path}
+            alt={`${BRAND.product.name} icon`}
             width={size}
             height={size}
             className="w-full h-full object-contain"

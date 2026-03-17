@@ -34,7 +34,7 @@ export default function GalaxyPage() {
 
   useEffect(() => {
     if (!galaxySceneRef.current) return;
-
+    
     const updateSceneSize = () => {
       if (!galaxySceneRef.current) return;
       const { width, height } = galaxySceneRef.current.getBoundingClientRect();
@@ -52,7 +52,6 @@ export default function GalaxyPage() {
     const radius = 220 + index * 45;
     const duration = 25 + index * 6;
     const delay = index * -4;
-
     return { radius, duration, delay };
   };
 
@@ -60,13 +59,15 @@ export default function GalaxyPage() {
     const { radius, duration, delay } = getOrbitConfig(index);
     const centerX = sceneSize.width / 2;
     const centerY = sceneSize.height / 2;
+    
+    // Calculate current angle based on fixed initial state for static snapshot
     const initialOffsetProgress = (-delay / duration) % 1;
-    const angle = Math.PI + initialOffsetProgress * Math.PI * 2;
+    const angle = Math.PI + (initialOffsetProgress * Math.PI * 2);
     const scaledRadius = radius * zoom;
 
     return {
       x: centerX + Math.cos(angle) * scaledRadius,
-      y: centerY + Math.sin(angle) * scaledRadius,
+      y: centerY + Math.sin(angle) * scaledRadius
     };
   };
 
@@ -195,7 +196,7 @@ export default function GalaxyPage() {
         ))}
 
         {/* Agent Connection Lines (Synaptic Web) */}
-        {showConnections && agents.length > 1 && (
+        {showConnections && agents.length > 1 && sceneSize.width > 0 && (
           <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox={`0 0 ${sceneSize.width} ${sceneSize.height}`}>
             <defs>
               <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -214,7 +215,6 @@ export default function GalaxyPage() {
 
               const lineStart = connectToCore ? { x: centerX, y: centerY } : currentPosition;
               const lineEnd = connectToCore ? currentPosition : nextPosition;
-
               return (
                 <motion.line
                   key={`connection-${i}`}
