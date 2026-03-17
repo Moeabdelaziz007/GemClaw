@@ -373,7 +373,7 @@ setRateLimit(serverId: string, rpm: number, rph?: number): void {
 ```typescript
 // Subscribe to MCP events
 mcpClient.addEventListener('server_connected', (data) => {
-  console.log(`Connected to ${data.serverId}`);
+  // console.log(`Connected to ${data.serverId}`);
 });
 
 mcpClient.addEventListener('provider_state_changed', (data) => {

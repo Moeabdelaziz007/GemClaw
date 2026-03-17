@@ -55,7 +55,7 @@ export async function createMemory(memory: Omit<Memory, 'id' | 'createdAt' | 'la
       lastAccessedAt: Timestamp.now(),
     });
     
-    console.log('[MemoryStore] Memory created:', docRef.id);
+    // console.log('[MemoryStore] Memory created:', docRef.id);
     return docRef.id;
   } catch (error) {
     console.error('[MemoryStore] Failed to create memory:', error);
@@ -89,7 +89,7 @@ export async function updateMemory(memoryId: string, updates: Partial<Memory>): 
   try {
     const memoryRef = doc(db, 'memories', memoryId);
     await updateDoc(memoryRef, updates);
-    console.log('[MemoryStore] Memory updated:', memoryId);
+    // console.log('[MemoryStore] Memory updated:', memoryId);
   } catch (error) {
     console.error('[MemoryStore] Failed to update memory:', error);
     throw new Error(`Failed to update memory: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -103,7 +103,7 @@ export async function deleteMemory(memoryId: string): Promise<void> {
   try {
     const memoryRef = doc(db, 'memories', memoryId);
     await deleteDoc(memoryRef);
-    console.log('[MemoryStore] Memory deleted:', memoryId);
+    // console.log('[MemoryStore] Memory deleted:', memoryId);
   } catch (error) {
     console.error('[MemoryStore] Failed to delete memory:', error);
     throw new Error(`Failed to delete memory: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -267,7 +267,7 @@ export async function applyMemoryDecay(agentId: string): Promise<void> {
       }
     }));
 
-    console.log(`[MemoryStore] Decay applied to ${updates.length} memories`);
+    // console.log(`[MemoryStore] Decay applied to ${updates.length} memories`);
   } catch (error) {
     console.error('[MemoryStore] Failed to apply memory decay:', error);
   }
@@ -330,7 +330,7 @@ export async function clearAgentMemories(agentId: string): Promise<void> {
       }
     }
     
-    console.log('[MemoryStore] Cleared all memories for agent:', agentId);
+    // console.log('[MemoryStore] Cleared all memories for agent:', agentId);
   } catch (error) {
     console.error('[MemoryStore] Failed to clear agent memories:', error);
     throw error;

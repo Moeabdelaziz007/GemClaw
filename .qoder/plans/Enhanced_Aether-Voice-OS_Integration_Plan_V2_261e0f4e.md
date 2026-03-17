@@ -1132,7 +1132,7 @@ export class VoiceEngine {
       this.websocketClient = new WebSocketAudioClient('ws://localhost:8765');
       await this.websocketClient.connect();
 
-      console.log('🎤 Thalamic Gate V2 initialized');
+      // console.log('🎤 Thalamic Gate V2 initialized');
     } catch (error) {
       console.error('Failed to initialize voice engine:', error);
       throw error;
@@ -1199,7 +1199,7 @@ export class VoiceEngine {
 
   private handleTranscript(text: string): void {
     // Process transcript from Gemini
-    console.log('📝 Transcript:', text);
+    // console.log('📝 Transcript:', text);
   }
 
   stopListening(): void {
@@ -1253,7 +1253,7 @@ export class WebSocketAudioClient {
         this.ws = new WebSocket(this.url);
         
         this.ws.onopen = () => {
-          console.log('🔌 Connected to audio backend');
+          // console.log('🔌 Connected to audio backend');
           this.reconnectAttempts = 0;
           resolve();
         };
@@ -1264,7 +1264,7 @@ export class WebSocketAudioClient {
         };
 
         this.ws.onclose = () => {
-          console.log('🔌 Disconnected from audio backend');
+          // console.log('🔌 Disconnected from audio backend');
           this.attemptReconnect();
         };
       } catch (error) {
@@ -1296,7 +1296,7 @@ export class WebSocketAudioClient {
   private async attemptReconnect(): Promise<void> {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
-      console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+      // console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
       
       setTimeout(async () => {
         try {

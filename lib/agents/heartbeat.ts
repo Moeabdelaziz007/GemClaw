@@ -51,7 +51,7 @@ export async function startAgentHeartbeat(
         }
       });
 
-      console.log(`[Heartbeat] Agent ${agentId} pulse sent`);
+      // console.log(`[Heartbeat] Agent ${agentId} pulse sent`);
     } catch (error) {
       console.error('[Heartbeat] Failed to send pulse:', error);
       
@@ -83,7 +83,7 @@ export async function startAgentHeartbeat(
     
     // Set up recurring heartbeats
     intervalId = setInterval(sendHeartbeat, intervalMs);
-    console.log(`[Heartbeat] Started monitoring agent ${agentId} (interval: ${intervalMs}ms)`);
+    // console.log(`[Heartbeat] Started monitoring agent ${agentId} (interval: ${intervalMs}ms)`);
   }
 
   // Return cleanup function
@@ -91,7 +91,7 @@ export async function startAgentHeartbeat(
     isActive = false;
     if (intervalId) {
       clearInterval(intervalId);
-      console.log(`[Heartbeat] Stopped monitoring agent ${agentId}`);
+      // console.log(`[Heartbeat] Stopped monitoring agent ${agentId}`);
     }
   };
 }
@@ -210,7 +210,7 @@ export async function getAgentHealth(agentId: string): Promise<AgentHealthMetric
  * Stop all heartbeats (for cleanup on app unload)
  */
 export function stopAllHeartbeats(): void {
-  console.log('[Heartbeat] Stopping all agent monitors');
+  // console.log('[Heartbeat] Stopping all agent monitors');
   // In a real app, we'd track all intervals and clear them
   // For now, browser cleanup will handle this
 }

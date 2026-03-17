@@ -124,8 +124,8 @@ Files: 5 files changed, 1,878 insertions(+)
 import MCPProviderSelector from '@/components/mcp/MCPProviderSelector';
 
 <MCPProviderSelector
-  onProviderConnect={(id) => console.log('Connected:', id)}
-  onProviderDisconnect={(id) => console.log('Disconnected:', id)}
+  onProviderConnect={(id) => // console.log('Connected:', id)}
+  onProviderDisconnect={(id) => // console.log('Disconnected:', id)}
 />
 ```
 
@@ -134,8 +134,8 @@ import MCPProviderSelector from '@/components/mcp/MCPProviderSelector';
 import MCPServerBrowser from '@/components/mcp/MCPServerBrowser';
 
 <MCPServerBrowser
-  onServerInstall={(id) => console.log('Installed:', id)}
-  onServerUninstall={(id) => console.log('Uninstalled:', id)}
+  onServerInstall={(id) => // console.log('Installed:', id)}
+  onServerUninstall={(id) => // console.log('Uninstalled:', id)}
 />
 ```
 
@@ -144,7 +144,7 @@ import MCPServerBrowser from '@/components/mcp/MCPServerBrowser';
 import APIMarketplaceBrowser from '@/components/mcp/APIMarketplaceBrowser';
 
 <APIMarketplaceBrowser
-  onAPISubscribe={(apiId, plan) => console.log('Subscribed:', apiId, plan)}
+  onAPISubscribe={(apiId, plan) => // console.log('Subscribed:', apiId, plan)}
 />
 ```
 
@@ -153,8 +153,8 @@ import APIMarketplaceBrowser from '@/components/mcp/APIMarketplaceBrowser';
 import APICredentialsManager from '@/components/mcp/APICredentialsManager';
 
 <APICredentialsManager
-  onCredentialAdd={(id) => console.log('Added:', id)}
-  onCredentialRemove={(id) => console.log('Removed:', id)}
+  onCredentialAdd={(id) => // console.log('Added:', id)}
+  onCredentialRemove={(id) => // console.log('Removed:', id)}
 />
 ```
 

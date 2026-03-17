@@ -12,7 +12,7 @@ if (!apiKey) {
 const ai = new GoogleGenAI({ apiKey });
 
 async function gen(prompt, file) {
-  console.log(`Generating ${file}...`);
+  // console.log(`Generating ${file}...`);
   try {
     const res = await ai.models.generateContent({
       model: 'gemini-3.1-flash-image-preview',
@@ -25,11 +25,11 @@ async function gen(prompt, file) {
       if (part.inlineData) {
         const buffer = Buffer.from(part.inlineData.data, 'base64');
         fs.writeFileSync(path.join(process.cwd(), 'public', file), buffer);
-        console.log(`Saved ${file}`);
+        // console.log(`Saved ${file}`);
         return;
       }
     }
-    console.log(`Failed to find image data for ${file}`);
+    // console.log(`Failed to find image data for ${file}`);
   } catch (err) {
     console.error(`Error generating ${file}:`, err);
   }

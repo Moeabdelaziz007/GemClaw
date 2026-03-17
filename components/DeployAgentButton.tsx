@@ -54,7 +54,7 @@ export function DeployAgentButton({ agent, className }: DeployAgentButtonProps) 
     
     try {
       // Step 1: Generate and validate avatar
-      console.log('[DeployAgent] Generating avatar...');
+      // console.log('[DeployAgent] Generating avatar...');
       const avatarUrl = await generateAgentAvatar({ agent });
       
       if (!avatarUrl || !avatarUrl.startsWith('data:image/')) {
@@ -62,7 +62,7 @@ export function DeployAgentButton({ agent, className }: DeployAgentButtonProps) 
       }
       
       setIsGeneratingAvatar(false);
-      console.log('[DeployAgent] Avatar generated successfully');
+      // console.log('[DeployAgent] Avatar generated successfully');
       
       // Step 2: Save to Firebase Storage with retry logic
       let storedAvatarUrl: string = '';
@@ -75,12 +75,12 @@ export function DeployAgentButton({ agent, className }: DeployAgentButtonProps) 
         } catch (storageError) {
           retries--;
           if (retries === 0) throw storageError;
-          console.log(`[DeployAgent] Retrying avatar upload... (${retries} attempts left)`);
+          // console.log(`[DeployAgent] Retrying avatar upload... (${retries} attempts left)`);
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
       
-      console.log('[DeployAgent] Avatar saved to Firebase Storage:', storedAvatarUrl);
+      // console.log('[DeployAgent] Avatar saved to Firebase Storage:', storedAvatarUrl);
       
       // Step 3: Install as PWA
       const success = await installAgentAsPWA({

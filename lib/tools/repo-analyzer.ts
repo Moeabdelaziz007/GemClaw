@@ -55,7 +55,6 @@ export async function analyzeRepository(repoUrl: string) {
     const cacheKey = `aether_repo_cache_${owner}_${repo}_${commitSha}`;
 
     if (commitSha && analysisCache.has(cacheKey)) {
-      console.log(`[Cache Hit] Returning cached analysis for ${owner}/${repo} at ${commitSha}`);
       // Re-insert to maintain recent usage order
       const cached = analysisCache.get(cacheKey);
       analysisCache.delete(cacheKey);
@@ -124,7 +123,6 @@ export async function analyzeRepository(repoUrl: string) {
 
     if (!cachedContentName) {
       try {
-        console.log(`[Gemini Cache] Creating new context cache for ${owner}/${repo} at ${commitSha}`);
         const cachedContent = await ai.caches.create({
           model: 'gemini-2.0-flash-exp',
           config: {
@@ -147,7 +145,6 @@ export async function analyzeRepository(repoUrl: string) {
         console.warn('Failed to create Gemini context cache, falling back to full prompt:', err.message);
       }
     } else {
-      console.log(`[Gemini Cache] Reusing context cache ${cachedContentName} for ${owner}/${repo} at ${commitSha}`);
     }
 
     const prompt = `

@@ -78,7 +78,6 @@ export function useMemory(agentId: string) {
 
   const addSkill = async (name: string, description: string, type: string) => {
     // Skill logic to be integrated with Procedural memory
-    console.log('Skill addition requested:', { name, description, type });
   };
 
   return {

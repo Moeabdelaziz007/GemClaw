@@ -14,8 +14,6 @@ import { useAetherStore } from '../store/useAetherStore';
 import { ToolResult } from '../types/live-api';
 
 export async function handleNeuralTool(name: string, args: Record<string, any>): Promise<ToolResult> {
-  console.log(`[NeuralHandler] Executing: ${name}`, args);
-
   const FUNCTION_URL = "https://executeagenttool-v7vofv7mxa-uc.a.run.app"; 
   const LOCAL_BRIDGE_URL = "http://localhost:9999/execute"; // For zero-cost local execution
 
@@ -24,7 +22,6 @@ export async function handleNeuralTool(name: string, args: Record<string, any>):
   // 🌐 Stateless Web Navigation (Jina Reader)
   if (name === 'browse_url' || (name === 'searchWeb' && args.url)) {
     const urlToRead = args.url || args.query;
-    console.log(`[NeuralHandler] Stateless Browsing: ${urlToRead}`);
     try {
       const response = await fetch(`https://r.jina.ai/${urlToRead}`);
       const markdown = await response.text();
@@ -42,7 +39,6 @@ export async function handleNeuralTool(name: string, args: Record<string, any>):
 
   // 🧬 Agent Genesis Engine
   if (name === 'create_agent') {
-    console.log(`[NeuralHandler] Materializing Agent: ${args.name}`);
     try {
       const { setPendingManifest } = useAetherStore.getState();
       
@@ -193,30 +189,28 @@ export async function handleNeuralTool(name: string, args: Record<string, any>):
   else if (name.startsWith('workspace_')) {
     const isAdmin = auth.currentUser?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
     if (!isAdmin && (name === 'list_users' || name === 'analyze_users')) {
-      return { status: "error", message: "Unauthorized. Admin spinal access required." };
+      return { status: "error" as const, message: "Unauthorized. Admin spinal access required." };
     }
 
     // 🛡️ MOBILE-FIRST PROTOCOL: Attempt Direct Client-Side Execution
     try {
-      console.log(`[NeuralHandler] Attempting Client-Spine Execution for ${name}...`);
-      
       const user = auth.currentUser;
-      if (!user) return { status: "error", message: "User must be authenticated for Workspace operations." };
+      if (!user) return { status: "error" as const, message: "User must be authenticated for Workspace operations." };
 
       // We need a fresh token with GWS scopes if not provided
       let gwsToken = args.accessToken;
       if (!gwsToken) {
-        // Fallback to scoped popup if token is missing
-        const gwsResult = await signInWithPopup(auth, googleProvider);
-        const credential = GoogleAuthProvider.credentialFromResult(gwsResult);
-        gwsToken = credential?.accessToken;
+        return { 
+          status: "error" as const, 
+          message: "Action requires elevated GWS credentials. Please re-authenticate via Nexus Gateway.",
+          requiresAuth: true 
+        } as any;
       }
 
       if (gwsToken) {
         try {
           const clientResult = await executeGWSClientAction(name, args.action || '+triage', args.params || {}, gwsToken);
-          console.log("[NeuralHandler] Client-Spine Execution Successful.");
-          return clientResult;
+          return clientResult as ToolResult;
         } catch (clientErr) {
           console.warn("[NeuralHandler] Client-Spine direct API failed, falling back to bridge.");
         }
@@ -237,7 +231,6 @@ export async function handleNeuralTool(name: string, args: Record<string, any>):
 
       if (localResponse && localResponse.ok) {
         result = await localResponse.json();
-        console.log("[NeuralHandler] Local-Spine Execution Successful.");
         return result;
       }
 
@@ -258,12 +251,13 @@ export async function handleNeuralTool(name: string, args: Record<string, any>):
       });
 
       result = await response.json();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
       console.error("[NeuralHandler] Critical Failure:", err);
       result = { 
         status: "error" as const, 
         message: "Neural routing failed (Client, Local & Cloud unavailable).",
-        details: err.message
+        details: errorMessage
       };
     }
   }
@@ -278,8 +272,6 @@ export async function handleNeuralTool(name: string, args: Record<string, any>):
  * Autonomous Tool Execution.
  */
 export async function AetherVoiceOrchestrator(intent: string, context: any) {
-  console.log(`[AetherVoice] Orchestrating Intent: ${intent}`);
-
   // 1. Analyze Intention (Neural Route)
   // Matching against GWS Recipes and Helpers (+ commands)
   const recipeMatch = intent.match(/(triage|agenda|standup|meeting prep|email to task|weekly digest)/i);

@@ -38,7 +38,7 @@ export default function ForgePage() {
   // 🧬 Genesis Protocol: Handle automated forging from Voice Prompt
   useEffect(() => {
     if (pendingManifest && !isForging) {
-      console.log("[ForgePage] Genesis Intent Detected. Materializing...");
+      // console.log("[ForgePage] Genesis Intent Detected. Materializing...");
       setPendingAgentData(pendingManifest);
       setIsForging(true);
     }
@@ -83,7 +83,7 @@ export default function ForgePage() {
       });
       
       // Initialize agent's memory system with core memories
-      console.log('[ForgePage] Initializing memory system for agent:', agentId);
+      // console.log('[ForgePage] Initializing memory system for agent:', agentId);
       await createMemory({
         agentId: agentId,
         userId: user.uid,
@@ -119,10 +119,10 @@ export default function ForgePage() {
         }
       });
       
-      console.log('[ForgePage] Memory system initialized successfully');
+      // console.log('[ForgePage] Memory system initialized successfully');
       
       // Start heartbeat monitoring for this agent
-      console.log('[ForgePage] Starting heartbeat monitor for:', agentId);
+      // console.log('[ForgePage] Starting heartbeat monitor for:', agentId);
       startAgentHeartbeat(agentId);
       
       setPendingAgentData(null);

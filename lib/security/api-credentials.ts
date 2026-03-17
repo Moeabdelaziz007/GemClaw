@@ -91,7 +91,7 @@ class APICredentialsManager {
     
     // Credential storage is private to this manager
     
-    console.log(`[Credentials] Stored encrypted API key for ${providerId}`);
+    // console.log(`[Credentials] Stored encrypted API key for ${providerId}`);
     return credentialId;
   }
   
@@ -139,7 +139,7 @@ class APICredentialsManager {
     
     // Credential storage is private to this manager
     
-    console.log(`[Credentials] Stored encrypted OAuth tokens for ${providerId}`);
+    // console.log(`[Credentials] Stored encrypted OAuth tokens for ${providerId}`);
     return { accessTokenId, refreshTokenId };
   }
   
@@ -224,7 +224,7 @@ class APICredentialsManager {
   deleteCredential(credentialId: string): boolean {
     const deleted = this.credentials.delete(credentialId);
     if (deleted) {
-      console.log(`[Credentials] Deleted credential ${credentialId}`);
+      // console.log(`[Credentials] Deleted credential ${credentialId}`);
     }
     return deleted;
   }
@@ -250,7 +250,7 @@ class APICredentialsManager {
     
     this.credentials.set(credentialId, credential);
     
-    console.log(`[Credentials] Rotated API key for ${credential.providerId}`);
+    // console.log(`[Credentials] Rotated API key for ${credential.providerId}`);
     return true;
   }
   
@@ -294,7 +294,7 @@ class APICredentialsManager {
    */
   clearAll(): void {
     this.credentials.clear();
-    console.log('[Credentials] Cleared all credentials');
+    // console.log('[Credentials] Cleared all credentials');
   }
   
   /**
@@ -321,7 +321,7 @@ class APICredentialsManager {
       parsed.credentials.forEach(([key, value]: [string, EncryptedCredential]) => {
         this.credentials.set(key, value);
       });
-      console.log(`[Credentials] Imported ${this.credentials.size} credentials`);
+      // console.log(`[Credentials] Imported ${this.credentials.size} credentials`);
       return true;
     } catch (error) {
       console.error('[Credentials] Failed to import credentials:', error);

@@ -106,7 +106,6 @@ export class MCPClient {
       throw new Error(`Provider "${provider.id}" is already registered.`);
     }
     this.providers.set(provider.id, provider);
-    console.log(`[MCP] Registered provider: ${provider.name}`);
   }
   
   /**
@@ -155,7 +154,6 @@ export class MCPClient {
   async connectToServer(serverConfig: MCPServer): Promise<void> {
     const existingServer = this.servers.get(serverConfig.id);
     if (existingServer && existingServer.status === 'active') {
-      console.log(`[MCP] Server ${serverConfig.name} already connected`);
       return;
     }
     
@@ -176,8 +174,6 @@ export class MCPClient {
       serverConfig.status = 'active';
       serverConfig.lastHealthCheck = Date.now();
       this.servers.set(serverConfig.id, serverConfig);
-      
-      console.log(`[MCP] Successfully connected to server: ${serverConfig.name}`);
       
       this.emitEvent('server_connected', {
         serverId: serverConfig.id,
@@ -215,8 +211,6 @@ export class MCPClient {
     
     server.status = 'inactive';
     this.servers.set(serverId, server);
-    
-    console.log(`[MCP] Disconnected from server: ${server.name}`);
     
     this.emitEvent('server_disconnected', {
       serverId,
@@ -448,7 +442,6 @@ export class MCPClient {
    */
   saveConnectionProfile(profile: MCPConnectionProfile): void {
     this.profiles.set(profile.id, profile);
-    console.log(`[MCP] Saved connection profile: ${profile.name}`);
   }
   
   /**
@@ -473,8 +466,6 @@ export class MCPClient {
     if (!profile) {
       throw new Error(`Profile "${profileId}" not found.`);
     }
-    
-    console.log(`[MCP] Loading connection profile: ${profile.name}`);
     
     for (const serverId of profile.servers) {
       const server = this.servers.get(serverId);
@@ -574,12 +565,6 @@ export class MCPClient {
         this.listPrompts(server.id)
       ]);
       
-      console.log(`[MCP] Server ${server.name} capabilities:`, {
-        resources: resources.status === 'fulfilled' ? resources.value.length : 0,
-        tools: tools.status === 'fulfilled' ? tools.value.length : 0,
-        prompts: prompts.status === 'fulfilled' ? prompts.value.length : 0
-      });
-      
     } catch (error) {
       console.warn(`[MCP] Could not discover all capabilities for ${server.name}:`, error);
     }
@@ -666,8 +651,6 @@ export class MCPClient {
       limit,
       window
     });
-    
-    console.log(`[MCP] Set rate limit for ${serverId}: ${requestsPerMinute} req/min`);
   }
   
   /**
@@ -681,8 +664,6 @@ export class MCPClient {
     this.prompts.clear();
     this.profiles.clear();
     this.rateLimiters.clear();
-    
-    console.log('[MCP] Cleared all connections');
   }
   
   /**

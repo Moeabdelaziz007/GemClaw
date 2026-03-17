@@ -16,7 +16,6 @@ export function useAudioProcessor() {
         // const engine = await import('../public/engine.wasm'); 
         // voiceEngineRef.current = engine;
         // setIsWasmLoaded(true);
-        console.log('Neural Spine: Jitter Buffer Active [JS Fallback Mode]');
       } catch (e) {
         console.error('Neural Spine WASM Sync Error:', e);
       }

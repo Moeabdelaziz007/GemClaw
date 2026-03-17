@@ -1,4 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react';
+import { useAetherStore } from '../lib/store/useAetherStore';
 
 interface ThalamicGateConfig {
   /** Silence threshold (0-1) below which we consider the user "quiet". Default: 0.02 */
@@ -99,6 +100,8 @@ export function useThalamicGate(
     ].join(" ");
 
     try {
+
+      // Inject a system-level prompt that encourages the AI to reach out
       ws.send(JSON.stringify({
         clientContent: {
           turns: [{
@@ -109,7 +112,6 @@ export function useThalamicGate(
         }
       }));
 
-      console.log("⚡ Thalamic Gate: Proactive intervention triggered");
     } catch (err) {
       console.error("Thalamic Gate: Intervention injection failed:", err);
     }
@@ -123,6 +125,14 @@ export function useThalamicGate(
     isActiveRef.current = true;
 
     intervalRef.current = setInterval(() => {
+      const { isThinking, isSpeaking } = useAetherStore.getState();
+      
+      // Do not intervene if the AI is currently processing or talking
+      if (isThinking || isSpeaking) {
+        streakRef.current = 0;
+        return;
+      }
+
       const score = computeNeedHelpScore();
 
       if (score > 0.5) {

@@ -39,10 +39,22 @@ export class AgentRegistry {
         this.unsubscribeSnapshot = onSnapshot(
           q,
           (snapshot) => {
+            // Track IDs in current snapshot to detect deletions
+            const currentIds = new Set<string>();
+            
             snapshot.docs.forEach(doc => {
               const data = doc.data() as AgentManifest;
-              this.agents.set(doc.id, { ...data, id: doc.id });
+              const agentId = doc.id;
+              currentIds.add(agentId);
+              this.agents.set(agentId, { ...data, id: agentId });
             });
+
+            // Reconcile: remove items that are no longer in Firestore
+            for (const id of this.agents.keys()) {
+              if (!currentIds.has(id)) {
+                this.agents.delete(id);
+              }
+            }
 
             if (isFirstSnapshot) {
               isFirstSnapshot = false;
@@ -52,7 +64,7 @@ export class AgentRegistry {
           (error) => {
             console.error("Failed to sync AgentRegistry:", error);
             if (isFirstSnapshot) {
-              resolve(); // Resolve even on error to unblock caller, though error is logged
+              resolve(); 
             }
           }
         );

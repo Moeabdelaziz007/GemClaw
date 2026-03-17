@@ -67,7 +67,7 @@ export interface GenericToolResponse {
 }
 
 export interface ToolMetadata {
-  status?: "success" | "error" | "fail" | "orchestrated";
+  status?: "success" | "error" | "fail" | "orchestrated" | "simulation";
   message?: string;
   synthesis?: string;
 }

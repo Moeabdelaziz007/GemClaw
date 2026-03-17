@@ -206,7 +206,7 @@ export default function MCPProviderSelector({
       // Trigger OAuth flow if needed
       if (provider.authType === 'oauth2') {
         // This would redirect to OAuth URL
-        console.log('Initiating OAuth flow for', provider.name);
+        // console.log('Initiating OAuth flow for', provider.name);
       }
 
       setProviders(prev => prev.map(p => 
@@ -320,7 +320,7 @@ const MCPConfigModal: React.FC<MCPConfigModalProps> = ({ providerId, onClose }) 
     try {
       // Store API key using credential manager
       // This would integrate with apiCredentialsManager
-      console.log('Saving API key for provider:', providerId);
+      // console.log('Saving API key for provider:', providerId);
       onClose();
     } catch (error) {
       console.error('Failed to save configuration:', error);

@@ -69,7 +69,6 @@ export class MCPConfigManager {
     scopes?: string[]
   ): Promise<void> {
     await apiCredentialsManager.storeAPIKey(providerId, apiKey, { scopes });
-    console.log(`[MCP Config] Stored encrypted API key for provider: ${providerId}`);
   }
   
   /**
@@ -89,7 +88,6 @@ export class MCPConfigManager {
       expiresIn, 
       scopes
     );
-    console.log(`[MCP Config] Stored encrypted OAuth tokens for provider: ${providerId}`);
   }
   
   /**
@@ -131,7 +129,6 @@ export class MCPConfigManager {
    */
   async removeCredential(providerId: string, credentialType: string): Promise<void> {
     apiCredentialsManager.deleteByProvider(providerId, credentialType);
-    console.log(`[MCP Config] Removed credential for ${providerId}:${credentialType}`);
   }
   
   /**
@@ -139,7 +136,6 @@ export class MCPConfigManager {
    */
   async clearCredentials(): Promise<void> {
     apiCredentialsManager.clearAll();
-    console.log('[MCP Config] Cleared all credentials');
   }
   
   /**
@@ -168,7 +164,6 @@ export class MCPConfigManager {
   cacheDiscoveredServers(servers: DiscoveredServer[]): void {
     this.discoveredServers = servers;
     this.lastMarketplaceFetch = Date.now();
-    console.log(`[MCP Config] Cached ${servers.length} discovered servers`);
   }
   
   /**
@@ -177,9 +172,6 @@ export class MCPConfigManager {
   getDiscoveredServers(): DiscoveredServer[] {
     // Check if cache is stale
     const now = Date.now();
-    if (now - this.lastMarketplaceFetch > this.marketplaceCacheDuration) {
-      console.log('[MCP Config] Marketplace cache is stale, refresh recommended');
-    }
     
     return [...this.discoveredServers];
   }
@@ -237,7 +229,6 @@ export class MCPConfigManager {
       active: false
     };
     
-    console.log(`[MCP Config] Created profile "${profileName}" with server ${server.name}`);
     return profile;
   }
   
@@ -246,7 +237,6 @@ export class MCPConfigManager {
    */
   setMarketplaceCacheDuration(durationMs: number): void {
     this.marketplaceCacheDuration = durationMs;
-    console.log(`[MCP Config] Set marketplace cache duration to ${durationMs}ms`);
   }
   
   /**
@@ -295,8 +285,6 @@ export class MCPConfigManager {
       if (config.lastMarketplaceFetch) {
         this.lastMarketplaceFetch = config.lastMarketplaceFetch;
       }
-      
-      console.log('[MCP Config] Successfully imported configuration');
       
     } catch (error) {
       console.error('[MCP Config] Failed to import configuration:', error);

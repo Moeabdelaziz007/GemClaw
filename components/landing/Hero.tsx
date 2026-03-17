@@ -38,7 +38,7 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
     return () => clearInterval(timer);
   }, []);
   return (
-    <section className="relative min-h-[95vh] flex items-center justify-center pt-32 pb-20 overflow-hidden bg-carbon-black">
+    <section className="relative min-h-[95vh] flex items-center justify-center pt-24 md:pt-32 pb-12 md:pb-20 overflow-hidden bg-carbon-black">
       {/* Subtle Carbon Fiber Background Pattern */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
       
@@ -61,7 +61,7 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
               opacity: [0.6, 0.8, 0.6]
             }}
             transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="w-[280px] h-[280px] sm:w-[450px] sm:h-[450px] lg:w-[600px] lg:h-[600px] rounded-full relative"
+            className="w-[200px] h-[200px] sm:w-[450px] sm:h-[450px] lg:w-[600px] lg:h-[600px] rounded-full relative"
             style={{
               background: 'radial-gradient(circle, var(--gemigram-neon-glow) 0%, rgba(57,255,20,0.1) 40%, transparent 70%)',
               filter: 'blur(20px)'
@@ -96,14 +96,14 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
           <motion.h1 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-6xl sm:text-8xl lg:text-[12rem] font-black tracking-[-0.05em] leading-[0.8] mb-6 neon-shimmer uppercase"
+            className="text-4xl sm:text-6xl md:text-8xl lg:text-[12rem] font-black tracking-[-0.05em] leading-[0.8] mb-6 neon-shimmer uppercase"
           >
             {BRAND.product.name}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-xl md:text-2xl text-white/40 font-bold uppercase tracking-[0.4em] mb-12"
+            className="text-sm md:text-xl lg:text-2xl text-white/40 font-bold uppercase tracking-[0.4em] mb-12"
           >
             {BRAND.product.tagline}
           </motion.p>
@@ -148,12 +148,11 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
           </div>
         </div>
 
-        {/* Agent Hive Preview - Enhanced */}
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}
-          className="w-full mt-40 glass-strong border border-gemigram-neon/10 rounded-[3rem] p-12 overflow-hidden relative shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+          className="w-full mt-20 md:mt-40 glass-strong border border-gemigram-neon/10 rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 overflow-hidden relative shadow-[0_0_40px_rgba(0,0,0,0.5)]"
         >
           {/* Enhanced background glow */}
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gemigram-neon/10 blur-[120px] pointer-events-none mix-blend-screen" />
@@ -163,7 +162,7 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
           <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.8)_1px,transparent_1px)] bg-[length:24px_24px] pointer-events-none" />
 
           <div className="flex justify-between items-center mb-16 relative z-10">
-            <h2 className="text-4xl font-black uppercase tracking-tighter text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">Agent_Hive</h2>
+            <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tighter text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">Agent_Hive</h2>
             <div className="flex gap-4">
                {[1,2].map(i => (
                  <motion.button
@@ -221,12 +220,11 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
           </div>
         </motion.div>
 
-        {/* Global Trust Indicators */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.8 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mt-32 max-w-6xl mx-auto border-t border-white/[0.03] pt-16"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12 mt-20 md:mt-32 max-w-6xl mx-auto border-t border-white/[0.03] pt-12 md:pt-16"
         >
           {[
             { icon: Shield, label: 'Carbon Secure', value: 'AES-256', color: 'text-neon-green' },

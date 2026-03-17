@@ -40,7 +40,6 @@ const GITHUB_OAUTH_CONFIG = {
 export function initializeGitHubProvider(): void {
   try {
     mcpClient.registerProvider(GITHUB_PROVIDER);
-    console.log('[GitHub MCP] Provider registered successfully');
   } catch (error) {
     console.error('[GitHub MCP] Failed to register provider:', error);
     throw error;
