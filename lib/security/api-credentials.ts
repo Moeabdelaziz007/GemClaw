@@ -269,6 +269,25 @@ class APICredentialsManager {
       maskedValue: '****' + (cred.id.slice(-4))
     }));
   }
+
+  /**
+   * Get credential statistics
+   */
+  getStatistics() {
+    const creds = Array.from(this.credentials.values());
+    const now = Date.now();
+    const weekInMs = 7 * 24 * 60 * 60 * 1000;
+
+    return {
+      totalCredentials: creds.length,
+      expiringSoon: creds.filter(c => c.expiresAt && (c.expiresAt - now) < weekInMs && (c.expiresAt - now) > 0).length,
+      expired: creds.filter(c => c.expiresAt && now > c.expiresAt).length,
+      needsRotation: creds.filter(c => {
+        const lastRotated = c.lastRotatedAt || c.createdAt;
+        return (now - lastRotated) > (this.defaultRotationPeriod * 24 * 60 * 60 * 1000);
+      }).length
+    };
+  }
   
   /**
    * Clear all credentials

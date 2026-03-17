@@ -5,11 +5,13 @@ export interface ProjectMetadata {
   name: string;
 }
 
+export type AgentRole = 'Sovereign Intelligence' | 'Neural Architect' | 'Ethereal Guide' | 'Shadow Sentinel' | 'Core Oracle' | string;
+
 export interface Agent {
   id: string;
   aetherId: string;
   name: string;
-  role: string;
+  role: AgentRole;
   users: string;
   seed: string;
   systemPrompt: string;

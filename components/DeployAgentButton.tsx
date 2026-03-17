@@ -65,7 +65,7 @@ export function DeployAgentButton({ agent, className }: DeployAgentButtonProps) 
       console.log('[DeployAgent] Avatar generated successfully');
       
       // Step 2: Save to Firebase Storage with retry logic
-      let storedAvatarUrl: string;
+      let storedAvatarUrl: string = '';
       let retries = 3;
       
       while (retries > 0) {

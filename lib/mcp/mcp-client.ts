@@ -57,7 +57,7 @@ type MCPClientEventListener = (event: any) => void;
 /**
  * MCP Client - Singleton for managing MCP connections
  */
-class MCPClient {
+export class MCPClient {
   private static instance: MCPClient;
   
   // Connection pools

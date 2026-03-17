@@ -155,7 +155,7 @@ export async function getAgentMemories(
 export async function searchMemories(
   agentId: string,
   searchTerm: string,
-  limit: number = 10
+  limitCount: number = 10
 ): Promise<Memory[]> {
   try {
     const memoriesRef = collection(db, 'memories');
@@ -163,7 +163,7 @@ export async function searchMemories(
       memoriesRef,
       where('agentId', '==', agentId),
       orderBy('createdAt', 'desc'),
-      limit(limit * 5) // Get more results for client-side filtering
+      limit(limitCount * 5) // Get more results for client-side filtering
     );
 
     const snapshot = await getDocs(q);
@@ -192,7 +192,7 @@ export async function searchMemories(
       });
     });
 
-    return filteredMemories.slice(0, limit);
+    return filteredMemories.slice(0, limitCount);
   } catch (error) {
     console.error('[MemoryStore] Failed to search memories:', error);
     return [];

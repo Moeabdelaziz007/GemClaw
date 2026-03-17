@@ -1,19 +1,19 @@
-import { create } from 'zustand';
+import { create, StateCreator } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { createSensorySlice, SensorySlice } from './slices/createSensorySlice';
 import { createAgentSlice, AgentSlice } from './slices/createAgentSlice';
 import { createUiSlice, UiSlice } from './slices/createUiSlice';
 import { createCognitiveSlice, CognitiveSlice } from './slices/createCognitiveSlice';
 
-export type AetherState = SensorySlice & AgentSlice & UiSlice & CognitiveSlice;
+export interface AetherState extends SensorySlice, AgentSlice, UiSlice, CognitiveSlice {}
 
 export const useAetherStore = create<AetherState>()(
   persist(
-    (...a) => ({
-      ...createSensorySlice(...a),
-      ...createAgentSlice(...a),
-      ...createUiSlice(...a),
-      ...createCognitiveSlice(...a),
+    (set, get, api) => ({
+      ...createSensorySlice(set, get, api),
+      ...createAgentSlice(set, get, api),
+      ...createUiSlice(set, get, api),
+      ...createCognitiveSlice(set, get, api),
     }),
     {
       name: 'aether-storage',

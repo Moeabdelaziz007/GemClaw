@@ -35,7 +35,7 @@ interface DiscoveredServer {
 /**
  * MCP Configuration Manager
  */
-class MCPConfigManager {
+export class MCPConfigManager {
   private static instance: MCPConfigManager;
   
   // Discovered servers from marketplace

@@ -132,7 +132,9 @@ export default function WorkspacePage() {
 
       {/* Main VoiceAgent Component */}
       <div className="pt-16 h-full">
-        <VoiceAgent activeAgent={activeAgent} googleAccessToken={googleAccessToken} />
+        {activeAgent && (
+          <VoiceAgent activeAgent={activeAgent} googleAccessToken={googleAccessToken || undefined} />
+        )}
       </div>
     </div>
   );

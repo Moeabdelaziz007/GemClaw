@@ -95,7 +95,7 @@ export async function handleNeuralTool(name: string, args: Record<string, any>):
       const data = await response.json();
       result = { status: "success", projects: data.projects || [] };
     } catch (err) {
-      result = { status: "error", message: "Failed to fetch projects." };
+      result = { status: "error" as const, message: "Failed to fetch projects." };
     }
   }
   else if (name === 'getProjectDetails') {
@@ -109,7 +109,7 @@ export async function handleNeuralTool(name: string, args: Record<string, any>):
       });
       result = await response.json();
     } catch (err) {
-      result = { status: "error", message: "Failed to fetch project details." };
+      result = { status: "error" as const, message: "Failed to fetch project details." };
     }
   }
   else if (name === 'getWeather') {
@@ -166,7 +166,7 @@ export async function handleNeuralTool(name: string, args: Record<string, any>):
         synthesis: "Successfully stored in permanent neural substrate. Ready for contextual recall."
       };
     } catch (err) {
-      result = { status: "error", message: "Failed to store memory substrate." };
+      result = { status: "error" as const, message: "Failed to store memory substrate." };
     }
   }
   else if (name === 'search_memory' || name === 'search_knowledge_base') {
@@ -187,7 +187,7 @@ export async function handleNeuralTool(name: string, args: Record<string, any>):
         )
       };
     } catch (err) {
-      result = { status: "error", message: "Memory retrieval failure." };
+      result = { status: "error" as const, message: "Memory retrieval failure." };
     }
   }
   else if (name.startsWith('workspace_')) {
@@ -261,7 +261,7 @@ export async function handleNeuralTool(name: string, args: Record<string, any>):
     } catch (err: any) {
       console.error("[NeuralHandler] Critical Failure:", err);
       result = { 
-        status: "error", 
+        status: "error" as const, 
         message: "Neural routing failed (Client, Local & Cloud unavailable).",
         details: err.message
       };

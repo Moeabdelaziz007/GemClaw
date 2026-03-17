@@ -66,15 +66,21 @@ export interface GenericToolResponse {
   [key: string]: unknown;
 }
 
+export interface ToolMetadata {
+  status?: "success" | "error" | "fail" | "orchestrated";
+  message?: string;
+  synthesis?: string;
+}
+
 export type ToolResult =
-  | WeatherResult
-  | CryptoResult
-  | MapLocationResult
-  | SearchWebResult
-  | MemoryResult
-  | ProjectResult
-  | WorkspaceResult
-  | GenericToolResponse;
+  | (WeatherResult & ToolMetadata)
+  | (CryptoResult & ToolMetadata)
+  | (MapLocationResult & ToolMetadata)
+  | (SearchWebResult & ToolMetadata)
+  | (MemoryResult & ToolMetadata)
+  | (ProjectResult & ToolMetadata)
+  | (WorkspaceResult & ToolMetadata)
+  | (GenericToolResponse & ToolMetadata);
 
 export interface FunctionDeclaration {
   name: string;

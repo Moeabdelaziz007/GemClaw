@@ -1,6 +1,6 @@
 import { test, mock } from 'node:test';
 import assert from 'node:assert';
-import { exportAgentAsAth } from '../utils/athPackage.ts';
+import { athPackage } from '../lib/athPackage';
 
 test('exportAgentAsAth exports agent correctly', async (t) => {
   const mockFile = mock.fn();

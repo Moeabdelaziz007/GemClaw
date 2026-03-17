@@ -10,7 +10,7 @@ import { BRAND } from '@/lib/constants/branding';
 export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
   const [mounted, setMounted] = useState(false);
   const telemetry = useSystemTelemetry();
-  const { bots } = useAetherStore();
+  const { agents } = useAetherStore();
   const [stats, setStats] = useState({ agents: 0, latency: 0, uptime: 0 });
 
   useEffect(() => {
@@ -231,7 +231,7 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
           {[
             { icon: Shield, label: 'Carbon Secure', value: 'AES-256', color: 'text-neon-green' },
             { icon: Activity, label: 'L1 Latency', value: `${telemetry.latency}ms`, color: 'text-neon-blue' },
-            { icon: Zap, label: 'Neon Active', value: `${bots.length} Agents`, color: 'text-cyber-lime' },
+            { icon: Zap, label: 'Neon Active', value: `${agents.length} Agents`, color: 'text-cyber-lime' },
             { icon: Globe, label: 'Session Uptime', value: `${telemetry.uptime}s`, color: 'text-electric-purple' },
           ].map((item, idx) => (
             <motion.div 
