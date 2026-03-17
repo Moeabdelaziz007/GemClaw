@@ -1,8 +1,10 @@
 import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
+import fileSaver from 'file-saver';
+const { saveAs } = fileSaver;
 
-export const exportAgentAsAth = async (agent: any) => {
-  const zip = new JSZip();
+export const exportAgentAsAth = async (agent: any, mocks: any = {}) => {
+  const zip = mocks.JSZip ? new mocks.JSZip() : new JSZip();
+  const save = mocks.saveAs || saveAs;
 
   // 📄 manifest.json
   const manifest = {
@@ -32,5 +34,5 @@ export const exportAgentAsAth = async (agent: any) => {
   zip.folder('sandbox')?.file('permissions.json', JSON.stringify({ permissions: ['camera', 'microphone'] }, null, 2));
 
   const content = await zip.generateAsync({ type: 'blob' });
-  saveAs(content, `${agent.name.replace(/\s+/g, '_')}.ath`);
+  save(content, `${agent.name.replace(/\s+/g, '_')}.ath`);
 };
