@@ -3,10 +3,10 @@ import type {NextConfig} from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true, // Allow export even with minor lint issues in complex neural code
+    ignoreBuildErrors: false,
   },
   images: {
     unoptimized: true, // Required for static export

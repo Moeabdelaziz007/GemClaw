@@ -91,7 +91,7 @@ class APICredentialsManager {
     
     // Credential storage is private to this manager
     
-    console.log(`[Credentials] Stored encrypted API key for ${providerId}`);
+    // console.log(`[Credentials] Stored encrypted API key for ${providerId}`);
     return credentialId;
   }
   
@@ -139,7 +139,7 @@ class APICredentialsManager {
     
     // Credential storage is private to this manager
     
-    console.log(`[Credentials] Stored encrypted OAuth tokens for ${providerId}`);
+    // console.log(`[Credentials] Stored encrypted OAuth tokens for ${providerId}`);
     return { accessTokenId, refreshTokenId };
   }
   
@@ -224,7 +224,7 @@ class APICredentialsManager {
   deleteCredential(credentialId: string): boolean {
     const deleted = this.credentials.delete(credentialId);
     if (deleted) {
-      console.log(`[Credentials] Deleted credential ${credentialId}`);
+      // console.log(`[Credentials] Deleted credential ${credentialId}`);
     }
     return deleted;
   }
@@ -250,7 +250,7 @@ class APICredentialsManager {
     
     this.credentials.set(credentialId, credential);
     
-    console.log(`[Credentials] Rotated API key for ${credential.providerId}`);
+    // console.log(`[Credentials] Rotated API key for ${credential.providerId}`);
     return true;
   }
   
@@ -269,13 +269,32 @@ class APICredentialsManager {
       maskedValue: '****' + (cred.id.slice(-4))
     }));
   }
+
+  /**
+   * Get credential statistics
+   */
+  getStatistics() {
+    const creds = Array.from(this.credentials.values());
+    const now = Date.now();
+    const weekInMs = 7 * 24 * 60 * 60 * 1000;
+
+    return {
+      totalCredentials: creds.length,
+      expiringSoon: creds.filter(c => c.expiresAt && (c.expiresAt - now) < weekInMs && (c.expiresAt - now) > 0).length,
+      expired: creds.filter(c => c.expiresAt && now > c.expiresAt).length,
+      needsRotation: creds.filter(c => {
+        const lastRotated = c.lastRotatedAt || c.createdAt;
+        return (now - lastRotated) > (this.defaultRotationPeriod * 24 * 60 * 60 * 1000);
+      }).length
+    };
+  }
   
   /**
    * Clear all credentials
    */
   clearAll(): void {
     this.credentials.clear();
-    console.log('[Credentials] Cleared all credentials');
+    // console.log('[Credentials] Cleared all credentials');
   }
   
   /**
@@ -302,7 +321,7 @@ class APICredentialsManager {
       parsed.credentials.forEach(([key, value]: [string, EncryptedCredential]) => {
         this.credentials.set(key, value);
       });
-      console.log(`[Credentials] Imported ${this.credentials.size} credentials`);
+      // console.log(`[Credentials] Imported ${this.credentials.size} credentials`);
       return true;
     } catch (error) {
       console.error('[Credentials] Failed to import credentials:', error);

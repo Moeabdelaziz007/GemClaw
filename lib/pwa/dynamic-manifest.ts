@@ -132,12 +132,14 @@ async function handleDesktopInstall(): Promise<void> {
  */
 export function showIOSInstallInstructions(agentName: string): void {
   // This would typically show a modal/dialog
+  /* 
   console.log(`
     To install ${agentName} on iOS:
     1. Tap the Share button
     2. Scroll down and tap "Add to Home Screen"
     3. Tap "Add" in the top right corner
   `);
+  */
 }
 
 // TypeScript interfaces

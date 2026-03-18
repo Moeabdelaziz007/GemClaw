@@ -36,6 +36,6 @@ tests.forEach(t => {
     console.error(`FAILED: Expected ${t.expected}, got ${cmd}`);
     process.exit(1);
   } else {
-    console.log(`PASSED: ${t.tool} ${t.action}`);
+    // console.log(`PASSED: ${t.tool} ${t.action}`);
   }
 });

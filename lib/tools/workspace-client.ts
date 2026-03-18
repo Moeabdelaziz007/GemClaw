@@ -7,7 +7,6 @@
 
 export async function executeGWSClientAction(toolId: string, action: string, params: any, accessToken: string) {
   const service = toolId.replace('workspace_', '');
-  console.log(`[GWS-Client] Executing ${service}.${action} direct-to-API...`);
 
   const API_BASE = "https://www.googleapis.com";
   let url = "";

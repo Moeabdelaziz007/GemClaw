@@ -5,19 +5,20 @@ export function useVisionPulse(onFrame: (base64: string) => void) {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const captureFrame = useCallback(async () => {
+    let stream: MediaStream | null = null;
     try {
-      // In a real browser, we'd use getDisplayMedia or a hidden video element
-      // For this applet environment, we simulate it or use a placeholder
-      // if we don't have direct access to screen capture APIs in the iframe.
-      
-      // Attempt to capture current window (if permitted)
-      const stream = await navigator.mediaDevices.getDisplayMedia({
+      stream = await navigator.mediaDevices.getDisplayMedia({
         video: { width: 1280, height: 720 },
         audio: false
       });
       
       const video = document.createElement('video');
       video.srcObject = stream;
+      
+      await new Promise((resolve) => {
+        video.onloadedmetadata = () => resolve(true);
+      });
+      
       await video.play();
       
       const canvas = document.createElement('canvas');
@@ -28,15 +29,18 @@ export function useVisionPulse(onFrame: (base64: string) => void) {
       
       const base64 = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
       onFrame(base64);
-      
-      // Stop stream
-      stream.getTracks().forEach(t => t.stop());
     } catch (error) {
       console.error("Vision Pulse capture failed:", error);
+    } finally {
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+      }
     }
   }, [onFrame]);
 
   const startPulse = useCallback((intervalMs: number = 5000) => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    
     setIsCapturing(true);
     captureFrame(); // Initial capture
     intervalRef.current = setInterval(captureFrame, intervalMs);

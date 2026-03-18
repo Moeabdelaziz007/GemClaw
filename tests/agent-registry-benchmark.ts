@@ -63,11 +63,11 @@ test('AgentRegistry syncWithFirestore performance benchmark', async () => {
   const endTime = Date.now();
   const duration = endTime - startTime;
 
-  console.log('\n--- BENCHMARK RESULTS ---');
-  console.log(`Iterations: ${iterations}`);
-  console.log(`Total duration: ${duration}ms`);
-  console.log(`Average per call: ${duration / iterations}ms`);
-  console.log(`getDocs calls: ${(global as any).getDocsCount}`);
-  console.log(`onSnapshot calls: ${(global as any).onSnapshotCount}`);
-  console.log('-------------------------\n');
+  // console.log('\n--- BENCHMARK RESULTS ---');
+  // console.log(`Iterations: ${iterations}`);
+  // console.log(`Total duration: ${duration}ms`);
+  // console.log(`Average per call: ${duration / iterations}ms`);
+  // console.log(`getDocs calls: ${(global as any).getDocsCount}`);
+  // console.log(`onSnapshot calls: ${(global as any).onSnapshotCount}`);
+  // console.log('-------------------------\n');
 });

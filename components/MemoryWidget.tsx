@@ -18,7 +18,7 @@ export function MemoryWidget({ agentId }: MemoryWidgetProps) {
   const handleAddMemory = async () => {
     if (!newMemory.trim()) return;
     try {
-      await saveMemory(newMemory, 'interaction', 5, { tags: [] });
+      await saveMemory(newMemory, 'semantic', 5, { tags: [] });
       setNewMemory('');
     } catch (err) {
       console.error('Failed to save memory:', err);

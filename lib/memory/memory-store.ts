@@ -55,7 +55,7 @@ export async function createMemory(memory: Omit<Memory, 'id' | 'createdAt' | 'la
       lastAccessedAt: Timestamp.now(),
     });
     
-    console.log('[MemoryStore] Memory created:', docRef.id);
+    // console.log('[MemoryStore] Memory created:', docRef.id);
     return docRef.id;
   } catch (error) {
     console.error('[MemoryStore] Failed to create memory:', error);
@@ -89,7 +89,7 @@ export async function updateMemory(memoryId: string, updates: Partial<Memory>): 
   try {
     const memoryRef = doc(db, 'memories', memoryId);
     await updateDoc(memoryRef, updates);
-    console.log('[MemoryStore] Memory updated:', memoryId);
+    // console.log('[MemoryStore] Memory updated:', memoryId);
   } catch (error) {
     console.error('[MemoryStore] Failed to update memory:', error);
     throw new Error(`Failed to update memory: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -103,7 +103,7 @@ export async function deleteMemory(memoryId: string): Promise<void> {
   try {
     const memoryRef = doc(db, 'memories', memoryId);
     await deleteDoc(memoryRef);
-    console.log('[MemoryStore] Memory deleted:', memoryId);
+    // console.log('[MemoryStore] Memory deleted:', memoryId);
   } catch (error) {
     console.error('[MemoryStore] Failed to delete memory:', error);
     throw new Error(`Failed to delete memory: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -150,35 +150,49 @@ export async function getAgentMemories(
 }
 
 /**
- * Search memories by content (simple text search, no embeddings)
+ * Search memories by content (Offloaded to Web Worker)
  */
 export async function searchMemories(
   agentId: string,
   searchTerm: string,
-  limit: number = 10
+  limitCount: number = 10
 ): Promise<Memory[]> {
   try {
-    // Note: This is a simple query - for production, use Algolia or similar
     const memoriesRef = collection(db, 'memories');
     const q = query(
       memoriesRef,
       where('agentId', '==', agentId),
       orderBy('createdAt', 'desc'),
-      limit(limit * 5) // Get more results for client-side filtering
+      limit(limitCount * 5) // Get more results for client-side filtering
     );
-    
+
     const snapshot = await getDocs(q);
-    const memories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Memory));
-    
-    // Client-side text search
-    const termLower = searchTerm.toLowerCase();
-    const filtered = memories.filter(memory => 
-      memory.content.toLowerCase().includes(termLower) ||
-      memory.tags.some(tag => tag.toLowerCase().includes(termLower)) ||
-      (memory.metadata.context && memory.metadata.context.toLowerCase().includes(termLower))
-    );
-    
-    return filtered.slice(0, limit);
+    const memories = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: (data.createdAt as Timestamp).toMillis(), // Convert for worker
+      } as any;
+    });
+
+    // Instantiate Worker
+    const worker = new Worker(new URL('../workers/cognitive-worker.ts', import.meta.url));
+
+    const filteredMemories = await new Promise<Memory[]>((resolve) => {
+      worker.onmessage = (e) => {
+        if (e.data.type === 'SEARCH_RESULTS') {
+          resolve(e.data.payload);
+          worker.terminate();
+        }
+      };
+      worker.postMessage({
+        type: 'SEARCH_FILTER',
+        payload: { memories, searchTerm }
+      });
+    });
+
+    return filteredMemories.slice(0, limitCount);
   } catch (error) {
     console.error('[MemoryStore] Failed to search memories:', error);
     return [];
@@ -192,7 +206,7 @@ export async function recordMemoryAccess(memoryId: string): Promise<void> {
   try {
     const memory = await getMemory(memoryId);
     if (!memory) return;
-    
+
     await updateMemory(memoryId, {
       accessCount: (memory.accessCount || 0) + 1,
       lastAccessedAt: Timestamp.now(),
@@ -203,32 +217,62 @@ export async function recordMemoryAccess(memoryId: string): Promise<void> {
 }
 
 /**
- * Apply decay to memories based on time
- * Call this periodically (e.g., daily cron job)
+ * Apply decay to memories based on time (Offloaded to Web Worker)
  */
 export async function applyMemoryDecay(agentId: string): Promise<void> {
   try {
     const memories = await getAgentMemories(agentId);
+    if (memories.length === 0) return;
+
     const now = Date.now();
-    
-    for (const memory of memories) {
-      if (!memory.id) continue;
-      
-      const hoursSinceCreation = (now - memory.createdAt.toMillis()) / (1000 * 60 * 60);
-      const decayAmount = memory.decay * hoursSinceCreation;
-      const newImportance = Math.max(0, memory.importance - decayAmount);
-      
-      if (newImportance < 0.1) {
-        // Auto-delete very low importance memories
-        await deleteMemory(memory.id);
-      } else {
-        await updateMemory(memory.id, { importance: newImportance });
+
+    // Simplify memories for worker transfer
+    const simplifiedMemories = memories.map(m => ({
+      id: m.id,
+      createdAt: m.createdAt.toMillis(),
+      importance: m.importance,
+      decay: m.decay,
+      content: m.content,
+      tags: m.tags,
+      metadata: { ...m.metadata, accessCount: m.accessCount }
+    }));
+
+    const worker = new Worker(new URL('../workers/cognitive-worker.ts', import.meta.url));
+
+    const updates = await new Promise<any[]>((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error('Worker timeout')), 5000);
+      worker.onmessage = (e) => {
+        if (e.data.type === 'DECAY_RESULTS') {
+          clearTimeout(timeout);
+          resolve(e.data.payload);
+          worker.terminate();
+        }
+      };
+      worker.onerror = (err) => {
+        clearTimeout(timeout);
+        reject(err);
+      };
+      worker.postMessage({
+        type: 'APPLY_DECAY',
+        payload: { memories: simplifiedMemories, now }
+      });
+    });
+
+    // Execute updates in parallel for performance
+    await Promise.all(updates.map(async (update) => {
+      if (update.delete) {
+        await deleteMemory(update.id);
+      } else if (update.importance !== undefined) {
+        await updateMemory(update.id, { importance: update.importance });
       }
-    }
+    }));
+
+    // console.log(`[MemoryStore] Decay applied to ${updates.length} memories`);
   } catch (error) {
     console.error('[MemoryStore] Failed to apply memory decay:', error);
   }
 }
+
 
 /**
  * Batch create multiple memories
@@ -286,7 +330,7 @@ export async function clearAgentMemories(agentId: string): Promise<void> {
       }
     }
     
-    console.log('[MemoryStore] Cleared all memories for agent:', agentId);
+    // console.log('[MemoryStore] Cleared all memories for agent:', agentId);
   } catch (error) {
     console.error('[MemoryStore] Failed to clear agent memories:', error);
     throw error;

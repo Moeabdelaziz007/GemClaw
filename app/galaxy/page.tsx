@@ -5,13 +5,18 @@ import { Brain, Globe, ZoomIn, ZoomOut, Move, Network, Radio } from 'lucide-reac
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
+import { BRAND } from '@/lib/constants/branding';
 
 export default function GalaxyPage() {
   const { agents, setActiveAgentId, activeAgentId } = useAetherStore();
   const router = useRouter();
   const [zoom, setZoom] = useState(1);
   const [showConnections, setShowConnections] = useState(true);
+  const [activeHint, setActiveHint] = useState<string | null>(null);
+  const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const galaxySceneRef = useRef<HTMLDivElement>(null);
+  const [sceneSize, setSceneSize] = useState({ width: 0, height: 0 });
   
   // Mouse position for parallax effect
   const mouseX = useMotionValue(0);
@@ -29,6 +34,58 @@ export default function GalaxyPage() {
   const parallaxX = useTransform(mouseX, [-0.5, 0.5], [-20, 20]);
   const parallaxY = useTransform(mouseY, [-0.5, 0.5], [-20, 20]);
 
+  useEffect(() => {
+    if (!galaxySceneRef.current) return;
+    
+    const updateSceneSize = () => {
+      if (!galaxySceneRef.current) return;
+      const { width, height } = galaxySceneRef.current.getBoundingClientRect();
+      setSceneSize({ width, height });
+    };
+
+    updateSceneSize();
+    const observer = new ResizeObserver(updateSceneSize);
+    observer.observe(galaxySceneRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  const getOrbitConfig = (index: number) => {
+    const radius = 220 + index * 45;
+    const duration = 25 + index * 6;
+    const delay = index * -4;
+    return { radius, duration, delay };
+  };
+
+  const getAgentProjectedPosition = (index: number) => {
+    const { radius, duration, delay } = getOrbitConfig(index);
+    const centerX = sceneSize.width / 2;
+    const centerY = sceneSize.height / 2;
+    
+    // Calculate current angle based on fixed initial state for static snapshot
+    const initialOffsetProgress = (-delay / duration) % 1;
+    const angle = Math.PI + (initialOffsetProgress * Math.PI * 2);
+    const scaledRadius = radius * zoom;
+
+    return {
+      x: centerX + Math.cos(angle) * scaledRadius,
+      y: centerY + Math.sin(angle) * scaledRadius
+    };
+  };
+
+  const startHintPress = (hint: string) => {
+    if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+    hintTimerRef.current = setTimeout(() => setActiveHint(hint), 450);
+  };
+
+  const endHintPress = () => {
+    if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+    setActiveHint(null);
+  };
+
+  useEffect(() => () => {
+    if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+  }, []);
   return (
     <div 
       ref={containerRef}
@@ -41,26 +98,56 @@ export default function GalaxyPage() {
         animate={{ opacity: 1, y: 0 }}
         className="absolute top-8 right-8 z-30 flex flex-col gap-2"
       >
-        <button 
-          onClick={() => setZoom(z => Math.min(z + 0.2, 2))}
-          className="w-10 h-10 rounded-xl glass-medium border border-white/10 flex items-center justify-center hover:border-gemigram-neon/50 hover:bg-gemigram-neon/10 transition-all group"
-        >
-          <ZoomIn className="w-4 h-4 text-white/60 group-hover:text-gemigram-neon" />
-        </button>
-        <button 
-          onClick={() => setZoom(z => Math.max(z - 0.2, 0.6))}
-          className="w-10 h-10 rounded-xl glass-medium border border-white/10 flex items-center justify-center hover:border-gemigram-neon/50 hover:bg-gemigram-neon/10 transition-all group"
-        >
-          <ZoomOut className="w-4 h-4 text-white/60 group-hover:text-gemigram-neon" />
-        </button>
-        <button 
-          onClick={() => setShowConnections(!showConnections)}
-          className={`w-10 h-10 rounded-xl glass-medium border transition-all group ${showConnections ? 'border-gemigram-neon/50 bg-gemigram-neon/10' : 'border-white/10'}`}
-        >
-          <Network className={`w-4 h-4 ${showConnections ? 'text-gemigram-neon' : 'text-white/60 group-hover:text-white'}`} />
-        </button>
+        <div className="relative group flex justify-center">
+          <button
+            onClick={() => setZoom(z => Math.min(z + 0.2, 2))}
+            aria-label="Zoom in galaxy view"
+            title="Zoom in galaxy view"
+            onTouchStart={() => startHintPress('zoom-in')}
+            onTouchEnd={endHintPress}
+            onTouchCancel={endHintPress}
+            className="w-10 h-10 rounded-xl glass-medium border border-white/10 flex items-center justify-center hover:border-gemigram-neon/50 hover:bg-gemigram-neon/10 transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gemigram-neon focus-visible:ring-offset-2 focus-visible:ring-offset-black/80"
+          >
+            <ZoomIn aria-hidden="true" className="w-4 h-4 text-white/60 group-hover:text-gemigram-neon" />
+          </button>
+          <span className={`pointer-events-none absolute right-full mr-2 top-1/2 -translate-y-1/2 rounded-lg border border-white/10 bg-black/85 px-2 py-1 text-[10px] uppercase tracking-wider text-white/80 transition-opacity duration-200 md:group-hover:opacity-100 md:group-hover:visible ${activeHint === 'zoom-in' ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+            Zoom In
+          </span>
+        </div>
+        <div className="relative group flex justify-center">
+          <button
+            onClick={() => setZoom(z => Math.max(z - 0.2, 0.6))}
+            aria-label="Zoom out galaxy view"
+            title="Zoom out galaxy view"
+            onTouchStart={() => startHintPress('zoom-out')}
+            onTouchEnd={endHintPress}
+            onTouchCancel={endHintPress}
+            className="w-10 h-10 rounded-xl glass-medium border border-white/10 flex items-center justify-center hover:border-gemigram-neon/50 hover:bg-gemigram-neon/10 transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gemigram-neon focus-visible:ring-offset-2 focus-visible:ring-offset-black/80"
+          >
+            <ZoomOut aria-hidden="true" className="w-4 h-4 text-white/60 group-hover:text-gemigram-neon" />
+          </button>
+          <span className={`pointer-events-none absolute right-full mr-2 top-1/2 -translate-y-1/2 rounded-lg border border-white/10 bg-black/85 px-2 py-1 text-[10px] uppercase tracking-wider text-white/80 transition-opacity duration-200 md:group-hover:opacity-100 md:group-hover:visible ${activeHint === 'zoom-out' ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+            Zoom Out
+          </span>
+        </div>
+        <div className="relative group flex justify-center">
+          <button
+            onClick={() => setShowConnections(!showConnections)}
+            aria-label={showConnections ? 'Hide neural connections' : 'Show neural connections'}
+            title={showConnections ? 'Hide neural connections' : 'Show neural connections'}
+            onTouchStart={() => startHintPress('connections')}
+            onTouchEnd={endHintPress}
+            onTouchCancel={endHintPress}
+            className={`w-10 h-10 rounded-xl glass-medium border transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gemigram-neon focus-visible:ring-offset-2 focus-visible:ring-offset-black/80 ${showConnections ? 'border-gemigram-neon/50 bg-gemigram-neon/10' : 'border-white/10'}`}
+          >
+            <Network aria-hidden="true" className={`w-4 h-4 ${showConnections ? 'text-gemigram-neon' : 'text-white/60 group-hover:text-white'}`} />
+          </button>
+          <span className={`pointer-events-none absolute right-full mr-2 top-1/2 -translate-y-1/2 rounded-lg border border-white/10 bg-black/85 px-2 py-1 text-[10px] uppercase tracking-wider text-white/80 transition-opacity duration-200 md:group-hover:opacity-100 md:group-hover:visible ${activeHint === 'connections' ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+            {showConnections ? 'Hide Connections' : 'Show Connections'}
+          </span>
+        </div>
         <div className="w-10 h-10 rounded-xl quantum-glass border border-white/10 flex items-center justify-center cursor-move">
-          <Move className="w-4 h-4 text-white/40" />
+          <Move aria-hidden="true" className="w-4 h-4 text-white/40" />
         </div>
       </motion.div>
       <div className="relative z-20 mb-12">
@@ -70,13 +157,13 @@ export default function GalaxyPage() {
           transition={{ duration: 0.8 }}
         >
           <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-2 uppercase bg-clip-text text-transparent bg-gradient-to-r from-gemigram-neon via-white to-gemigram-neon drop-shadow-[0_0_30px_rgba(16,255,135,0.3)]">
-            Gemigalaxy
+            {BRAND.subProducts.galaxy}
           </h2>
           <p className="text-slate-500 font-mono text-[10px] uppercase tracking-[0.2em]">Sovereign Planet Architecture // Live Orchestration</p>
         </motion.div>
       </div>
       
-      <div className="flex-1 relative flex items-center justify-center overflow-hidden">
+      <div ref={galaxySceneRef} className="flex-1 relative flex items-center justify-center overflow-hidden">
         {/* Enhanced Dark Matter Background with Nebula */}
         <div className="absolute inset-0">
           {/* Base gradient */}
@@ -124,7 +211,7 @@ export default function GalaxyPage() {
             />
             {/* Inner scanning light */}
             <div className="absolute top-0 left-0 w-full h-2 bg-gemigram-neon/80 blur-sm opacity-50 animate-[scanline_2s_linear_infinite]" />
-            <Brain className="w-10 h-10 text-gemigram-neon drop-shadow-[0_0_20px_rgba(57,255,20,0.8)] relative z-10" />
+            <Brain aria-hidden="true" className="w-10 h-10 text-gemigram-neon drop-shadow-[0_0_20px_rgba(57,255,20,0.8)] relative z-10" />
           </div>
           
           {/* Core Labels */}
@@ -154,8 +241,8 @@ export default function GalaxyPage() {
         ))}
 
         {/* Agent Connection Lines (Synaptic Web) */}
-        {showConnections && agents.length > 1 && (
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ scale: zoom }}>
+        {showConnections && agents.length > 1 && sceneSize.width > 0 && (
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox={`0 0 ${sceneSize.width} ${sceneSize.height}`}>
             <defs>
               <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="rgba(16,255,135,0)" />
@@ -165,13 +252,21 @@ export default function GalaxyPage() {
             </defs>
             {agents.map((agent, i) => {
               const nextIndex = (i + 1) % agents.length;
+              const centerX = sceneSize.width / 2;
+              const centerY = sceneSize.height / 2;
+              const currentPosition = getAgentProjectedPosition(i);
+              const nextPosition = getAgentProjectedPosition(nextIndex);
+              const connectToCore = i % 2 === 0;
+
+              const lineStart = connectToCore ? { x: centerX, y: centerY } : currentPosition;
+              const lineEnd = connectToCore ? currentPosition : nextPosition;
               return (
                 <motion.line
                   key={`connection-${i}`}
-                  x1="50%"
-                  y1="50%"
-                  x2="50%"
-                  y2="50%"
+                  x1={lineStart.x}
+                  y1={lineStart.y}
+                  x2={lineEnd.x}
+                  y2={lineEnd.y}
                   stroke="url(#connectionGradient)"
                   strokeWidth="1"
                   initial={{ pathLength: 0, opacity: 0 }}
@@ -185,9 +280,7 @@ export default function GalaxyPage() {
 
         {/* Orbiting Agent Planets - Enhanced */}
         {agents.map((agent, i) => {
-          const radius = 220 + (i * 45); // Spread them out slightly more
-          const duration = 25 + (i * 6); // Slightly slower for smoother tracking
-          const delay = i * -4;
+          const { radius, duration, delay } = getOrbitConfig(i);
           
           return (
             <motion.div
@@ -207,7 +300,9 @@ export default function GalaxyPage() {
                     setActiveAgentId(agent.id);
                     router.push('/workspace');
                   }}
-                  className="group relative flex flex-col items-center"
+                  aria-label={`Open workspace for ${agent.name}`}
+                  title={`Open workspace for ${agent.name}`}
+                  className="group relative flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gemigram-neon focus-visible:ring-offset-2 focus-visible:ring-offset-black/80 rounded-full"
                 >
                   <motion.div 
                     whileHover={{ scale: 1.3 }}
@@ -226,7 +321,7 @@ export default function GalaxyPage() {
                       />
                     )}
                     
-                    <Globe className={`w-6 h-6 transition-colors duration-300 ${activeAgentId === agent.id ? 'text-gemigram-neon drop-shadow-[0_0_8px_rgba(57,255,20,1)]' : 'text-white/40 group-hover:text-gemigram-neon'}`} />
+                    <Globe aria-hidden="true" className={`w-6 h-6 transition-colors duration-300 ${activeAgentId === agent.id ? 'text-gemigram-neon drop-shadow-[0_0_8px_rgba(57,255,20,1)]' : 'text-white/40 group-hover:text-gemigram-neon'}`} />
                     
                     {/* Status indicator */}
                     <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-gemigram-neon shadow-[0_0_12px_rgba(57,255,20,1)] border border-black" />
@@ -267,7 +362,7 @@ export default function GalaxyPage() {
       >
         <div className="glass-medium p-6 border border-gemigram-neon/20 bg-black/40 rounded-[2rem] w-72 backdrop-blur-xl">
           <div className="flex items-center gap-2 mb-4">
-            <Network className="w-4 h-4 text-gemigram-neon" />
+            <Network aria-hidden="true" className="w-4 h-4 text-gemigram-neon" />
             <div className="text-[10px] font-black uppercase tracking-widest text-gemigram-neon">Sync Telemetry</div>
           </div>
           
@@ -323,7 +418,7 @@ export default function GalaxyPage() {
       >
         <div className="glass-medium p-6 border border-white/5 bg-black/40 rounded-[2rem] w-80 backdrop-blur-xl">
           <div className="flex items-center gap-2 mb-6">
-            <Radio className="w-4 h-4 text-gemigram-neon animate-pulse" />
+            <Radio aria-hidden="true" className="w-4 h-4 text-gemigram-neon animate-pulse" />
             <div className="text-[10px] font-black uppercase tracking-widest text-white/60">Cosmic_Pulse</div>
           </div>
           
@@ -347,4 +442,3 @@ function ActivityItem({ time, text }: { time: string; text: string }) {
     </div>
   );
 }
-

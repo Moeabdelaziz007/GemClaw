@@ -97,8 +97,6 @@ class MCPMarketplaceConnector {
    */
   async fetchFromOfficialRegistry(): Promise<MarketplaceServer[]> {
     try {
-      console.log('[MCP Marketplace] Fetching from official registry...');
-      
       const response = await fetch(`${REGISTRY_API}/servers`);
       
       if (!response.ok) {
@@ -128,7 +126,6 @@ class MCPMarketplaceConnector {
         }))
       );
       
-      console.log(`[MCP Marketplace] Fetched ${servers.length} servers from registry`);
       return servers;
       
     } catch (error) {
@@ -136,7 +133,6 @@ class MCPMarketplaceConnector {
       
       // Return cached data if available
       if (this.cachedServers.length > 0) {
-        console.log('[MCP Marketplace] Using cached server list');
         return [...this.cachedServers];
       }
       
@@ -304,8 +300,6 @@ class MCPMarketplaceConnector {
    */
   async installServer(serverId: string): Promise<InstallationResult> {
     try {
-      console.log(`[MCP Marketplace] Installing server: ${serverId}`);
-      
       // Get server details
       const serverDetails = await this.getServerDetails(serverId);
       
@@ -356,8 +350,6 @@ class MCPMarketplaceConnector {
       try {
         await mcpClient.connectToServer(mcpServer);
         
-        console.log(`[MCP Marketplace] Successfully installed server: ${serverDetails.name}`);
-        
         return {
           success: true,
           serverId,
@@ -390,7 +382,6 @@ class MCPMarketplaceConnector {
   uninstallServer(serverId: string): void {
     try {
       mcpClient.disconnectFromServer(serverId);
-      console.log(`[MCP Marketplace] Uninstalled server: ${serverId}`);
     } catch (error) {
       console.error('[MCP Marketplace] Uninstall failed:', error);
       throw error;
@@ -467,16 +458,12 @@ class MCPMarketplaceConnector {
    * Rate server (for future implementation)
    */
   async rateServer(serverId: string, rating: number): Promise<void> {
-    // TODO: Implement rating submission to registry
-    console.log(`[MCP Marketplace] Rating ${serverId}: ${rating}/5`);
   }
   
   /**
    * Report issue with server (for future implementation)
    */
   async reportServer(serverId: string, reason: string): Promise<void> {
-    // TODO: Implement issue reporting to registry
-    console.log(`[MCP Marketplace] Reporting ${serverId}: ${reason}`);
   }
   
   /**
@@ -485,7 +472,6 @@ class MCPMarketplaceConnector {
   clearCache(): void {
     this.cachedServers = [];
     this.lastCacheUpdate = 0;
-    console.log('[MCP Marketplace] Cache cleared');
   }
   
   /**

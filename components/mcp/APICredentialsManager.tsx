@@ -176,7 +176,7 @@ export default function APICredentialsManager({
       {showAddModal && (
         <AddCredentialModal
           onClose={() => setShowAddModal(false)}
-          onAdd={(id) => {
+          onAdd={(id: string) => {
             loadCredentials();
             onCredentialAdd?.(id);
           }}

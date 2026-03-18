@@ -22,7 +22,6 @@ class TextToSpeechService {
       // Wait for voices to load
       if (this.synth.onvoiceschanged !== undefined) {
         this.synth.onvoiceschanged = () => {
-          console.log('Voices changed - available for TTS');
         };
       }
     }

@@ -59,7 +59,7 @@ export const executeAgentTool = onRequest({ timeoutSeconds: 60, memory: "256MiB"
     return;
   }
 
-  console.log(`[GWS-Bridge] Persona: ${persona || 'Default'} | Executing: ${toolId} ${action}`);
+  // console.log(`[GWS-Bridge] Persona: ${persona || 'Default'} | Executing: ${toolId} ${action}`);
 
   // 1. Build Command
   let baseCmd = "gws";

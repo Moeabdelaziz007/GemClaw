@@ -1,10 +1,9 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Cloud, Newspaper, Bitcoin, Calculator, Database } from 'lucide-react';
+import { Agent } from '@/lib/store/useAetherStore';
 
 type WorkspaceProps = {
-  activeAgent: any;
+  activeAgent: Agent;
 };
 
 export default function Workspace({ activeAgent }: WorkspaceProps) {

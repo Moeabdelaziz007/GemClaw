@@ -121,8 +121,6 @@ class APIMarketplaceClient {
    */
   async fetchFromRapidAPI(apiKey?: string): Promise<APIMetadata[]> {
     try {
-      console.log('[API Marketplace] Fetching from APIs.guru...');
-      
       const res = await fetch('https://api.apis.guru/v2/list.json');
       const data = await res.json();
       
@@ -169,15 +167,12 @@ class APIMarketplaceClient {
    */
   async fetchFromAPILayer(apiKey?: string): Promise<APIMetadata[]> {
     try {
-      console.log('[API Marketplace] Fetching from APILayer...');
-      
       // Mock implementation - would use actual API in production
       const response = await this.mockAPILayerResponse();
       
       this.cachedAPIs = [...this.cachedAPIs, ...response];
       this.lastCacheUpdate = Date.now();
       
-      console.log(`[API Marketplace] Fetched ${response.length} APIs from APILayer`);
       return response;
       
     } catch (error) {
@@ -271,8 +266,6 @@ class APIMarketplaceClient {
     
     this.subscriptions.set(subscription.subscriptionId, subscription);
     
-    console.log(`[API Marketplace] Subscribed to ${api.name} (${plan} plan)`);
-    
     return subscription;
   }
   
@@ -287,7 +280,6 @@ class APIMarketplaceClient {
     }
     
     this.subscriptions.delete(subscriptionId);
-    console.log(`[API Marketplace] Unsubscribed from ${subscription.apiId}`);
   }
   
   /**
@@ -389,7 +381,6 @@ class APIMarketplaceClient {
   clearCache(): void {
     this.cachedAPIs = [];
     this.lastCacheUpdate = 0;
-    console.log('[API Marketplace] Cache cleared');
   }
   
   /**

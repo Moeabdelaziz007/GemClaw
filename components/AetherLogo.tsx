@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import GemigramLogoIcon from './GemigramLogo';
+import { BRAND } from '@/lib/constants/branding';
 
 export type LogoVariant = 'icon' | 'wordmark' | 'full' | 'favicon';
 
@@ -36,8 +37,8 @@ export const GemigramLogo = ({ variant = 'icon', size = 48, className = '' }: Ge
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         >
           <Image
-            src="/assets/branding/forge-logo.png"
-            alt="Aether Forge Logo"
+            src={BRAND.assets.icon.path}
+            alt={`${BRAND.product.name} icon`}
             width={size}
             height={size}
             className="w-full h-full object-contain"
@@ -58,13 +59,13 @@ export const GemigramLogo = ({ variant = 'icon', size = 48, className = '' }: Ge
             className="text-white font-black tracking-[0.3em] uppercase leading-none"
             style={{ fontSize: size * 0.3 }}
           >
-            AETHER FORGE
+            {BRAND.subProducts.forge}
           </span>
           <span 
             className="text-orange-500 font-bold tracking-[0.4em] uppercase leading-none mt-1"
             style={{ fontSize: size * 0.12 }}
           >
-            Neural Genesis
+            {BRAND.product.tagline}
           </span>
         </div>
       </div>
@@ -80,13 +81,13 @@ export const GemigramLogo = ({ variant = 'icon', size = 48, className = '' }: Ge
           className="text-white font-black tracking-[0.3em] uppercase leading-none"
           style={{ fontSize: size * 0.25 }}
         >
-          AETHER FORGE
+          {BRAND.subProducts.forge}
         </span>
         <span 
           className="text-orange-500 font-bold tracking-[0.4em] uppercase leading-none mt-1"
           style={{ fontSize: size * 0.1 }}
         >
-          Neural Genesis
+          {BRAND.product.tagline}
         </span>
       </div>
     </div>

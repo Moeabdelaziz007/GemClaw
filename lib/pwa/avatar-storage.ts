@@ -42,7 +42,6 @@ export async function saveAgentAvatar(
     // Get download URL
     const downloadURL = await getDownloadURL(avatarRef);
 
-    console.log('[AvatarStorage] Avatar uploaded successfully:', downloadURL);
     return downloadURL;
   } catch (error) {
     console.error('[AvatarStorage] Failed to save avatar:', error);
@@ -79,7 +78,6 @@ export async function deleteAgentAvatar(agentId: string): Promise<void> {
   try {
     const avatarRef = ref(storage, `${AVATAR_PATH}/${agentId}.png`);
     await deleteObject(avatarRef);
-    console.log('[AvatarStorage] Avatar deleted successfully:', agentId);
   } catch (error) {
     console.error('[AvatarStorage] Failed to delete avatar:', error);
     // Don't throw error if file doesn't exist

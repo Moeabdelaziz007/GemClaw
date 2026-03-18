@@ -3,35 +3,36 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Cpu, Lock, Terminal, BarChart, Layers } from 'lucide-react';
+import { BRAND } from '@/lib/constants/branding';
 
 export function BentoFeatures() {
   const features = [
     {
-      title: 'Carbon Core',
+      title: `${BRAND.product.name} Core`,
       description: 'Ultra-secure L1 synapse processing for industrial applications.',
       icon: Cpu,
       className: 'md:col-span-2 md:row-span-2',
     },
     {
-      title: 'Neural Lock',
+      title: `${BRAND.product.name} Lock`,
       description: 'Quantum-safe cryptographic identity management.',
       icon: Lock,
       className: 'md:col-span-1 md:row-span-1 border-gemigram-neon/20',
     },
     {
-      title: 'Neon CLI',
+      title: `${BRAND.product.name} CLI`,
       description: 'Advanced command execution with sub-ms feedback.',
       icon: Terminal,
       className: 'md:col-span-1 md:row-span-1',
     },
     {
-      title: 'Carbon Logic',
+      title: `${BRAND.product.name} Logic`,
       description: 'Deterministic AI logic gates for complex workflows.',
       icon: BarChart,
       className: 'md:col-span-1 md:row-span-2 border-gemigram-neon/10',
     },
     {
-      title: 'Neural Spine',
+      title: `${BRAND.product.name} Spine`,
       description: 'Zero-latency Bi-Directional PCM streaming for sub-millisecond AI response.',
       icon: Layers,
       className: 'md:col-span-2 md:row-span-1',
@@ -49,7 +50,7 @@ export function BentoFeatures() {
             whileInView={{ opacity: 1 }}
             className="text-4xl md:text-6xl font-black mb-6 tracking-tighter uppercase"
           >
-            The <span className="text-gemigram-neon">Gemigram</span> Spine
+            The <span className="text-gemigram-neon">{BRAND.product.name}</span> Spine
           </motion.h2>
           <p className="text-white/30 max-w-2xl mx-auto text-lg font-medium">
             Next-generation infrastructure architected for neural sovereignty.
@@ -64,7 +65,7 @@ export function BentoFeatures() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: idx * 0.1 }}
-              className={`sovereign-glass p-12 flex flex-col justify-between group hover:border-gemigram-neon/40 transition-all duration-700 ${feature.className}`}
+              className={`sovereign-glass p-8 md:p-12 flex flex-col justify-between group hover:border-gemigram-neon/40 transition-all duration-700 ${feature.className}`}
             >
               <div>
                 <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center mb-10 group-hover:bg-gemigram-neon group-hover:text-black transition-all duration-500 shadow-[0_0_20px_rgba(57,255,20,0)] group-hover:shadow-[0_0_30px_rgba(57,255,20,0.4)]">

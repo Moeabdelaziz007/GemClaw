@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Fingerprint, Mail, ShieldCheck, Globe, ChevronRight, Loader2, Sparkles, Lock, Shield } from 'lucide-react';
 import { useAuth } from '@/components/Providers';
@@ -12,33 +12,44 @@ export function AuthOverlay({ isOpen, onClose }: { isOpen: boolean, onClose: () 
   const [mode, setMode] = useState<AuthMode>('login');
   const [scanProgress, setScanProgress] = useState(0);
   const [authStatus, setAuthStatus] = useState('Standby');
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
   const handleGoogleLogin = async () => {
     setMode('scanning');
     setAuthStatus('Initializing Biometric Uplink...');
     
-    // Fake scanning delay for immersion
+    // Start login immediately to avoid popup blocking and friction
+    const loginPromise = login();
+    
+    // Immersion animation runs in parallel
     let progress = 0;
-    const interval = setInterval(() => {
-      progress += 2;
-      setScanProgress(progress);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    
+    intervalRef.current = setInterval(() => {
+      progress += 5; // Faster progress
+      setScanProgress(Math.min(progress, 99));
       if (progress === 30) setAuthStatus('Analyzing Neural Signature...');
       if (progress === 60) setAuthStatus('Verifying Genesis Credentials...');
       if (progress === 90) setAuthStatus('Sovereign Link Established.');
-      
-      if (progress >= 100) {
-        clearInterval(interval);
-        setTimeout(async () => {
-          try {
-            await login();
-            onClose();
-          } catch (err) {
-            setMode('login');
-            setAuthStatus('Authentication Failed');
-          }
-        }, 500);
-      }
-    }, 40);
+    }, 30);
+
+    try {
+      await loginPromise;
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      setScanProgress(100);
+      setAuthStatus('Sovereign Link Established.');
+      setTimeout(() => onClose(), 300);
+    } catch (err) {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      setMode('login');
+      setAuthStatus('Authentication Failed');
+    }
   };
 
   return (
