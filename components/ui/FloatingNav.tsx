@@ -1,15 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Users, Settings, Plus, User, LogOut, Bell, Globe, Home, ChevronRight } from 'lucide-react';
-import { db } from '@/firebase';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { LayoutDashboard, Users, Settings, Plus, User, LogOut, Globe, Home } from 'lucide-react';
 import Image from 'next/image';
 import { AetherLogo } from '@/components/AetherLogo';
 import { useRouter } from 'next/navigation';
-import { Notification } from '@/lib/types/models';
 import { BRAND } from '@/lib/constants/branding';
+import { useUnreadNotificationsCount } from '@/lib/store/useAetherStore';
+import type { User } from 'firebase/auth';
 
 const ORBS_CONFIG = [
   {
@@ -72,35 +71,17 @@ const ORBS_CONFIG = [
 
 interface FloatingNavProps {
   currentView: string;
-  user: any;
+  user: User | null;
   onLogin: () => void;
   onLogout: () => void;
 }
 
 export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNavProps) {
   const [expandingOrb, setExpandingOrb] = useState<string | null>(null);
-  const [unreadNotifications, setUnreadNotifications] = useState<Notification[]>([]);
   const [activeHint, setActiveHint] = useState<string | null>(null);
+  const unreadNotificationsCount = useUnreadNotificationsCount();
   const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    if (!user) return;
-    const q = query(
-      collection(db, 'notifications'),
-      where('userId', '==', user.uid),
-      where('read', '==', false)
-    );
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      try {
-        const notifs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Notification));
-        setUnreadNotifications(notifs);
-      } catch (err) {
-        console.warn('Notifications error:', err);
-      }
-    });
-    return () => unsubscribe();
-  }, [user]);
 
   const handleNavigate = (id: string, path: string) => {
     if (currentView === id) return;
@@ -126,7 +107,6 @@ export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNa
 
   return (
     <>
-      {/* Page Transition Overlay */}
       <AnimatePresence>
         {expandingOrb && (
           <motion.div
@@ -139,7 +119,6 @@ export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNa
         )}
       </AnimatePresence>
 
-      {/* Sovereign Sidebar (Desktop) */}
       <motion.aside
         initial={{ x: -80, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
@@ -162,13 +141,18 @@ export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNa
                   title={`Navigate to ${orb.label}`}
                   aria-label={`Navigate to ${orb.label}`}
                   className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gemigram-neon focus-visible:ring-offset-2 focus-visible:ring-offset-black/80 ${
-                    isActive 
-                      ? 'bg-gemigram-neon/10 text-gemigram-neon border border-gemigram-neon/25 shadow-[0_0_25px_rgba(57,255,20,0.15)]' 
+                    isActive
+                      ? 'bg-gemigram-neon/10 text-gemigram-neon border border-gemigram-neon/25 shadow-[0_0_25px_rgba(57,255,20,0.15)]'
                       : 'text-white/30 hover:text-white hover:bg-white/[0.04] border border-transparent hover:border-white/[0.06]'
                   }`}
                 >
-                  <div className={`${isActive ? 'text-gemigram-neon' : 'group-hover:text-white'}`}>
+                  <div className={`${isActive ? 'text-gemigram-neon' : 'group-hover:text-white'} relative`}>
                     {orb.icon}
+                    {orb.id === 'home' && unreadNotificationsCount > 0 && (
+                      <span className="absolute -right-1.5 -top-1.5 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full bg-gemigram-neon px-1 text-[9px] font-black text-black">
+                        {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                      </span>
+                    )}
                   </div>
                   <span className="hidden xl:block text-[10px] font-black uppercase tracking-[0.15em] whitespace-nowrap">{orb.label}</span>
                 </button>
@@ -198,7 +182,7 @@ export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNa
                   <span className="text-[8px] text-white/40 uppercase tracking-widest leading-none mt-1">Sovereign_Active</span>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={onLogout}
                 title="Terminate session"
                 aria-label="Terminate session"
@@ -209,7 +193,7 @@ export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNa
               </button>
             </div>
           ) : (
-            <button 
+            <button
               onClick={onLogin}
               className="w-full py-4 rounded-2xl bg-gemigram-neon text-black font-black uppercase text-[10px] tracking-widest shadow-[0_0_30px_rgba(16,255,135,0.3)] hover:scale-[1.02] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gemigram-neon focus-visible:ring-offset-2 focus-visible:ring-offset-black/80"
             >
@@ -219,7 +203,6 @@ export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNa
         </div>
       </motion.aside>
 
-      {/* Mobile Dock (Bottom) */}
       <motion.nav
         initial={{ y: 80 }}
         animate={{ y: 0 }}
@@ -240,7 +223,14 @@ export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNa
                   isActive ? 'text-gemigram-neon bg-gemigram-neon/10' : 'text-white/40'
                 }`}
               >
-                {orb.icon}
+                <div className="relative">
+                  {orb.icon}
+                  {orb.id === 'home' && unreadNotificationsCount > 0 && (
+                    <span className="absolute -right-1.5 -top-1.5 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full bg-gemigram-neon px-1 text-[9px] font-black text-black">
+                      {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                    </span>
+                  )}
+                </div>
               </button>
               <span className={`pointer-events-none absolute bottom-full mb-2 rounded-lg border border-white/10 bg-black/85 px-2 py-1 text-[10px] uppercase tracking-wider text-white/80 transition-opacity duration-200 md:group-hover:opacity-100 md:group-hover:visible ${activeHint === orb.id ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
                 {orb.label}
