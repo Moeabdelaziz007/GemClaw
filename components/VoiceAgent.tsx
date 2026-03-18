@@ -9,8 +9,8 @@ import { useEffect, useMemo } from 'react';
 import { SovereignDashboard } from './SovereignDashboard';
 
 export function VoiceAgent({ activeAgent, googleAccessToken }: { activeAgent: Agent; googleAccessToken?: string }) {
-  const setVoiceSession = useAetherStore(state => state.setVoiceSession);
-  
+  const setVoiceSession = useAetherStore((state) => state.setVoiceSession);
+
   const {
     isConnected,
     isRecording,
@@ -21,7 +21,6 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: { activeAgent: Ag
     transcript,
     linkType,
     showLogs,
-    setShowLogs,
     toggleConnection,
     startRecording,
     stopRecording,
@@ -45,9 +44,8 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: { activeAgent: Ag
   }, [isConnected, isRecording]);
 
   return (
-    <div className="relative w-full h-full flex flex-col bg-[#030303] overflow-hidden">
-      {/* The Sovereign Dashboard HUD */}
-      <SovereignDashboard 
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#030303] pb-nav-safe">
+      <SovereignDashboard
         activeAgent={activeAgent}
         volume={volume}
         status={agentStatus}
@@ -55,94 +53,99 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: { activeAgent: Ag
         transcript={transcript}
       />
 
-      <div className="absolute bottom-40 left-1/2 -translate-x-1/2 z-[105] w-[min(92vw,52rem)]">
-        <div className="glass-medium border border-white/15 rounded-2xl px-5 py-4 flex items-center justify-between gap-4">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.25em] text-gemigram-neon/80 font-bold">Voice Link Status · {agentStatus}</p>
+      <div className="pointer-events-none absolute inset-x-0 bottom-[calc(8rem+var(--safe-area-bottom))] z-[105] px-4 sm:bottom-[calc(8.5rem+var(--safe-area-bottom))] sm:px-6 lg:bottom-28">
+        <div className="pointer-events-auto mx-auto flex w-full max-w-3xl flex-col gap-3 rounded-2xl border border-white/15 glass-medium px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div className="min-w-0">
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.25em] text-gemigram-neon/80">Voice Link Status · {agentStatus}</p>
             <p className="text-sm text-white/85">{voiceActionPrompt}</p>
           </div>
           {!isConnected && (
             <button
               onClick={toggleConnection}
-              className="shrink-0 px-4 py-2 rounded-xl border border-gemigram-neon/30 bg-gemigram-neon/10 text-gemigram-neon text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-gemigram-neon/30 bg-gemigram-neon/10 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gemigram-neon"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
+              <RotateCcw className="h-3.5 w-3.5" />
               Re-establish voice link
             </button>
           )}
         </div>
       </div>
 
-      {/* Control Actions Overlay (Floating) */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-6">
-         <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+      <div className="pointer-events-none absolute inset-x-0 bottom-[calc(1rem+var(--safe-area-bottom))] z-[100] px-4 sm:px-6 lg:bottom-6">
+        <div className="pointer-events-auto mx-auto flex w-full max-w-xl flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-4">
+          <motion.button
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
             onClick={toggleConnection}
-            className={`px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.3em] transition-all shadow-2xl ${
-               isConnected 
-               ? 'bg-red-500/20 text-red-500 border border-red-500/30' 
-               : 'bg-gemigram-neon/20 text-gemigram-neon border border-gemigram-neon/30'
+            className={`min-h-[52px] rounded-2xl px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] shadow-2xl transition-all ${
+              isConnected
+                ? 'border border-red-500/30 bg-red-500/20 text-red-500'
+                : 'border border-gemigram-neon/30 bg-gemigram-neon/20 text-gemigram-neon'
             }`}
-         >
+          >
             {isConnected ? 'Kill_Link' : 'Establish_Link'}
-         </motion.button>
+          </motion.button>
 
-         <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => isRecording ? stopRecording() : startRecording()}
+          <motion.button
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            onClick={() => (isRecording ? stopRecording() : startRecording())}
             disabled={!isConnected}
-            className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all shadow-2xl ${
-               !isConnected ? 'bg-white/5 text-white/20' :
-               isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-white/10 text-white border border-white/10'
+            className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl shadow-2xl transition-all sm:mx-0 ${
+              !isConnected
+                ? 'bg-white/5 text-white/20'
+                : isRecording
+                  ? 'animate-pulse bg-red-500 text-white'
+                  : 'border border-white/10 bg-white/10 text-white'
             }`}
-         >
-            {isRecording ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-         </motion.button>
+          >
+            {isRecording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
+          </motion.button>
+        </div>
       </div>
 
-      {/* Widget Overlay */}
       <AnimatePresence>
         {activeWidget && (
-           <div className="absolute inset-x-0 bottom-40 z-[110] px-6 pointer-events-none flex justify-center">
-              <motion.div 
-                initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 50, scale: 0.9 }}
-                className="w-full max-w-2xl sovereign-glass p-8 rounded-[32px] border border-gemigram-neon/30 pointer-events-auto shadow-2xl"
-              >
-                 <WidgetRenderer data={activeWidget!} />
-              </motion.div>
-           </div>
+          <div className="pointer-events-none absolute inset-x-0 bottom-[calc(10.5rem+var(--safe-area-bottom))] z-[110] flex justify-center px-4 sm:px-6 lg:bottom-40">
+            <motion.div
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 50, scale: 0.9 }}
+              className="pointer-events-auto w-full max-w-2xl rounded-[28px] border border-gemigram-neon/30 p-5 shadow-2xl sovereign-glass sm:p-6 md:p-8"
+            >
+              <WidgetRenderer data={activeWidget} />
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
-      {/* Sidebar Logs (Slide-in) */}
       <AnimatePresence>
         {showLogs && (
           <motion.div
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
-            className="absolute left-0 top-0 bottom-0 w-80 z-20 quantum-glass border-r border-white/10 p-8 flex flex-col"
+            className="absolute inset-y-0 left-0 z-20 flex w-full max-w-[20rem] flex-col border-r border-white/10 p-4 quantum-glass sm:p-6 md:p-8"
           >
-            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-8 flex items-center gap-2">
-              <Activity className="w-4 h-4" /> Neural Logs
+            <h3 className="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 sm:mb-8">
+              <Activity className="h-4 w-4" /> Neural Logs
             </h3>
-            <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar flex flex-col-reverse">
+            <div className="custom-scrollbar flex flex-1 flex-col-reverse overflow-y-auto pr-2">
               <div className="flex flex-col gap-3">
                 {logs.map((log) => (
-                  <div 
+                  <div
                     key={log.id}
                     className={`text-[10px] font-mono leading-relaxed ${
-                      log.type === 'system' ? 'text-slate-500' :
-                      log.type === 'user' ? 'text-emerald-400' :
-                      log.type === 'tool' ? 'text-fuchsia-400' :
-                      'text-cyan-400'
+                      log.type === 'system'
+                        ? 'text-slate-500'
+                        : log.type === 'user'
+                          ? 'text-emerald-400'
+                          : log.type === 'tool'
+                            ? 'text-fuchsia-400'
+                            : 'text-cyan-400'
                     }`}
                   >
-                    <span className="opacity-30 mr-2">[{log.timestamp}]</span>
+                    <span className="mr-2 opacity-30">[{log.timestamp}]</span>
                     {log.text}
                   </div>
                 ))}
