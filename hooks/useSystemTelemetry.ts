@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { fetchWithTimeout, getNetworkTimeoutMs, getTelemetryEndpoint, getTelemetryPollIntervalMs, normalizeNetworkError } from '@/lib/network/runtime';
 
 export interface SystemTelemetry {
   weather: {
@@ -9,67 +10,93 @@ export interface SystemTelemetry {
     city: string;
   };
   latency: number;
-  uptime: number; // seconds since session start
+  uptime: number;
   activeAgents: number;
 }
 
+const DEFAULT_TELEMETRY: SystemTelemetry = {
+  weather: { temp: 0, condition: 'Unavailable', city: 'Local' },
+  latency: 0,
+  uptime: 0,
+  activeAgents: 0,
+};
+
 export function useSystemTelemetry() {
-  const [telemetry, setTelemetry] = useState<SystemTelemetry>({
-    weather: { temp: 24, condition: 'Clear', city: 'NYC' },
-    latency: 0,
-    uptime: 0,
-    activeAgents: 0,
-  });
+  const [telemetry, setTelemetry] = useState<SystemTelemetry>(DEFAULT_TELEMETRY);
 
-  const startTime = useEffect(() => {
-    const start = Date.now();
-    
-    // 1. Weather fetching (Simple public API)
-    const fetchWeather = async () => {
-      try {
-        // wttr.in is a common public weather tool
-        const res = await fetch('https://wttr.in/?format=j1');
-        const data = await res.json();
-        const current = data.current_condition[0];
-        const area = data.nearest_area[0];
-        setTelemetry(prev => ({
-          ...prev,
-          weather: {
-            temp: parseInt(current.temp_C),
-            condition: current.weatherDesc[0].value,
-            city: area.areaName[0].value,
-          }
-        }));
-      } catch (err) {
-        console.error('Weather fetch failed:', err);
-      }
-    };
-
-    // 2. Latency measurement (Ping)
-    const measureLatency = async () => {
-      try {
-        const start = performance.now();
-        await fetch('https://www.google.com/generate_204', { mode: 'no-cors', cache: 'no-cache' });
-        const end = performance.now();
-        setTelemetry(prev => ({ ...prev, latency: Math.round(end - start) }));
-      } catch (err) {
-        // Fallback for offline or blocked
-        setTelemetry(prev => ({ ...prev, latency: Math.floor(Math.random() * 5) + 1 }));
-      }
-    };
-
-    fetchWeather();
-    measureLatency();
-
-    const telemetryInterval = setInterval(() => {
+  useEffect(() => {
+    const startedAt = Date.now();
+    const uptimeTimer = window.setInterval(() => {
       setTelemetry(prev => ({
         ...prev,
-        uptime: Math.floor((Date.now() - start) / 1000),
+        uptime: Math.floor((Date.now() - startedAt) / 1000),
       }));
-      measureLatency();
-    }, 5000);
+    }, 1000);
 
-    return () => clearInterval(telemetryInterval);
+    return () => window.clearInterval(uptimeTimer);
+  }, []);
+
+  useEffect(() => {
+    const telemetryEndpoint = getTelemetryEndpoint();
+    if (!telemetryEndpoint) {
+      return;
+    }
+
+    const timeoutMs = getNetworkTimeoutMs(process.env.NEXT_PUBLIC_TELEMETRY_TIMEOUT_MS, 2500);
+    const pollIntervalMs = getTelemetryPollIntervalMs();
+    let cancelled = false;
+    let pollTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const loadTelemetry = async () => {
+      const requestStartedAt = performance.now();
+
+      try {
+        const response = await fetchWithTimeout(
+          telemetryEndpoint,
+          {
+            headers: { Accept: 'application/json' },
+            cache: 'no-store',
+          },
+          timeoutMs
+        );
+
+        const payload = await response.json() as Partial<SystemTelemetry>;
+        if (cancelled) {
+          return;
+        }
+
+        const measuredLatency = Math.round(performance.now() - requestStartedAt);
+
+        setTelemetry(prev => ({
+          weather: {
+            temp: payload.weather?.temp ?? prev.weather.temp,
+            condition: payload.weather?.condition ?? prev.weather.condition,
+            city: payload.weather?.city ?? prev.weather.city,
+          },
+          latency: typeof payload.latency === 'number' ? payload.latency : measuredLatency,
+          uptime: prev.uptime,
+          activeAgents: typeof payload.activeAgents === 'number' ? payload.activeAgents : prev.activeAgents,
+        }));
+      } catch (error) {
+        const failure = normalizeNetworkError(error);
+        console.warn('[Telemetry] Optional telemetry request skipped:', failure.kind, failure.message);
+      } finally {
+        if (!cancelled && pollIntervalMs > 0) {
+          pollTimer = setTimeout(() => {
+            void loadTelemetry();
+          }, pollIntervalMs);
+        }
+      }
+    };
+
+    void loadTelemetry();
+
+    return () => {
+      cancelled = true;
+      if (pollTimer) {
+        clearTimeout(pollTimer);
+      }
+    };
   }, []);
 
   return telemetry;

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLiveAPI } from '@/hooks/useLiveAPI';
 import { useAudioProcessor } from '@/hooks/useAudioProcessor';
 import { useAetherStore, Agent } from '@/lib/store/useAetherStore';
+import { fetchWithTimeout, getLocalBridgeUrl, getNetworkTimeoutMs, isBridgeCheckEnabled, normalizeNetworkError } from '@/lib/network/runtime';
 import { ToolResult, Tool, FunctionDeclaration } from '@/lib/types/live-api';
 
 export interface UseVoiceAgentLogicProps {
@@ -19,18 +20,46 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
   const linkType = useAetherStore(state => state.linkType);
   const setLinkType = useAetherStore(state => state.setLinkType);
 
-  // Connection Bridge Check
   useEffect(() => {
+    if (!isBridgeCheckEnabled()) {
+      setLinkType('stateless');
+      return;
+    }
+
+    const bridgeStatusUrl = getLocalBridgeUrl('/status');
+    if (!bridgeStatusUrl) {
+      setLinkType('stateless');
+      return;
+    }
+
+    let isMounted = true;
+
     const checkBridge = async () => {
       try {
-        const res = await fetch('http://localhost:9999/status');
-        if (res.ok) setLinkType('bridge');
-        else setLinkType('stateless');
-      } catch (e) {
-        setLinkType('stateless');
+        const response = await fetchWithTimeout(
+          bridgeStatusUrl,
+          { cache: 'no-store' },
+          getNetworkTimeoutMs(process.env.NEXT_PUBLIC_BRIDGE_TIMEOUT_MS, 1500)
+        );
+
+        if (isMounted) {
+          setLinkType(response.ok ? 'bridge' : 'stateless');
+        }
+      } catch (error) {
+        const failure = normalizeNetworkError(error);
+        console.warn('[VoiceAgent] Bridge probe unavailable:', failure.kind, failure.message);
+
+        if (isMounted) {
+          setLinkType('stateless');
+        }
       }
     };
-    checkBridge();
+
+    void checkBridge();
+
+    return () => {
+      isMounted = false;
+    };
   }, [setLinkType]);
 
   const { 
@@ -49,7 +78,6 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
 
   const { getVolume, isWasmLoaded, isSpeaking } = useAudioProcessor();
 
-  // Optimized volume selection
   const volume = isWasmLoaded || isSpeaking ? getVolume() : cloudVolume;
 
   const agentStatus = useMemo(() => {
@@ -73,46 +101,43 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
         tools.push({ googleSearch: {} });
       }
       
-      // Standard Tools Definition
-      const addTool = (name: string, desc: string, props: any, req: string[] = []) => {
+      const addTool = (name: string, desc: string, props: FunctionDeclaration['parameters']['properties'], req: string[] = []) => {
         functionDeclarations.push({
           name,
           description: desc,
-          parameters: { type: "OBJECT", properties: props, required: req }
+          parameters: { type: 'OBJECT', properties: props, required: req }
         });
       };
 
       if (activeAgent?.tools?.weather) {
-        addTool("getWeather", "Get current weather", { location: { type: "STRING" } }, ["location"]);
+        addTool('getWeather', 'Get current weather', { location: { type: 'STRING' } }, ['location']);
       }
       if (activeAgent?.tools?.crypto) {
-        addTool("getCryptoPrice", "Get crypto price", { symbol: { type: "STRING" } }, ["symbol"]);
+        addTool('getCryptoPrice', 'Get crypto price', { symbol: { type: 'STRING' } }, ['symbol']);
       }
       if (activeAgent?.tools?.googleMaps) {
-        addTool("getMapLocation", "Get geographical data", { location: { type: "STRING" } });
+        addTool('getMapLocation', 'Get geographical data', { location: { type: 'STRING' } });
       }
 
-      // Agent Materialization Tool
       functionDeclarations.push({
-        name: "create_agent",
-        description: "Materialize a new specialized Sovereign Intelligence agent.",
+        name: 'create_agent',
+        description: 'Materialize a new specialized Sovereign Intelligence agent.',
         parameters: {
-          type: "OBJECT",
+          type: 'OBJECT',
           properties: {
-            name: { type: "STRING" },
-            role: { type: "STRING" },
-            systemPrompt: { type: "STRING" },
-            voiceName: { type: "STRING", enum: ["Charon", "Puck", "Kore", "Fenrir"] },
-            tools: { type: "ARRAY", items: { type: "STRING" } },
-            skills: { type: "ARRAY", items: { type: "STRING" } }
+            name: { type: 'STRING' },
+            role: { type: 'STRING' },
+            systemPrompt: { type: 'STRING' },
+            voiceName: { type: 'STRING', enum: ['Charon', 'Puck', 'Kore', 'Fenrir'] },
+            tools: { type: 'ARRAY', items: { type: 'STRING' } },
+            skills: { type: 'ARRAY', items: { type: 'STRING' } }
           },
-          required: ["name", "role", "systemPrompt"]
+          required: ['name', 'role', 'systemPrompt']
         }
       });
 
-      // Firebase Project Tools
-      addTool("listProjects", "List all Firebase projects", {});
-      addTool("getProjectDetails", "Get detailed info for a project", { projectId: { type: "STRING" } }, ["projectId"]);
+      addTool('listProjects', 'List all Firebase projects', {});
+      addTool('getProjectDetails', 'Get detailed info for a project', { projectId: { type: 'STRING' } }, ['projectId']);
 
       if (functionDeclarations.length > 0) {
         tools.push({ functionDeclarations });
