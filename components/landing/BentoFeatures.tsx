@@ -65,7 +65,7 @@ export function BentoFeatures() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: idx * 0.1 }}
-              className={`sovereign-glass p-12 flex flex-col justify-between group hover:border-gemigram-neon/40 transition-all duration-700 ${feature.className}`}
+              className={`sovereign-glass p-8 md:p-12 flex flex-col justify-between group hover:border-gemigram-neon/40 transition-all duration-700 ${feature.className}`}
             >
               <div>
                 <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center mb-10 group-hover:bg-gemigram-neon group-hover:text-black transition-all duration-500 shadow-[0_0_20px_rgba(57,255,20,0)] group-hover:shadow-[0_0_30px_rgba(57,255,20,0.4)]">

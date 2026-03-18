@@ -2,40 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Activity, Shield, Zap, Globe, Users, Cpu, Network, Fingerprint, Mic, ArrowRight } from 'lucide-react';
+import { Shield, Zap, Globe, Fingerprint, Mic, ArrowRight } from 'lucide-react';
 import { useSystemTelemetry } from '../../hooks/useSystemTelemetry';
 import { useAetherStore } from '../../lib/store/useAetherStore';
 import { BRAND } from '@/lib/constants/branding';
 
 export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
-  const [mounted, setMounted] = useState(false);
-  const telemetry = useSystemTelemetry();
-  const { agents } = useAetherStore();
-  const [stats, setStats] = useState({ agents: 0, latency: 0, uptime: 0 });
-
   useEffect(() => {
-    setMounted(true);
-    // Animate counter for stats
-    const duration = 2000;
-    const steps = 60;
-    const interval = duration / steps;
-    let step = 0;
-    
-    const timer = setInterval(() => {
-      step++;
-      const progress = step / steps;
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      
-      setStats({
-        agents: Math.floor(2847 * easeOut),
-        latency: Math.floor(12 * easeOut),
-        uptime: Math.floor(99.99 * easeOut)
-      });
-      
-      if (step >= steps) clearInterval(timer);
-    }, interval);
-    
-    return () => clearInterval(timer);
+    // Stats are currently static or powered by telemetry hook
   }, []);
   return (
     <section className="relative min-h-[95vh] flex items-center justify-center pt-24 md:pt-32 pb-12 md:pb-20 overflow-hidden bg-carbon-black">
@@ -61,7 +35,7 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
               opacity: [0.6, 0.8, 0.6]
             }}
             transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="w-[200px] h-[200px] sm:w-[450px] sm:h-[450px] lg:w-[600px] lg:h-[600px] rounded-full relative"
+            className="w-[180px] h-[180px] sm:w-[350px] sm:h-[350px] lg:w-[500px] lg:h-[500px] rounded-full relative"
             style={{
               background: 'radial-gradient(circle, var(--gemigram-neon-glow) 0%, rgba(57,255,20,0.1) 40%, transparent 70%)',
               filter: 'blur(20px)'
@@ -96,7 +70,7 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
           <motion.h1 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-4xl sm:text-6xl md:text-8xl lg:text-[12rem] font-black tracking-[-0.05em] leading-[0.8] mb-6 neon-shimmer uppercase"
+            className="text-4xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-[-0.05em] leading-[0.8] mb-6 neon-shimmer uppercase"
           >
             {BRAND.product.name}
           </motion.h1>
@@ -111,13 +85,13 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col md:flex-row items-center justify-center gap-8"
+            className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 w-full max-w-sm sm:max-w-none mx-auto"
           >
             <motion.button
               whileHover={{ scale: 1.05, boxShadow: '0 0 80px rgba(57,255,20,0.5)' }}
               whileTap={{ scale: 0.95 }}
               onClick={onLogin}
-              className="px-10 md:px-16 py-6 bg-gemigram-neon text-black rounded-full text-lg md:text-2xl font-black uppercase tracking-[0.2em] shadow-[0_0_50px_rgba(57,255,20,0.4)] transition-all inline-flex items-center gap-3"
+              className="w-full sm:w-auto px-10 md:px-16 py-6 bg-gemigram-neon text-black rounded-full text-lg md:text-2xl font-black uppercase tracking-[0.2em] shadow-[0_0_50px_rgba(57,255,20,0.4)] transition-all inline-flex items-center justify-center gap-3"
             >
               <Mic className="w-5 h-5" />
               Create with Voice
@@ -126,7 +100,7 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
             <motion.button
               whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.05)' }}
               whileTap={{ scale: 0.95 }}
-              className="px-16 py-8 border border-white/10 text-white rounded-full text-xl font-black uppercase tracking-[0.2em] transition-all backdrop-blur-xl"
+              className="w-full sm:w-auto px-10 md:px-16 py-6 border border-white/10 text-white rounded-full text-lg md:text-2xl font-black uppercase tracking-[0.2em] transition-all backdrop-blur-xl bg-white/5"
             >
               Explore_Mainnet
             </motion.button>
@@ -228,9 +202,8 @@ export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
         >
           {[
             { icon: Shield, label: 'Carbon Secure', value: 'AES-256', color: 'text-neon-green' },
-            { icon: Activity, label: 'L1 Latency', value: `${telemetry.latency}ms`, color: 'text-neon-blue' },
-            { icon: Zap, label: 'Neon Active', value: `${agents.length} Agents`, color: 'text-cyber-lime' },
-            { icon: Globe, label: 'Session Uptime', value: `${telemetry.uptime}s`, color: 'text-electric-purple' },
+            { icon: Zap, label: 'Neon Active', value: `${useAetherStore.getState().agents.length} Agents`, color: 'text-cyber-lime' },
+            { icon: Globe, label: 'Session Uptime', value: `${useSystemTelemetry().uptime}s`, color: 'text-electric-purple' },
           ].map((item, idx) => (
             <motion.div 
               key={idx} 
