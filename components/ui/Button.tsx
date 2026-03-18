@@ -11,6 +11,7 @@ interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'size'> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
+  loadingText?: string;
   children: React.ReactNode;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -35,6 +36,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       variant = 'primary',
       size = 'md',
       isLoading = false,
+      loadingText,
       children,
       leftIcon,
       rightIcon,
@@ -67,15 +69,18 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         whileTap={{ scale: disabled || isLoading ? 1 : 0.98 }}
         {...props}
       >
-        {isLoading && (
-          <Loader2 className="w-4 h-4 animate-spin absolute left-1/2 -translate-x-1/2" />
+        {isLoading ? (
+          <div className="flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            {loadingText && <span className="text-xs">{loadingText}</span>}
+          </div>
+        ) : (
+          <span className="relative flex items-center justify-center gap-2">
+            {leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
+            {children}
+            {rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
+          </span>
         )}
-        
-        <span className={isLoading ? 'invisible' : 'relative flex items-center justify-center gap-2'}>
-          {leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
-          {children}
-          {rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
-        </span>
       </motion.button>
     );
   }

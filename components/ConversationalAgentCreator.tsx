@@ -279,7 +279,7 @@ export default function ConversationalAgentCreator({
     };
     
     setMessages(prev => [...prev, completionMessage]);
-    speak(completionMessage.text, {}, () => {
+    speak(completionMessage.text, {}).then(() => {
       onSubmit(finalData);
     });
   };
