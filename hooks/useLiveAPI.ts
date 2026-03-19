@@ -110,7 +110,7 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
       reconnectAttemptsRef.current = 0;
       addLog("Live API connected successfully.", "system");
       
-      const setupMsg: any = {
+    const setupMsg = {
         setup: {
           model: MODEL,
           systemInstruction: systemInstruction ? {
@@ -343,7 +343,14 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
             pcm16[i] = Math.max(-1, Math.min(1, rawPcm[i])) * 0x7FFF;
           }
           
-          const base64data = btoa(String.fromCharCode(...new Uint8Array(pcm16.buffer)));
+          // ─── Sovereign Encoding (Fix Gem #4: PCM Overflow) ────
+          const uint8 = new Uint8Array(pcm16.buffer);
+          let binary = "";
+          const chunk_size = 8192;
+          for (let i = 0; i < uint8.length; i += chunk_size) {
+            binary += String.fromCharCode(...uint8.subarray(i, i + chunk_size));
+          }
+          const base64data = btoa(binary);
           
           if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
             wsRef.current.send(JSON.stringify({

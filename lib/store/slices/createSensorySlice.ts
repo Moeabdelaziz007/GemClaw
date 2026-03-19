@@ -16,6 +16,7 @@ export interface SensorySlice {
   volume: number;
   contextUsage: number;
   addTranscriptMessage: (role: 'user' | 'agent', content: string) => void;
+  addBulkTranscriptMessages: (messages: { role: 'user' | 'agent', content: string }[]) => void;
   setStreamingBuffer: (buffer: string) => void;
   setInterrupted: (interrupted: boolean) => void;
   setIsThinking: (thinking: boolean) => void;
@@ -45,6 +46,16 @@ export const createSensorySlice: StateCreator<SensorySlice> = (set) => ({
       // Limit transcript to last 100 messages to prevent memory bloat
       const newTranscript = [...state.transcript, newMessage].slice(-100);
       
+      return { transcript: newTranscript };
+    }),
+  addBulkTranscriptMessages: (messages) =>
+    set((state) => {
+      const newMessages = messages.map(m => ({
+        id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(7),
+        ...m,
+        timestamp: Date.now(),
+      }));
+      const newTranscript = [...state.transcript, ...newMessages].slice(-100);
       return { transcript: newTranscript };
     }),
   setStreamingBuffer: (buffer) => set({ streamingBuffer: buffer }),

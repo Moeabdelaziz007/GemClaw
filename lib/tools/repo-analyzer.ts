@@ -124,7 +124,7 @@ export async function analyzeRepository(repoUrl: string) {
     if (!cachedContentName) {
       try {
         const cachedContent = await ai.caches.create({
-          model: 'gemini-2.0-flash-exp',
+          model: 'gemini-1.5-flash',
           config: {
             contents: [
               { role: 'user', parts: [{ text: `إليك الكود المصدري للمشروع بالكامل:\n${combinedCode}` }] }
@@ -165,7 +165,7 @@ ${!cachedContentName ? `إليك الكود المصدري للمشروع بال
 `;
 
     const modelConfig: any = {
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-1.5-flash',
       contents: [
         { role: 'user', parts: [{ text: prompt }] }
       ],

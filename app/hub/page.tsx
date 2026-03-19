@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAetherStore } from '@/lib/store/useAetherStore';
 import { Search, Plus } from 'lucide-react';
 import { AgentCard } from '@/components/ui/AgentCard';

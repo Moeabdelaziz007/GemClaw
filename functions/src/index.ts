@@ -1,12 +1,9 @@
 import { onRequest } from "firebase-functions/v2/https";
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import * as admin from "firebase-admin";
-import { exec } from "child_process";
-import { promisify } from "util";
+import { spawn } from "child_process";
 
 admin.initializeApp();
-
-const execAsync = promisify(exec);
 
 export const syncAdminRole = onDocumentWritten("users/{userId}", async (event) => {
   const userId = event.params.userId;
@@ -52,55 +49,61 @@ export const executeAgentTool = onRequest({ timeoutSeconds: 60, memory: "256MiB"
     return;
   }
 
-  const { toolId, action, params, persona } = req.body;
+  const { toolId, action, params } = req.body;
   
   if (!toolId) {
     res.status(400).json({ status: "error", message: "Missing toolId substrate." });
     return;
   }
 
-  // console.log(`[GWS-Bridge] Persona: ${persona || 'Default'} | Executing: ${toolId} ${action}`);
+  // 1. Build Command Arguments
+  const serviceName = toolId.replace('workspace_', ''); // e.g., 'workspace_gmail' -> 'gmail'
+  const args = [serviceName, action];
 
-  // 1. Build Command
-  let baseCmd = "gws";
-  let serviceName = toolId.replace('workspace_', ''); // e.g., 'workspace_gmail' -> 'gmail'
-  
-  // 2. Handle GWS Helper + commands vs Discovery methods
-  let finalCommand = `${baseCmd} ${serviceName} ${action}`;
-
-  // 3. Inject Parameters
+  // 2. Inject Parameters safely
   if (params && typeof params === 'object') {
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        // Sanitize shell input
-        const sanitizedValue = String(value).replace(/"/g, '\\"');
-        finalCommand += ` --${key} "${sanitizedValue}"`;
+        args.push(`--${key}`, String(value));
       }
     });
   }
 
-  // 4. Execution Loop
+  // 4. Execution via spawn (Sovereign Safety)
   try {
-    const { stdout, stderr } = await execAsync(finalCommand);
-    
-    if (stderr && !stdout) {
-      console.warn(`[GWS-Bridge] Stderr reported: ${stderr}`);
+    const child = spawn('gws', args);
+    let stdoutArr: Buffer[] = [];
+    let stderrArr: Buffer[] = [];
+
+    child.stdout.on('data', (data: Buffer) => { stdoutArr.push(data); });
+    child.stderr.on('data', (data: Buffer) => { stderrArr.push(data); });
+
+    const exitCode = await new Promise((resolve) => {
+      child.on('close', resolve);
+    });
+
+    const stdout = Buffer.concat(stdoutArr).toString();
+    const stderr = Buffer.concat(stderrArr).toString();
+
+    if (exitCode !== 0) {
+      console.warn(`[GWS-Bridge] Command failed with exit code ${exitCode}. Stderr: ${stderr}`);
     }
 
-    // Try to parse as JSON, fallback to raw string if requested
+    // Try to parse as JSON, fallback to raw string
     try {
       const data = JSON.parse(stdout);
       res.json({ status: "success", toolId, action, data });
-    } catch (e) {
-      res.json({ status: "success", toolId, action, rawOutput: stdout });
+    } catch {
+      res.json({ status: "success", toolId, action, rawOutput: stdout || stderr });
     }
 
-  } catch (error: any) {
-    console.error(`[GWS-Bridge] Critical Failure:`, error);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`[GWS-Bridge] Critical Failure:`, errorMessage);
     res.status(500).json({ 
       status: "error", 
       message: "Neural routing failed.",
-      details: error.message 
+      details: errorMessage 
     });
   }
 });
