@@ -25,6 +25,7 @@ jobs:
       run: npm run build
 
     - name: Deploy Frontend to Firebase Hosting
+      if: "${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}"
       uses: FirebaseExtended/action-hosting-deploy@v0
       with:
         repoToken: '${{ secrets.GITHUB_TOKEN }}'
@@ -50,6 +51,7 @@ jobs:
       run: npm ci || npm install
 
     - name: Deploy Functions to Firebase
+      if: "${{ secrets.FIREBASE_TOKEN != '' }}"
       uses: w9jds/firebase-action@master
       with:
         args: deploy --only functions
