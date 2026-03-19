@@ -5,7 +5,7 @@ import { spawn } from "child_process";
 
 admin.initializeApp();
 
-export const syncAdminRole = onDocumentWritten("users/{userId}", async (event) => {
+export const syncAdminRole = onDocumentWritten("users/{userId}", async (event: any) => {
   const userId = event.params.userId;
   const snapshot = event.data;
 
@@ -39,7 +39,7 @@ export const syncAdminRole = onDocumentWritten("users/{userId}", async (event) =
  * This function acts as the sovereign execution environment for workspace tasks.
  * It translates JSON intents into production-grade `@googleworkspace/cli` calls.
  */
-export const executeAgentTool = onRequest({ timeoutSeconds: 60, memory: "256MiB" }, async (req, res) => {
+export const executeAgentTool = onRequest({ timeoutSeconds: 60, memory: "256MiB" }, async (req: any, res: any) => {
   // CORS Support for Firebase Hosting
   res.set('Access-Control-Allow-Origin', '*');
   if (req.method === 'OPTIONS') {

@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# 🧬 AetherOS Sovereign Launcher
+# 🧬 GemigramAIOS Sovereign Launcher
 # Double-click this to ignite the Aether Neural Spine.
 
 clear
 echo "------------------------------------------------"
-echo "🌐 AetherOS: Initializing Sovereign Neural Spine"
+echo "🌐 GemigramAIOS: Initializing Sovereign Neural Spine"
 echo "------------------------------------------------"
 
 # 1. Directory Lock
@@ -31,6 +31,6 @@ echo "🖥️  Launching Aether Dashboard..."
 open "http://localhost:3000"
 
 echo ""
-echo "✅ SUCCESS: AetherOS is now active."
+echo "✅ SUCCESS: GemigramAIOS is now active."
 echo "You can close this window now. The AI remains conscious in the background."
 echo "------------------------------------------------"

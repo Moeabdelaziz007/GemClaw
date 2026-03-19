@@ -16,6 +16,9 @@ build/
 .pnpm-debug.log
 .shadow/
 
+# Project IDX
+.idx/
+
 # Playwright
 playwright-report/
 test-results/
