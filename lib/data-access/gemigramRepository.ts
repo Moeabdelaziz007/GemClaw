@@ -8,7 +8,7 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '@/firebase';
-import type { Agent } from '@/lib/store/useAetherStore';
+import type { Agent } from '@/lib/store/useGemigramStore';
 import type { Notification } from '@/lib/types/models';
 
 const buildQuery = (collectionName: string, constraints: QueryConstraint[]) =>

@@ -21,19 +21,23 @@ export interface UiSlice {
   setPendingManifest: (manifest: Partial<Agent> | null) => void;
 }
 
-export const createUiSlice: StateCreator<UiSlice> = (set) => ({
-  linkType: 'stateless',
+export const INITIAL_UI_STATE = {
+  linkType: 'stateless' as const,
   voiceProfile: {
     isCloned: false,
-    sampleStatus: 'none',
+    sampleStatus: 'none' as const,
   },
   voiceSession: {
-    stage: 'landing',
-    micPermission: 'unknown',
+    stage: 'landing' as const,
+    micPermission: 'unknown' as const,
     lastVoiceAction: 'Tap Create with Voice to start your onboarding.',
     updatedAt: null,
   },
   pendingManifest: null,
+};
+
+export const createUiSlice: StateCreator<UiSlice> = (set) => ({
+  ...INITIAL_UI_STATE,
   setLinkType: (type) => set({ linkType: type }),
   setVoiceProfile: (profile) => set((state) => ({ 
     voiceProfile: { ...state.voiceProfile, ...profile } 

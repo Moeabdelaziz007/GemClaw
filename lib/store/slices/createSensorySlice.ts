@@ -15,6 +15,7 @@ export interface SensorySlice {
   isSpeaking: boolean;
   volume: number;
   contextUsage: number;
+  unreadNotifications: any[]; // Adjust type as needed
   addTranscriptMessage: (role: 'user' | 'agent', content: string) => void;
   addBulkTranscriptMessages: (messages: { role: 'user' | 'agent', content: string }[]) => void;
   setStreamingBuffer: (buffer: string) => void;
@@ -23,10 +24,11 @@ export interface SensorySlice {
   setIsSpeaking: (speaking: boolean) => void;
   setVolume: (volume: number) => void;
   setContextUsage: (usage: number) => void;
+  setUnreadNotifications: (notifications: any[]) => void;
   clearTranscript: () => void;
 }
 
-export const createSensorySlice: StateCreator<SensorySlice> = (set) => ({
+export const INITIAL_SENSORY_STATE = {
   transcript: [],
   streamingBuffer: '',
   isInterrupted: false,
@@ -34,6 +36,11 @@ export const createSensorySlice: StateCreator<SensorySlice> = (set) => ({
   isSpeaking: false,
   volume: 0,
   contextUsage: 0,
+  unreadNotifications: [],
+};
+
+export const createSensorySlice: StateCreator<SensorySlice> = (set) => ({
+  ...INITIAL_SENSORY_STATE,
   addTranscriptMessage: (role, content) =>
     set((state) => {
       const newMessage = {
@@ -43,7 +50,6 @@ export const createSensorySlice: StateCreator<SensorySlice> = (set) => ({
         timestamp: Date.now(),
       };
       
-      // Limit transcript to last 100 messages to prevent memory bloat
       const newTranscript = [...state.transcript, newMessage].slice(-100);
       
       return { transcript: newTranscript };
@@ -64,5 +70,6 @@ export const createSensorySlice: StateCreator<SensorySlice> = (set) => ({
   setIsSpeaking: (speaking) => set({ isSpeaking: speaking }),
   setVolume: (volume) => set({ volume }),
   setContextUsage: (usage) => set({ contextUsage: usage }),
+  setUnreadNotifications: (notifications) => set({ unreadNotifications: notifications }),
   clearTranscript: () => set({ transcript: [] }),
 });

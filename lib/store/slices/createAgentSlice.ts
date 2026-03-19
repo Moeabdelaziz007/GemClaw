@@ -50,11 +50,15 @@ export interface AgentSlice {
   hydrateAgent: (agent: Agent) => void;
 }
 
-export const createAgentSlice: StateCreator<AgentSlice> = (set) => ({
+export const INITIAL_AGENT_STATE = {
   activeProjectId: null,
   userProjects: [],
   agents: [],
   activeAgentId: null,
+};
+
+export const createAgentSlice: StateCreator<AgentSlice> = (set) => ({
+  ...INITIAL_AGENT_STATE,
   setActiveProjectId: (id) => set({ activeProjectId: id }),
   setUserProjects: (projects) => set({ userProjects: projects }),
   setAgents: (agents) => set({ agents }),
