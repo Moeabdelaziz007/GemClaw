@@ -18,13 +18,13 @@ export default defineConfig({
       '**/.pnpm-store/**',
       '**/out/**',
     ],
-    server: {
-      watch: {
-        ignored: ['**/.firebase/**', '**/.pnpm-store/**', '**/.npm_cache/**'],
-      },
-    },
     alias: {
       '@': path.resolve(__dirname, './'),
+    },
+  },
+  server: {
+    watch: {
+      ignored: ['**/.firebase/**', '**/.pnpm-store/**', '**/.npm_cache/**'],
     },
   },
 });

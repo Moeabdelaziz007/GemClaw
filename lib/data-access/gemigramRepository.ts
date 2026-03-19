@@ -13,6 +13,7 @@ import {
 import { db } from '@/firebase';
 import type { Agent } from '@/lib/store/useGemigramStore';
 import type { Notification } from '@/lib/types/models';
+import { nanoid } from 'nanoid';
 
 const buildQuery = (collectionName: string, constraints: QueryConstraint[]) =>
   query(collection(db, collectionName), ...constraints);
@@ -75,6 +76,7 @@ export async function fetchGoogleCloudProjects(accessToken: string) {
       }))
     : [];
 }
+
 export async function saveAgent(agent: Agent, userId: string) {
   const agentRef = doc(db, 'agents', agent.id);
   await setDoc(agentRef, {
@@ -82,4 +84,22 @@ export async function saveAgent(agent: Agent, userId: string) {
     ownerId: userId,
     updatedAt: Timestamp.now()
   }, { merge: true });
+}
+
+export async function installMarketplaceAgent(templateAgent: Agent, userId: string) {
+  const newInstanceId = `agent_${nanoid(10)}`;
+  const agentRef = doc(db, 'agents', newInstanceId);
+  
+  const installedAgent = {
+    ...templateAgent,
+    id: newInstanceId,
+    aetherId: templateAgent.aetherId || templateAgent.id, // Reference to original
+    ownerId: userId,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+    isMarketplaceInstance: true
+  };
+
+  await setDoc(agentRef, installedAgent);
+  return installedAgent;
 }

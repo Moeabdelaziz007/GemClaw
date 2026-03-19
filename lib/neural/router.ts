@@ -65,7 +65,7 @@ export class NeuralRouter {
     
     const result = await model.generateContent({
       contents: history,
-      systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }] } : undefined,
+      systemInstruction: systemInstruction ? { role: "system", parts: [{ text: systemInstruction }] } : undefined,
     });
 
     const response = await result.response;

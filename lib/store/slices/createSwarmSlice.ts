@@ -1,5 +1,5 @@
 import { StateCreator } from 'zustand';
-import { SwarmSliceShape, SwarmSession, AgentSession, TaskManifest } from '../types/agentSwarm';
+import { SwarmSliceShape, SwarmSession, AgentSession, TaskManifest } from '../../types/agentSwarm';
 import { nanoid } from 'nanoid';
 
 export interface SwarmSlice extends SwarmSliceShape {
@@ -29,7 +29,7 @@ export const createSwarmSlice: StateCreator<SwarmSlice> = (set, get) => ({
       swarmId,
       orchestratorId,
       agents,
-      status: 'ASSEMBLING',
+      status: 'ASSEMBLING' as const,
       createdAt: Date.now(),
       voiceNarration: `Assembling swarm ${swarmId} to handle ${manifest.length} concurrent tasks.`
     };
@@ -50,7 +50,7 @@ export const createSwarmSlice: StateCreator<SwarmSlice> = (set, get) => ({
   abortSwarm: (swarmId) => {
     set((state) => {
       if (state.activeSwarm?.swarmId !== swarmId) return state;
-      const aborted = { ...state.activeSwarm, status: 'ABORTED', completedAt: Date.now() };
+      const aborted: SwarmSession = { ...state.activeSwarm!, status: 'ABORTED' as const, completedAt: Date.now() };
       return {
         activeSwarm: null,
         swarmHistory: [aborted, ...state.swarmHistory].slice(0, 10),
@@ -72,7 +72,7 @@ export const createSwarmSlice: StateCreator<SwarmSlice> = (set, get) => ({
       const updatedSwarm: SwarmSession = {
         ...state.activeSwarm,
         agents: newAgents,
-        status: allDone ? 'COMPLETE' : state.activeSwarm.status,
+        status: allDone ? ('COMPLETE' as const) : state.activeSwarm.status,
         completedAt: allDone ? Date.now() : undefined
       };
 

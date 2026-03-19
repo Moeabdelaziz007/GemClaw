@@ -31,8 +31,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-// output: 'export', // Removed to support NextAuth middleware
+  output: 'export', // Re-enabled to generate 'out' directory for Firebase Hosting
   transpilePackages: ['framer-motion'],
+  /*
   async headers() {
     return [
       {
@@ -50,6 +51,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  */
 };
 
 export default nextConfig;

@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-static';
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useGemigramStore } from '@/lib/store/useGemigramStore';

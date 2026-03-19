@@ -44,6 +44,14 @@ export interface Memory {
 }
 
 /**
+ * Memory Interface for Web Worker transfer (serialized dates)
+ */
+export interface MemoryForWorker extends Omit<Memory, 'createdAt' | 'lastAccessedAt'> {
+  createdAt: number;
+  lastAccessedAt: number;
+}
+
+/**
  * Create a new memory in Firestore
  */
 export async function createMemory(memory: Omit<Memory, 'id' | 'createdAt' | 'lastAccessedAt'>): Promise<string> {

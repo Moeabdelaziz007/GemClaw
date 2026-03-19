@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-static';
 
 import { useAuth } from '@/components/Providers';
 import { useGemigramStore } from '@/lib/store/useGemigramStore';

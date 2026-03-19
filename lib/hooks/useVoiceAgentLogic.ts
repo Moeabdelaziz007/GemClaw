@@ -38,8 +38,13 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
   }, []);
 
   useEffect(() => {
-    setLinkType(bridgeStatusManager.getStatus());
-    const unsub = bridgeStatusManager.subscribe(setLinkType);
+    const currentStatus = bridgeStatusManager.getStatus();
+    setLinkType(currentStatus === 'unknown' ? 'stateless' : currentStatus as any);
+    
+    const unsub = bridgeStatusManager.subscribe((status) => {
+      setLinkType(status === 'unknown' ? 'stateless' : status as any);
+    });
+    
     void bridgeStatusManager.probe();
     return unsub;
   }, [setLinkType]);
@@ -127,8 +132,8 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
       
       let finalPrompt = activeAgent?.systemPrompt || '';
 
-      const lastInt = useGemigramStore.getState().transcript.filter(m => m.role === 'user').pop();
-      if (lastInt && (Date.now() - (useGemigramStore.getState().interruptedAt || 0) < 5000)) {
+      const activeInterrupt = useGemigramStore.getState().activeInterrupt;
+      if (activeInterrupt && (Date.now() - activeInterrupt.interruptedAt < 5000)) {
         finalPrompt += `\n\n[CONTEXT: You were just interrupted by the user. Acknowledge the interruption and pivot immediately to their latest point.]`;
       }
 

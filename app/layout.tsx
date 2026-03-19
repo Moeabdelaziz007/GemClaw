@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
 import './globals.css';
-import { AuthProvider } from '@/components/Providers';
+import { Providers } from '@/components/Providers';
 import AppShell from '@/components/AppShell';
 import { ActiveIntelligence } from '@/components/ActiveIntelligence';
 
@@ -50,14 +50,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body suppressHydrationWarning className="font-sans antialiased selection:bg-aether-neon/30 overflow-x-hidden bg-theme-primary text-theme-primary">
         <div className="fixed inset-0 pointer-events-none hud-grid opacity-10 z-[0]" />
-        <AuthProvider>
+        <Providers>
           <AppShell>
             <main className="relative z-[1]">
               {children}
             </main>
             <ActiveIntelligence />
           </AppShell>
-        </AuthProvider>
+        </Providers>
       </body>
     </html>
   );

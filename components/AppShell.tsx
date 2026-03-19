@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FloatingNav } from './ui/FloatingNav';
+import { HUD } from './ui/HUD';
 import { Cloud, Signal, Activity } from 'lucide-react';
 import { GemigramLogo } from './GemigramLogo';
 import { useAuth } from './Providers';
@@ -13,6 +14,7 @@ import { BRAND } from '@/lib/constants/branding';
 import { useVisualTier } from '@/lib/hooks/useVisualTier';
 import { useFirestoreSync } from '../lib/hooks/useFirestoreSync';
 import { useVoiceCommandRouter } from '../lib/hooks/useVoiceCommandRouter';
+import { useGemigramStore } from '@/lib/store/useGemigramStore';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -28,7 +30,7 @@ export default function AppShell({ children }: AppShellProps) {
   
   // Activate Sovereign Sync & Command Router
   useFirestoreSync();
-  const voiceRouter = useVoiceCommandRouter();
+  useVoiceCommandRouter();
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 60000);
