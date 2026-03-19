@@ -31,6 +31,7 @@ export function VoiceAgent({ activeAgent, googleAccessToken }: { activeAgent: Ag
     transcript,
     linkType,
     showLogs,
+    setShowLogs,
     toggleConnection,
     startRecording,
     stopRecording,
