@@ -1,7 +1,8 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { getFirestore, collection, doc, getDoc, setDoc, addDoc, onSnapshot, query, where, orderBy, getDocFromServer } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { initializeApp, type FirebaseApp } from 'firebase/app';
+import { getAuth, GoogleAuthProvider, type Auth, type UserInfo } from 'firebase/auth';
+import { doc, getDocFromServer, getFirestore, type Firestore } from 'firebase/firestore';
+import { getStorage, type FirebaseStorage } from 'firebase/storage';
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -11,11 +12,10 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase only if we are in the browser
-let app;
-let db: any;
-let auth: any;
-let storage: any;
+let app: FirebaseApp;
+let db: Firestore;
+let auth: Auth;
+let storage: FirebaseStorage;
 
 if (typeof window !== 'undefined') {
   app = initializeApp(firebaseConfig);
@@ -23,28 +23,25 @@ if (typeof window !== 'undefined') {
   auth = getAuth(app);
   storage = getStorage(app);
 } else {
-  // Mock implementations for server-side/build-time
-  app = {} as any;
-  db = {} as any;
-  auth = { currentUser: null } as any;
-  storage = {} as any;
+  app = {} as FirebaseApp;
+  db = {} as Firestore;
+  auth = { currentUser: null } as Auth;
+  storage = {} as FirebaseStorage;
 }
 
 export { db, auth, storage };
 export const googleProvider = new GoogleAuthProvider();
 
-// Standard Scopes for GWS Discovery
 googleProvider.addScope('https://www.googleapis.com/auth/cloud-platform.read-only');
 googleProvider.addScope('https://www.googleapis.com/auth/cloud-platform');
 
-// Connection test - only run in browser
 if (typeof window !== 'undefined') {
   const testConnection = async () => {
     try {
       await getDocFromServer(doc(db, 'test', 'connection'));
     } catch (error) {
       if (error instanceof Error && error.message.includes('the client is offline')) {
-        console.error("Please check your Firebase configuration. The client is offline.");
+        console.error('Please check your Firebase configuration. The client is offline.');
       }
     }
   };
@@ -90,15 +87,15 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
       emailVerified: auth.currentUser?.emailVerified,
       isAnonymous: auth.currentUser?.isAnonymous,
       tenantId: auth.currentUser?.tenantId,
-      providerInfo: auth.currentUser?.providerData.map((provider: any) => ({
+      providerInfo: auth.currentUser?.providerData.map((provider: UserInfo) => ({
         providerId: provider.providerId,
         displayName: provider.displayName,
         email: provider.email,
-        photoUrl: provider.photoURL
-      })) || []
+        photoUrl: provider.photoURL,
+      })) || [],
     },
     operationType,
-    path
+    path,
   };
   console.error('Firestore Error: ', JSON.stringify(errInfo));
   throw new Error(JSON.stringify(errInfo));

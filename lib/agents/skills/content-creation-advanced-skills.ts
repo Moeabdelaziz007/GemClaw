@@ -182,7 +182,7 @@ export const THREE_D_ANIMATION_SKILL: SkillDefinition = {
   metadata: {
     icon: 'Box',
     color: 'text-indigo-500',
-    difficulty: 'expert',
+    difficulty: 'advanced',
     estimatedSetupTime: '35 minutes',
     tags: ['3d', 'modeling', 'animation', 'rendering', 'blender', 'visualization'],
     version: '1.0.0',
