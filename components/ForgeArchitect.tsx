@@ -57,13 +57,13 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
                     <Sparkles className="w-6 h-6 text-gemigram-neon animate-pulse" />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-black text-white uppercase tracking-widest drop-shadow-md">Aether_Forge</h1>
+                    <h1 className="text-3xl font-black text-white uppercase tracking-tighter italic drop-shadow-md">Gemi_<span className="text-gemigram-neon">Forge</span></h1>
                     <div className="flex items-center gap-3 mt-1">
                         <span className="text-[10px] font-mono text-gemigram-neon/80 uppercase tracking-[0.3em]">Voice_Synthesis_Active</span>
                         <div className="flex gap-1">
                             <span className={`w-1.5 h-1.5 rounded-full ${voiceState.status === 'listening' ? 'bg-red-500 animate-pulse shadow-[0_0_8px_red]' : 'bg-white/20'}`} />
-                            <span className={`w-1.5 h-1.5 rounded-full ${voiceState.status === 'processing' ? 'bg-neon-blue animate-pulse shadow-[0_0_8px_#00f0ff]' : 'bg-white/20'}`} />
-                            <span className={`w-1.5 h-1.5 rounded-full ${voiceState.status === 'speaking' ? 'bg-gemigram-neon animate-pulse shadow-[0_0_8px_#39ff14]' : 'bg-white/20'}`} />
+                            <span className={`w-1.5 h-1.5 rounded-full ${voiceState.status === 'processing' ? 'bg-gemigram-neon animate-pulse shadow-[0_0_8px_#10ff87]' : 'bg-white/20'}`} />
+                            <span className={`w-1.5 h-1.5 rounded-full ${voiceState.status === 'speaking' ? 'bg-accent-purple animate-pulse shadow-[0_0_8px_#a855f7]' : 'bg-white/20'}`} />
                         </div>
                     </div>
                   </div>
@@ -139,7 +139,7 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
                                             voiceState.status === 'processing' ? [1, 1.05, 1] : 1,
                                     rotate: voiceState.status === 'processing' ? 360 : 0,
                                     boxShadow: voiceState.status === 'listening' ? ['0 0 40px rgba(255,50,50,0.2)', '0 0 80px rgba(255,50,50,0.6)', '0 0 40px rgba(255,50,50,0.2)'] :
-                                                voiceState.status === 'processing' ? ['0 0 40px rgba(0,240,255,0.2)', '0 0 80px rgba(0,240,255,0.6)', '0 0 40px rgba(0,240,255,0.2)'] : 'none'
+                                                voiceState.status === 'processing' ? ['0 0 40px rgba(16,255,135,0.2)', '0 0 80px rgba(16,255,135,0.6)', '0 0 40px rgba(16,255,135,0.2)'] : 'none'
                                     }}
                                     transition={{ duration: voiceState.status === 'processing' ? 4 : 2, repeat: Infinity, ease: "easeInOut" }}
                                     onClick={() => {
@@ -147,7 +147,7 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
                                     }}
                                     className={`w-40 h-40 rounded-full border-2 border-dashed flex items-center justify-center relative mb-12 cursor-pointer backdrop-blur-xl ${
                                         voiceState.status === 'listening' ? 'border-red-500/50 bg-red-500/5' :
-                                        voiceState.status === 'processing' ? 'border-neon-blue/50 bg-neon-blue/5' :
+                                        voiceState.status === 'processing' ? 'border-gemigram-neon/50 bg-gemigram-neon/5' :
                                         'border-gemigram-neon/30 bg-gemigram-neon/5 hover:bg-gemigram-neon/10'
                                     }`}
                                 >
@@ -158,7 +158,7 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
                                         'border-gemigram-neon/20'
                                     }`} />
 
-                                    {voiceState.status === 'processing' ? <Brain className="w-16 h-16 text-neon-blue animate-pulse" /> :
+                                    {voiceState.status === 'processing' ? <Brain className="w-16 h-16 text-gemigram-neon animate-pulse" /> :
                                      voiceState.status === 'listening' ? <Mic className="w-16 h-16 text-red-500" /> :
                                      <Radio className="w-16 h-16 text-gemigram-neon" />}
                                 </motion.div>
@@ -195,8 +195,8 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* ID Card */}
                                     <div className="glass-medium p-8 rounded-[2.5rem] border border-white/10 relative overflow-hidden group">
-                                        <div className="absolute top-0 right-0 w-32 h-32 bg-neon-blue/10 blur-[50px] rounded-full mix-blend-screen" />
-                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-blue/80 mb-2">Designation</p>
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-gemigram-neon/10 blur-[50px] rounded-full mix-blend-screen" />
+                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gemigram-neon/80 mb-2">Designation</p>
                                         <h3 className="text-3xl font-black text-white uppercase tracking-tighter truncate">{formData.name}</h3>
                                         <p className="text-sm font-medium text-white/50 mt-1 truncate">{formData.role}</p>
                                     </div>
@@ -226,7 +226,7 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
                                                 </span>
                                             ))}
                                             {Object.keys(formData.tools).map(t => (
-                                                <span key={t} className="px-5 py-2 glass-strong border border-neon-blue/30 rounded-full text-xs font-bold text-neon-blue uppercase tracking-widest shadow-[0_0_15px_rgba(0,240,255,0.1)]">
+                                                <span key={t} className="px-5 py-2 glass-strong border border-gemigram-neon/30 rounded-full text-xs font-bold text-white uppercase tracking-widest shadow-[0_0_15px_rgba(16,255,135,0.1)]">
                                                     {t}
                                                 </span>
                                             ))}
@@ -284,8 +284,8 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
 function InferenceNode({ label, active }: { label: string; active: boolean }) {
   return (
     <div className="flex items-center justify-between group py-1">
-       <span className={`text-[9px] font-black uppercase tracking-[0.2em] transition-colors ${active ? 'text-gemigram-neon drop-shadow-[0_0_8px_rgba(57,255,20,0.5)]' : 'text-white/30'}`}>{label}</span>
-       <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${active ? 'bg-gemigram-neon animate-pulse shadow-[0_0_10px_#39ff14] scale-150' : 'bg-white/10'}`} />
+       <span className={`text-[9px] font-black uppercase tracking-[0.2em] transition-colors ${active ? 'text-gemigram-neon drop-shadow-[0_0_8px_rgba(16,255,135,0.5)]' : 'text-white/30'}`}>{label}</span>
+       <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${active ? 'bg-gemigram-neon animate-pulse shadow-[0_0_10px_#10ff87] scale-150' : 'bg-white/10'}`} />
     </div>
   );
 }

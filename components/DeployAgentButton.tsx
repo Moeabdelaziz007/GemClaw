@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Download, Smartphone, Monitor, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Agent } from '@/lib/store/useAetherStore';
+import { Agent } from '@/lib/store/useGemigramStore';
 import { installAgentAsPWA, showIOSInstallInstructions } from '@/lib/pwa/dynamic-manifest';
 import { generateAgentAvatar } from '@/lib/pwa/avatar-generator';
 import { saveAgentAvatar } from '@/lib/pwa/avatar-storage';

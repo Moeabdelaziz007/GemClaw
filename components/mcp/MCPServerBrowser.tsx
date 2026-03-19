@@ -68,8 +68,8 @@ const ServerCard: React.FC<ServerCardProps> = ({
 
   return (
     <motion.div
-      className="bg-gray-800/40 border border-gray-700/50 rounded-xl overflow-hidden 
-                 backdrop-blur-sm hover:border-cyan-500/50 transition-all duration-300"
+      className="bg-black/40 border border-white/5 rounded-xl overflow-hidden 
+                 backdrop-blur-sm hover:border-gemigram-neon/50 transition-all duration-300 sovereign-glass"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -78,8 +78,8 @@ const ServerCard: React.FC<ServerCardProps> = ({
       <div className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-lg">
-              <Package className="w-6 h-6 text-purple-400" />
+            <div className="p-2 bg-gradient-to-br from-accent-purple/20 to-gemigram-neon/20 rounded-lg">
+              <Package className="w-6 h-6 text-gemigram-neon" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-white">{server.name}</h3>
@@ -117,7 +117,7 @@ const ServerCard: React.FC<ServerCardProps> = ({
           {server.tags?.slice(0, 4).map((tag: string, idx: number) => (
             <span
               key={idx}
-              className="px-2 py-1 text-xs bg-cyan-500/10 text-cyan-400 rounded-md"
+              className="px-2 py-1 text-xs bg-gemigram-neon/10 text-gemigram-neon rounded-md font-mono"
             >
               {tag}
             </span>
@@ -204,9 +204,9 @@ const ServerCard: React.FC<ServerCardProps> = ({
               <button
                 onClick={handleInstall}
                 disabled={installing}
-                className="flex-1 px-4 py-2 text-sm font-medium text-white 
-                         bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg
-                         hover:from-purple-400 hover:to-blue-400 
+                className="flex-1 px-4 py-2 text-sm font-black uppercase tracking-widest text-white 
+                         bg-gradient-to-r from-accent-purple to-gemigram-neon rounded-lg
+                         hover:shadow-[0_0_20px_rgba(16,255,135,0.3)] 
                          disabled:opacity-50 disabled:cursor-not-allowed
                          flex items-center justify-center gap-2"
               >
@@ -323,9 +323,9 @@ export default function MCPServerBrowser({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search servers..."
-            className="w-full pl-10 pr-4 py-2.5 bg-gray-800/50 border border-gray-700 
-                     rounded-lg text-white placeholder-gray-500
-                     focus:outline-none focus:border-cyan-500"
+            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 
+                     rounded-lg text-white placeholder-white/20
+                     focus:outline-none focus:border-gemigram-neon"
           />
         </div>
 
@@ -333,8 +333,8 @@ export default function MCPServerBrowser({
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="px-4 py-2.5 bg-gray-800/50 border border-gray-700 
-                   rounded-lg text-white focus:outline-none focus:border-cyan-500"
+          className="px-4 py-2.5 bg-white/5 border border-white/10 
+                   rounded-lg text-white focus:outline-none focus:border-gemigram-neon"
         >
           {categories.map(cat => (
             <option key={cat} value={cat}>
@@ -347,8 +347,8 @@ export default function MCPServerBrowser({
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as any)}
-          className="px-4 py-2.5 bg-gray-800/50 border border-gray-700 
-                   rounded-lg text-white focus:outline-none focus:border-cyan-500"
+          className="px-4 py-2.5 bg-white/5 border border-white/10 
+                   rounded-lg text-white focus:outline-none focus:border-gemigram-neon"
         >
           <option value="popularity">Most Popular</option>
           <option value="rating">Highest Rated</option>

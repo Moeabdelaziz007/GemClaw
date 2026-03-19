@@ -87,10 +87,10 @@ function MarketplaceCard({ item, type }: { item: any; type: string }) {
               type === 'mcp'
                 ? 'border-gemigram-neon/20 bg-gemigram-neon/5 text-gemigram-neon shadow-[0_0_20px_rgba(16,255,135,0.1)]'
                 : type === 'api'
-                  ? 'border-blue-400/20 bg-blue-400/5 text-blue-400 shadow-[0_0_20px_rgba(96,165,250,0.1)]'
+                  ? 'border-accent-purple/20 bg-accent-purple/5 text-accent-purple shadow-[0_0_20px_rgba(157,80,255,0.1)]'
                   : type === 'skills'
-                    ? 'border-fuchsia-500/20 bg-fuchsia-500/5 text-fuchsia-500 shadow-[0_0_20px_rgba(217,70,239,0.1)]'
-                    : 'border-orange-500/20 bg-orange-500/5 text-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.1)]'
+                    ? 'border-gemigram-neon/20 bg-gemigram-neon/5 text-gemigram-neon shadow-[0_0_20px_rgba(16,255,135,0.1)]'
+                    : 'border-white/20 bg-white/5 text-white/40 shadow-[0_0_20px_rgba(255,255,255,0.05)]'
             }`}
           >
             {type === 'mcp' && <Package className="h-6 w-6" />}

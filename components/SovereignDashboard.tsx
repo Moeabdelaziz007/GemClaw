@@ -21,11 +21,11 @@ export function SovereignDashboard({
   transcript 
 }: SovereignDashboardProps) {
   return (
-    <div className="relative w-full h-full flex flex-col gap-6 p-6 overflow-hidden bg-industrial selection:bg-gemigram-neon/20">
+    <div className="relative w-full h-full flex flex-col gap-6 p-6 overflow-hidden bg-bg-primary selection:bg-gemigram-neon/20">
       {/* Background Ambience */}
-      <div className="absolute inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-[20%] left-[30%] w-[40vw] h-[40vw] bg-gemigram-neon/10 rounded-full blur-[150px]" />
-        <div className="absolute bottom-[20%] right-[30%] w-[40vw] h-[40vw] bg-fuchsia-500/5 rounded-full blur-[150px]" />
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[60vw] h-[60vw] bg-gemigram-neon/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-accent-purple/5 rounded-full blur-[100px]" />
       </div>
 
       <div className="grid grid-cols-12 gap-6 h-full relative z-10">
@@ -38,19 +38,19 @@ export function SovereignDashboard({
               icon={Cpu} 
               label="Neural_Core_Load" 
               value={42} 
-              color="gemigram-neon" 
+              color="var(--gemigram-neon)" 
             />
             <TelemetryItem 
               icon={HardDrive} 
               label="Synaptic_Buffer" 
               value={68} 
-              color="blue-400" 
+              color="var(--text-secondary)" 
             />
             <TelemetryItem 
               icon={Network} 
               label="Network_Bandwidth" 
               value={12} 
-              color="fuchsia-500" 
+              color="var(--accent-purple)" 
             />
           </div>
 
@@ -167,16 +167,17 @@ function TelemetryItem({ icon: Icon, label, value, color }: { icon: any, label: 
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Icon className={`w-4 h-4 text-${color}`} />
+          <Icon className="w-4 h-4" style={{ color }} />
           <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest">{label}</span>
         </div>
         <span className="text-[10px] font-mono font-bold text-white">{value}%</span>
       </div>
-      <div className="telemetry-bar h-1.5 rounded-full overflow-hidden border border-white/10">
+      <div className="h-1.5 rounded-full overflow-hidden bg-white/5 border border-white/5">
         <motion.div 
           initial={{ width: 0 }}
           animate={{ width: `${value}%` }}
-          className={`h-full bg-${color} shadow-[0_0_10px_rgba(0,0,0,0.5)]`}
+          className="h-full shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+          style={{ backgroundColor: color }}
         />
       </div>
     </div>

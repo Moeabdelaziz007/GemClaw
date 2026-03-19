@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useAetherStore } from '@/lib/store/useAetherStore';
+import { useGemigramStore } from '@/lib/store/useGemigramStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Mic, MicOff, Send, SkipForward, ChevronLeft, Sparkles,
@@ -21,7 +21,7 @@ interface AgentFormData {
   name: string;
   description: string;
   voiceName: string;
-  computeTier: 'Standard' | 'Neural' | 'Aether';
+  computeTier: 'Standard' | 'Neural' | 'Gemigram';
   systemPrompt: string;
   rules: string;
   soul: string;
@@ -49,7 +49,7 @@ export default function ConversationalAgentCreator({
   const [agentData, setAgentData] = useState<Partial<AgentFormData>>({});
   const [micPermission, setMicPermission] = useState<'unknown' | 'granted' | 'denied'>('unknown');
   const [permissionChecked, setPermissionChecked] = useState(false);
-  const setVoiceSession = useAetherStore(state => state.setVoiceSession);
+  const setVoiceSession = useGemigramStore(state => state.setVoiceSession);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   

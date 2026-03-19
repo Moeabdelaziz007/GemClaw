@@ -20,21 +20,21 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
     switch (state) {
       case 'Listening':
         return {
-          glow: isLocal ? 'rgba(168, 85, 247, 0.4)' : 'rgba(0, 240, 255, 0.4)',
-          accent: isLocal ? '#A855F7' : '#00F0FF',
-          corePulse: 1.2,
-          speed: 2,
-          eyeScale: 1,
-          ringOpacity: 0.6,
+          glow: 'var(--gemigram-glow)',
+          accent: 'var(--gemigram-neon)',
+          corePulse: 1.25,
+          speed: 2.2,
+          eyeScale: 1.1,
+          ringOpacity: 0.5,
         };
       case 'Thinking':
         return {
-          glow: isLocal ? 'rgba(139, 92, 246, 0.5)' : 'rgba(168, 85, 247, 0.5)',
-          accent: isLocal ? '#8B5CF6' : '#A855F7',
-          corePulse: 1.8,
-          speed: 0.8,
-          eyeScale: 0.8,
-          ringOpacity: 0.4,
+          glow: 'rgba(157, 80, 255, 0.4)',
+          accent: 'var(--accent-purple)',
+          corePulse: 1.6,
+          speed: 0.9,
+          eyeScale: 0.85,
+          ringOpacity: 0.35,
         };
       case 'Executing':
         return {
@@ -47,21 +47,21 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
         };
       case 'Speaking':
         return {
-          glow: isLocal ? 'rgba(192, 132, 252, 0.4)' : 'rgba(52, 211, 153, 0.4)',
-          accent: isLocal ? '#C084FC' : '#34D399',
-          corePulse: 1 + volume * 0.8,
-          speed: 1.5,
-          eyeScale: 1.2,
-          ringOpacity: 0.8,
+          glow: 'var(--gemigram-glow)',
+          accent: 'var(--gemigram-neon)',
+          corePulse: 1 + volume * 1.2,
+          speed: 1.4,
+          eyeScale: 1.25,
+          ringOpacity: 0.7,
         };
       default:
         return {
-          glow: 'rgba(255, 255, 255, 0.1)',
-          accent: '#475569',
+          glow: 'rgba(255, 255, 255, 0.05)',
+          accent: 'var(--text-tertiary)',
           corePulse: 1,
-          speed: 4,
+          speed: 4.5,
           eyeScale: 0,
-          ringOpacity: 0.2,
+          ringOpacity: 0.15,
         };
     }
   }, [state, volume, isLocal]);
@@ -127,7 +127,7 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
               ease: "easeInOut" 
             }}
           >
-            {/* The Aether Entity - Head (Floating Singularity) */}
+            {/* The Gemigram Entity - Head (Floating Singularity) */}
             <div className="relative w-28 h-32 mb-4 flex flex-col items-center justify-center">
               {/* Head Shell */}
               <div className="absolute inset-0 bg-white/5 backdrop-blur-md rounded-[40px] border border-white/10 overflow-hidden">
@@ -234,14 +234,14 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
           </div>
 
           <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center gap-3 px-4 py-1.5 rounded-full border border-white/5 bg-white/[0.02] backdrop-blur-md">
-              <div className={`w-2 h-2 rounded-full shadow-[0_0_8px_currentColor] ${
-                state === 'Disconnected' ? 'text-white/20 bg-white/20' : 
-                state === 'Listening' ? (isLocal ? 'text-purple-400 bg-purple-400 animate-pulse' : 'text-gemigram-neon bg-gemigram-neon animate-pulse') :
-                state === 'Thinking' ? 'text-purple-500 bg-purple-500 animate-pulse' :
-                (isLocal ? 'text-purple-300 bg-purple-300 animate-bounce' : 'text-emerald-400 bg-emerald-400 animate-bounce')
+            <div className="flex items-center gap-3 px-4 py-1.5 rounded-full border border-white/5 glass-subtle backdrop-blur-md">
+              <div className={`w-2 h-2 rounded-full shadow-[0_0_12px_currentColor] ${
+                state === 'Disconnected' ? 'text-white/10 bg-white/10' : 
+                state === 'Listening' ? 'text-gemigram-neon bg-gemigram-neon animate-pulse' :
+                state === 'Thinking' ? 'text-purple-400 bg-purple-400 animate-pulse' :
+                'text-gemigram-neon bg-gemigram-neon animate-bounce'
               }`} />
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50">
                 {state === 'Disconnected' ? 'Standby Matrix' : `${state} Mode`}
               </span>
             </div>

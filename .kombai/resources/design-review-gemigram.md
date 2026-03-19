@@ -1,7 +1,7 @@
 # 🧪 Gemigram Sovereign Design Review
 
 ## 🛰️ Overview
-This report documents the architectural and visual audit of Gemigram as it transitions to the **AetherOS Sovereignty** identity. The goal is to eliminate fragmentation and prepare for a voice-first multimodal future.
+This report documents the architectural and visual audit of Gemigram as it transitions to the **GemigramOS Sovereignty** identity. The goal is to eliminate fragmentation and prepare for a voice-first multimodal future.
 
 ---
 
@@ -36,7 +36,7 @@ This report documents the architectural and visual audit of Gemigram as it trans
 
 ---
 
-## 🎨 4. Design Standards (The Aether Mandate)
+## 🎨 4. Design Standards (The Gemigram Mandate)
 
 > [!IMPORTANT]
 > **Advisory for Future Implementation:**

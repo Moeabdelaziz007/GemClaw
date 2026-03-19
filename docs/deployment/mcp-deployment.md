@@ -67,7 +67,7 @@
 ## 🏗️ البنية النهائية
 
 ```
-Gemigram AetherOS/
+Gemigram GemigramOS/
 ├── lib/
 │   ├── agents/
 │   │   ├── skill-types.ts [EXTENDED - MCP types]
@@ -411,7 +411,7 @@ const apiKey = apiCredentialsManager.getCredentialValue(credId);
 
 ---
 
-*تم البناء وفقاً لأعلى معايير Gemigram AetherOS مع الحفاظ على:*
+*تم البناء وفقاً لأعلى معايير Gemigram GemigramOS مع الحفاظ على:*
 - *جودة الإنتاجية العالية*
 - *الأمان المتقدم*
 - *القابلية الكاملة للصيانة والتوسع*

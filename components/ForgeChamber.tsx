@@ -13,17 +13,17 @@ const FORGE_STEPS = [
   { id: 'skills', text: 'Activating Occupational Skill Directives...', icon: Cpu, duration: 2500 },
   { id: 'memory', text: 'Initializing Semantic Memory Networks...', icon: Database, duration: 3500 },
   { id: 'identity', text: 'Inscribing Sovereign Digital Signature...', icon: Fingerprint, duration: 2000 },
-  { id: 'package', text: 'Materializing .ath Entity...', icon: Package, duration: 2000 },
+  { id: 'package', text: 'Materializing .gem Entity...', icon: Package, duration: 2000 },
   { id: 'heartbeat', text: 'Initiating Vital Signs Monitor...', icon: Activity, duration: 1500 },
 ];
 
 // Forge Chamber internal imports
-import { useAetherStore } from '@/lib/store/useAetherStore';
+import { useGemigramStore } from '@/lib/store/useGemigramStore';
 import DeployAgentButton from './DeployAgentButton';
 
 export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
-  const pendingManifest = useAetherStore(state => state.pendingManifest);
-  const setActiveAgentId = useAetherStore(state => state.setActiveAgentId);
+  const pendingManifest = useGemigramStore(state => state.pendingManifest);
+  const setActiveAgentId = useGemigramStore(state => state.setActiveAgentId);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isFlashing, setIsFlashing] = useState(false);
   const [showDeployOption, setShowDeployOption] = useState(false);
@@ -70,21 +70,32 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
       
       const flashTimer = setTimeout(() => {
         setShowDeployOption(true);
-      }, 1500); // Show deploy option after flash
+        
+        // AUTO-DEPLOY LOGIC (Shortcut Creation)
+        if (pendingManifest && (pendingManifest as any).autoMaterialize) {
+          console.log('[Forge] Auto-deploying Sovereign Agent...');
+          // In a real PWA context, we would trigger the install prompt or redirect
+          // For now, we simulate the completion
+          setTimeout(() => {
+            setActiveAgentId(agentId || '');
+            onComplete();
+          }, 3000);
+        }
+      }, 1500);
       
       return () => {
         clearTimeout(timer);
         clearTimeout(flashTimer);
       };
     }
-  }, [currentStepIndex]);
+  }, [currentStepIndex, pendingManifest, agentId, setActiveAgentId, onComplete]);
 
   const currentStep = FORGE_STEPS[currentStepIndex];
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center bg-[#030303] overflow-hidden">
       {/* Ambient Forge Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,240,255,0.1)_0%,transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,255,135,0.08)_0%,transparent_70%)]" />
       
       {/* The Energy Orb */}
       <div className="relative w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 flex items-center justify-center mb-8 sm:mb-12 md:mb-16 px-4">
@@ -102,17 +113,17 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
         
         {/* Rings */}
         <motion.div 
-          className="absolute inset-0 rounded-full border border-cyan-500/30 border-dashed"
+          className="absolute inset-0 rounded-full border border-gemigram-neon/30 border-dashed"
           animate={{ rotate: 360 }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
         <motion.div 
-          className="absolute inset-6 sm:inset-8 rounded-full border border-purple-500/40"
+          className="absolute inset-6 sm:inset-8 rounded-full border border-accent-purple/40"
           animate={{ rotate: -360, scale: [1, 1.05, 1] }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="absolute inset-12 sm:inset-16 rounded-full border-2 border-cyan-300/20 border-dotted"
+          className="absolute inset-12 sm:inset-16 rounded-full border-2 border-gemigram-neon/20 border-dotted"
           animate={{ rotate: 180 }}
           transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
         />
@@ -121,7 +132,7 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
         {Array.from({ length: 12 }).map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-cyan-300 rounded-full blur-[1px]"
+            className="absolute w-1 h-1 bg-gemigram-neon/60 rounded-full blur-[1px]"
             initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
             animate={{ 
               opacity: [0, 1, 0],
@@ -137,6 +148,29 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
             }}
           />
         ))}
+
+        {/* Smart Touch Overlay */}
+        <motion.div 
+          className="absolute inset-0 z-10 cursor-pointer"
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            // Pulse effect to accelerate synthesis
+            setCurrentStepIndex(prev => Math.min(prev + 1, FORGE_STEPS.length));
+          }}
+        />
+        
+        {/* Avatar Preview (Appears late in the process) */}
+        <AnimatePresence>
+          {currentStepIndex >= 15 && (pendingManifest as any)?.avatarUrl && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              className="absolute z-20 w-32 h-32 sm:w-40 sm:h-40 rounded-3xl overflow-hidden border-2 border-gemigram-neon shadow-[0_0_30px_rgba(16,255,135,0.4)]"
+            >
+              <img src={(pendingManifest as any).avatarUrl} alt="Agent Avatar" className="w-full h-full object-cover" />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Text Sequence */}
@@ -151,8 +185,8 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
               transition={{ duration: 0.5 }}
               className="flex flex-col items-center text-center gap-2 sm:gap-3 md:gap-4"
             >
-              <currentStep.icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-cyan-400 animate-pulse" />
-              <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-light tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-purple-400 px-2">
+              <currentStep.icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-gemigram-neon animate-pulse" />
+              <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-black italic tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-gemigram-neon to-accent-purple px-2 uppercase">
                 {currentStep.text}
               </h2>
             </motion.div>
@@ -202,7 +236,7 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
                     <DeployAgentButton
                       agent={{
                         id: agentId || 'agent',
-                        aetherId: `ath://${agentId || 'agent'}`,
+                        aetherId: `gem://${agentId || 'agent'}`,
                         name: pendingManifest.name || 'Agent',
                         role: (pendingManifest as any).description || 'Assistant',
                         users: '0',

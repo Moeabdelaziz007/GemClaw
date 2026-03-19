@@ -65,10 +65,10 @@ export default function APICredentialsManager({
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="px-4 py-2 text-sm font-medium text-white 
-                   bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg
-                   hover:from-cyan-400 hover:to-blue-400 
-                   flex items-center gap-2"
+          className="px-6 py-2 text-sm font-black uppercase tracking-widest text-white 
+                   bg-gradient-to-r from-accent-purple to-gemigram-neon rounded-lg
+                   hover:shadow-[0_0_20px_rgba(16,255,135,0.3)] 
+                   flex items-center gap-2 transition-all"
         >
           <Plus className="w-4 h-4" />
           Add Credential
@@ -77,10 +77,10 @@ export default function APICredentialsManager({
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/50 rounded-lg p-4">
+        <div className="bg-gradient-to-br from-gemigram-neon/10 to-accent-purple/10 border border-gemigram-neon/30 rounded-lg p-4 sovereign-glass">
           <div className="flex items-center gap-2 mb-2">
-            <Key className="w-5 h-5 text-blue-400" />
-            <div className="text-2xl font-bold text-blue-400">{stats.totalCredentials}</div>
+            <Key className="w-5 h-5 text-gemigram-neon" />
+            <div className="text-2xl font-bold text-gemigram-neon">{stats.totalCredentials}</div>
           </div>
           <div className="text-sm text-gray-400">Total Keys</div>
         </div>
@@ -111,9 +111,9 @@ export default function APICredentialsManager({
       </div>
 
       {/* Security Notice */}
-      <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/50 rounded-lg">
+      <div className="mb-6 p-4 bg-gemigram-neon/10 border border-gemigram-neon/20 rounded-lg sovereign-glass">
         <div className="flex items-start gap-3">
-          <Shield className="w-5 h-5 text-blue-400 mt-0.5" />
+          <Shield className="w-5 h-5 text-gemigram-neon mt-0.5" />
           <div>
             <h4 className="text-sm font-semibold text-blue-400 mb-1">
               Security Features
@@ -198,15 +198,15 @@ function CredentialCard({ credential, onDelete }: any) {
 
   return (
     <motion.div
-      className="bg-gray-800/40 border border-gray-700/50 rounded-lg p-4 
-                 backdrop-blur-sm hover:border-cyan-500/50 transition-all"
+      className="bg-black/40 border border-white/5 rounded-lg p-4 
+                 backdrop-blur-sm hover:border-gemigram-neon/50 transition-all sovereign-glass"
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 flex-1">
-          <div className="p-2 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg">
-            <Key className="w-5 h-5 text-cyan-400" />
+          <div className="p-2 bg-gradient-to-br from-accent-purple/20 to-gemigram-neon/20 rounded-lg">
+            <Key className="w-5 h-5 text-gemigram-neon" />
           </div>
           
           <div className="flex-1">
@@ -367,10 +367,10 @@ function AddCredentialModal({ onClose, onAdd }: any) {
           <button
             onClick={handleSave}
             disabled={saving || !providerId || !apiKey}
-            className="flex-1 px-4 py-2 text-sm font-medium text-white 
-                     bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg
-                     hover:from-cyan-400 hover:to-blue-400 
-                     disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-2 text-sm font-black uppercase tracking-widest text-white 
+                     bg-gradient-to-r from-accent-purple to-gemigram-neon rounded-lg
+                     hover:shadow-[0_0_20px_rgba(16,255,135,0.3)] 
+                     disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {saving ? 'Saving...' : 'Save Credential'}
           </button>

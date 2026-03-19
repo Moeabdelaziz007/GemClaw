@@ -80,7 +80,7 @@
 ## 🏗️ Architecture Overview
 
 ```
-Gemigram AetherOS/
+Gemigram GemigramOS/
 ├── lib/
 │   ├── agents/
 │   │   ├── skill-types.ts [EXTENDED]
@@ -460,4 +460,4 @@ The implementation maintains strict adherence to Gemigram's existing patterns wh
 
 ---
 
-*Built with ❤️ following Gemigram AetherOS architecture standards*
+*Built with ❤️ following Gemigram GemigramOS architecture standards*

@@ -14,21 +14,21 @@ interface MiniAgentHUDProps {
 
 const themeMap = {
   Forge: {
-    color: '#FBBF24', // Gold
+    color: 'var(--gemigram-neon)',
     icon: Sparkles,
-    glow: 'rgba(251, 191, 36, 0.4)',
+    glow: 'var(--gemigram-glow)',
     label: 'FORGE_ASSISTANT'
   },
   Memory: {
-    color: '#34D399', // Emerald
+    color: 'var(--text-secondary)',
     icon: Brain,
-    glow: 'rgba(52, 211, 153, 0.4)',
+    glow: 'rgba(255, 255, 255, 0.05)',
     label: 'MEMORY_ASSISTANT'
   },
   Skills: {
-    color: '#A855F7', // Purple
+    color: 'var(--accent-purple)',
     icon: Zap,
-    glow: 'rgba(168, 85, 247, 0.4)',
+    glow: 'rgba(157, 80, 255, 0.2)',
     label: 'SKILLS_ASSISTANT'
   }
 };
@@ -50,7 +50,7 @@ export default function MiniAgentHUD({ type, status, isBusy }: MiniAgentHUDProps
           }}
           transition={{ duration: 1, repeat: Infinity }}
         />
-        <div className="relative z-10 w-8 h-8 rounded-lg bg-aether-black border border-white/10 flex items-center justify-center overflow-hidden">
+        <div className="relative z-10 w-8 h-8 rounded-lg bg-bg-primary border border-white/10 flex items-center justify-center overflow-hidden">
           <Icon className="w-4 h-4" style={{ color: theme.color }} />
           {isBusy && (
             <motion.div 
@@ -87,9 +87,9 @@ export default function MiniAgentHUD({ type, status, isBusy }: MiniAgentHUDProps
           <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">{theme.label}</span>
           {isBusy && (
             <span className="flex gap-0.5">
-              <span className="w-0.5 h-0.5 rounded-full bg-aether-neon animate-bounce" />
-              <span className="w-0.5 h-0.5 rounded-full bg-aether-neon animate-bounce delay-100" />
-              <span className="w-0.5 h-0.5 rounded-full bg-aether-neon animate-bounce delay-200" />
+              <span className="w-0.5 h-0.5 rounded-full bg-gemigram-neon animate-bounce" />
+              <span className="w-0.5 h-0.5 rounded-full bg-gemigram-neon animate-bounce delay-100" />
+              <span className="w-0.5 h-0.5 rounded-full bg-gemigram-neon animate-bounce delay-200" />
             </span>
           )}
         </div>

@@ -28,7 +28,7 @@ type AgentFormData = {
   skills_desc: string;
   soul: string;
   rules: string;
-  computeTier: 'Standard' | 'Neural' | 'Aether';
+  computeTier: 'Standard' | 'Neural' | 'Gemigram';
   tools: {
     googleSearch: boolean;
     googleMaps: boolean;
@@ -49,7 +49,7 @@ const AVAILABLE_VOICES = ['Puck', 'Charon', 'Kore', 'Fenrir', 'Zephyr'];
 const COMPUTE_TIERS = [
   { id: 'Standard', label: 'Standard', icon: Cpu, desc: 'Base logic processing', color: 'text-slate-400' },
   { id: 'Neural', label: 'Neural', icon: Brain, desc: 'Advanced reasoning + GWS', color: 'text-cyan-400' },
-  { id: 'Aether', label: 'Gemi', icon: Zap, desc: 'Omni-modal ultra-latency', color: 'text-gemigram-neon' },
+  { id: 'Gemigram', label: 'Gemi', icon: Zap, desc: 'Omni-modal ultra-latency', color: 'text-gemigram-neon' },
 ];
 
 interface CreateAgentFormProps {

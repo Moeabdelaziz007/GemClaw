@@ -293,7 +293,7 @@ import { Brain, Network, Zap, Activity } from 'lucide-react';
 - Activity: Real-time monitoring
 ```
 
-#### 2. **Cosmic/Aetherial Icons** (For forge/galaxy)
+#### 2. **Cosmic/Gemigramial Icons** (For forge/galaxy)
 ```tsx
 import { Sparkles, Globe, Cloud, Flame } from 'lucide-react';
 

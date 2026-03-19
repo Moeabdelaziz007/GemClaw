@@ -105,7 +105,7 @@ export default function SkillDetailsModal({
                 {/* Capabilities */}
                 <section>
                   <div className="flex items-center gap-2 mb-4">
-                    <Cpu className="w-5 h-5 text-aether-neon" />
+                    <Cpu className="w-5 h-5 text-gemigram-neon" />
                     <h3 className="text-lg font-bold text-white">Capabilities</h3>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -117,7 +117,7 @@ export default function SkillDetailsModal({
                         transition={{ delay: index * 0.05 }}
                         className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5"
                       >
-                        <Check className="w-4 h-4 text-aether-neon flex-shrink-0" />
+                        <Check className="w-4 h-4 text-gemigram-neon flex-shrink-0" />
                         <span className="text-white/80 text-sm">{formatCapabilityName(cap)}</span>
                       </motion.div>
                     ))}
@@ -197,7 +197,7 @@ export default function SkillDetailsModal({
                 {dependencySkills.length > 0 && (
                   <section>
                     <div className="flex items-center gap-2 mb-4">
-                      <Tag className="w-5 h-5 text-orange-500" />
+                      <Tag className="w-5 h-5 text-accent-purple" />
                       <h3 className="text-lg font-bold text-white">Dependencies</h3>
                     </div>
                     <div className="flex flex-wrap gap-2">

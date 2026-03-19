@@ -1,4 +1,4 @@
-# خطة دمج متقدمة: Aether-Voice-OS → Gemigram (V3.0 - Post-Update Enhanced)
+# خطة دمج متقدمة: Gemigram-Voice-OS → Gemigram (V3.0 - Post-Update Enhanced)
 
 ## دليل شامل لوكيل الذكاء الاصطناعي المنفذ
 
@@ -6,20 +6,20 @@
 
 ---
 
-## الجزء 1: فهم المستودع المصدر (Aether-Voice-OS)
+## الجزء 1: فهم المستودع المصدر (Gemigram-Voice-OS)
 
-### ما هو Aether-Voice-OS؟
+### ما هو Gemigram-Voice-OS؟
 
 مستودع يحتوي على مكونات صوتية متقدمة بزمن استجابة <200ms. تم بناؤه كـ voice-native operating system.
 
-**رابط المستودع:** https://github.com/Moeabdelaziz007/Aether-Voice-OS
+**رابط المستودع:** https://github.com/Moeabdelaziz007/Gemigram-Voice-OS
 
 **الفرع الأفضل للعمل عليه:** `feature/aetheros-final-boss-level-6312841618385848047`
 
 ### هيكل المستودع الكامل
 
 ```
-Aether-Voice-OS/
+Gemigram-Voice-OS/
 ├── apps/
 │   └── portal/
 │       ├── src/
@@ -270,7 +270,7 @@ export const updateAgentState = async (
 
 **تكامل Zustand Store:**
 ```typescript
-// في Gemigram/src/store/useAetherStore.ts
+// في Gemigram/src/store/useGemigramStore.ts
 import { subscribeToAgentState } from '@/lib/firebase';
 
 useEffect(() => {
@@ -416,10 +416,10 @@ function WorkspacePage() {
 ### خطوات ما قبل التكامل
 
 ```bash
-# 1. استنساخ Aether-Voice-OS
+# 1. استنساخ Gemigram-Voice-OS
 cd /tmp
 rm -rf aether-source-advanced
-git clone https://github.com/Moeabdelaziz007/Aether-Voice-OS.git aether-source-advanced
+git clone https://github.com/Moeabdelaziz007/Gemigram-Voice-OS.git aether-source-advanced
 cd aether-source-advanced
 git checkout feature/aetheros-final-boss-level-6312841618385848047
 
@@ -545,7 +545,7 @@ npm run test:firebase     # Firebase sync
 
 # 4. Git commit
 git add .
-git commit -m "feat: integrate Aether-Voice-OS components
+git commit -m "feat: integrate Gemigram-Voice-OS components
 
 - Added Thalamic Gate V2 voice engine (<200ms latency)
 - Implemented gravity-based routing (5 sectors)
@@ -638,7 +638,7 @@ service cloud.firestore {
 
 ### القائمة النهائية
 
-**استخرج هذه الملفات من Aether-Voice-OS:**
+**استخرج هذه الملفات من Gemigram-Voice-OS:**
 
 1. ⭐ `apps/portal/src/lib/voice-engine.ts`
 2. ⭐ `python-audio-backend/thalamic-gate-v2.py`
@@ -673,7 +673,7 @@ npm run dev
 # تحقق من latency < 200ms
 
 # 5. Commit
-git add . && git commit -m "feat: Aether-Voice-OS integration complete"
+git add . && git commit -m "feat: Gemigram-Voice-OS integration complete"
 ```
 
 ---
@@ -701,22 +701,22 @@ git add . && git commit -m "feat: Aether-Voice-OS integration complete"
 - Next.js 15 App Router
 - Gemini 2.0 Omni integration
 - Firebase Firestore + Auth + Deployment Script
-- Zustand state management (useAetherStore)
+- Zustand state management (useGemigramStore)
 - PWA capabilities
 - Routes: /dashboard, /workspace, /hub, /forge, /galaxy
-- **NEW:** Neural Voice Engine (Rust/WASM) - من Aether-Voice-OS
+- **NEW:** Neural Voice Engine (Rust/WASM) - من Gemigram-Voice-OS
 - **NEW:** High-performance audio processor
 - **NEW:** Sovereign client-side Google Workspace actions
 - Tailwind CSS v3 (upgraded from v4)
 - CI/CD pipelines + Playwright E2E tests
 - LRU cache for repository analysis
 
-🎯 **المكونات الموجودة حالياً التي كانت مستهدفة من Aether-Voice-OS:**
+🎯 **المكونات الموجودة حالياً التي كانت مستهدفة من Gemigram-Voice-OS:**
 ✅ Neural Voice Engine - **موجود بالفعل** (commit 2fdb6d4, adf1d30)
 ✅ Audio Processor - **موجود بالفعل** (commit a6adfff)
 ✅ Google Workspace Integration - **موجود بالفعل** (commit a6adfff)
 
-### ما سيتم دمجه من Aether-Voice-OS (النواقص فقط):
+### ما سيتم دمجه من Gemigram-Voice-OS (النواقص فقط):
 🎯 **5 مكونات متبقية** لم تُدمج بعد:
 1. Thalamic Gate V2 (الأكثر تقدماً من الحالي)
 2. Gravity-based routing algorithm (كامل)
@@ -766,12 +766,12 @@ git push origin backup-pre-aether-voice-merge
 
 ---
 
-### المهمة 0.3: استنساخ Aether-Voice-OS مع فحص متقدم
+### المهمة 0.3: استنساخ Gemigram-Voice-OS مع فحص متقدم
 **الأوامر:**
 ```bash
 cd /tmp
 rm -rf aether-source-advanced 2>/dev/null
-git clone https://github.com/Moeabdelaziz007/Aether-Voice-OS.git aether-source-advanced
+git clone https://github.com/Moeabdelaziz007/Gemigram-Voice-OS.git aether-source-advanced
 cd aether-source-advanced
 
 # فحص جميع الفbranches
@@ -801,7 +801,7 @@ cat /tmp/aether-files.txt | grep -E "(voice|audio|thalamic|forge|skill|gravity|f
 #### أ) المحرك الصوتي المتقدم Thalamic Gate V2
 **الملفات المستهدفة:**
 ```bash
-# من Aether-Voice-OS
+# من Gemigram-Voice-OS
 apps/portal/src/lib/voice-engine.ts
 python-audio-backend/thalamic-gate-v2.py
 python-audio-backend/requirements.txt
@@ -1066,7 +1066,7 @@ cat /tmp/aether-source-advanced/apps/portal/src/lib/voice-engine.ts
 
 ```typescript
 // src/lib/audio/voice-engine.ts
-// Source: Aether-Voice-OS - Thalamic Gate V2 Engine (Advanced)
+// Source: Gemigram-Voice-OS - Thalamic Gate V2 Engine (Advanced)
 
 import { GeminiClient } from './gemini-client';
 import { WebSocketAudioClient } from './websocket-audio-client';
@@ -1337,7 +1337,7 @@ cat /tmp/aether-source-advanced/apps/portal/src/hooks/useVoiceStream.ts
 
 ```typescript
 // src/hooks/useVoiceStream.ts
-// Source: Adapted from Aether-Voice-OS
+// Source: Adapted from Gemigram-Voice-OS
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { VoiceEngine } from '@/lib/audio/voice-engine';
@@ -1651,7 +1651,7 @@ export function routeByGravity(
 ---
 
 ### المهمة 4.2: دمج مع Zustand store
-**ملف:** `src/store/useAetherStore.ts`
+**ملف:** `src/store/useGemigramStore.ts`
 
 **التحديثات:**
 - Firebase real-time subscription
@@ -1697,15 +1697,15 @@ npm run lint
 ### المهمة 5.4: Git commit و push
 ```bash
 git add .
-git commit -m "feat: complete Aether-Voice-OS integration (V3.0 Enhanced)
+git commit -m "feat: complete Gemigram-Voice-OS integration (V3.0 Enhanced)
 
-- Upgraded existing Neural Voice Engine with latest from Aether-Voice-OS
+- Upgraded existing Neural Voice Engine with latest from Gemigram-Voice-OS
 - Added advanced Thalamic Gate V2 voice engine (<200ms latency)
 - Completed Gravity-based routing implementation
 - Added real-time telemetry system
 - Enhanced existing Google Workspace integration
 
-Gemigram now has FULL Aether-Voice-OS capabilities!
+Gemigram now has FULL Gemigram-Voice-OS capabilities!
 Ready for Gemini Live Agent Challenge 2026 submission"
 git push origin feature/aether-voice-integration-v3
 ```
@@ -1751,7 +1751,7 @@ git push origin feature/aether-voice-integration-v3
 - Security fixes
 - Firebase Memory System
 
-### 🎯 **سيتم إضافته من Aether-Voice-OS:**
+### 🎯 **سيتم إضافته من Gemigram-Voice-OS:**
 1. Thalamic Gate V2 (أحدث وأفضل من الحالي)
 2. Complete Gravity-based routing
 3. Real-time telemetry system
@@ -1761,7 +1761,7 @@ git push origin feature/aether-voice-integration-v3
 ### 🚀 **النتيجة النهائية:**
 Gemigram سيكون لديه **أفضل ما في العالمين**:
 - البنية الأساسية القوية الحالية
-- المكونات المتقدمة من Aether-Voice-OS
+- المكونات المتقدمة من Gemigram-Voice-OS
 - أداء فائق (<200ms latency)
 - Features كاملة للمسابقة
 
