@@ -11,9 +11,8 @@ import { ThemeToggle } from './ThemeToggle';
 import { useSystemTelemetry } from '../hooks/useSystemTelemetry';
 import { BRAND } from '@/lib/constants/branding';
 import { useVisualTier } from '@/lib/hooks/useVisualTier';
-import { useGemigramStore } from '../lib/store/useGemigramStore';
-import { HUD } from './ui/HUD';
 import { useFirestoreSync } from '../lib/hooks/useFirestoreSync';
+import { useVoiceCommandRouter } from '../lib/hooks/useVoiceCommandRouter';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -27,8 +26,9 @@ export default function AppShell({ children }: AppShellProps) {
   const telemetry = useSystemTelemetry();
   const { linkType } = useGemigramStore();
   
-  // Activate Sovereign Sync
+  // Activate Sovereign Sync & Command Router
   useFirestoreSync();
+  const voiceRouter = useVoiceCommandRouter();
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 60000);

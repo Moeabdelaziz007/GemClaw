@@ -1,8 +1,8 @@
 'use client';
 
 import { useWorkspaceLogic } from '@/lib/hooks/useWorkspaceLogic';
-import { VoiceAgent } from '@/components/VoiceAgent';
-import { Activity, AlertCircle, Cpu } from 'lucide-react';
+import { PureVoiceCanvas } from '@/components/workspace/PureVoiceCanvas';
+import { AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function WorkspacePage() {
@@ -59,50 +59,15 @@ export default function WorkspacePage() {
 
   if (!activeAgent) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-theme-primary p-4 sm:p-6 md:p-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md space-y-6 text-center">
-          <Cpu className="mx-auto h-14 w-14 text-white/10 sm:h-16 sm:w-16" />
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-white">No Active Agent</h2>
-            <p className="text-white/60">Create your first Sovereign Intelligence to begin.</p>
-          </div>
-          <button onClick={() => router.push('/forge')} className="btn-primary w-full sm:w-auto">
-            Navigate to Forge
-          </button>
-        </motion.div>
+      <div className="flex h-full w-full items-center justify-center bg-black">
+        <div className="text-center space-y-4">
+          <AlertCircle className="mx-auto h-8 w-8 text-gemigram-neon/40 animate-pulse" />
+          <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-white/20">Awaiting_Neural_Link...</p>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="relative h-full w-full overflow-hidden bg-theme-primary">
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] opacity-[0.02]" />
-      <div className="pointer-events-none absolute left-1/4 top-0 h-72 w-72 rounded-full bg-gradient-to-br from-neon-green/5 to-transparent blur-[120px] sm:h-96 sm:w-96" />
-
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="safe-top absolute left-0 right-0 top-0 z-50 border-b border-white/5 glass-medium px-4 py-3 sm:px-6"
-      >
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-            <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-neon-green/20 bg-neon-green/5 px-3 py-1.5">
-              <Activity className="h-3.5 w-3.5 animate-pulse text-neon-green" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-neon-green">Active Session</span>
-            </div>
-            <div className="truncate text-xs text-white/40">
-              <span className="font-medium text-white/70">{activeAgent.name}</span>
-              <span className="mx-2">·</span>
-              <span>{activeAgent.role}</span>
-            </div>
-          </div>
-          <div className="text-[10px] uppercase tracking-widest text-white/30">Workspace Terminal</div>
-        </div>
-      </motion.div>
-
-      <div className="h-full pt-20 sm:pt-24">
-        <VoiceAgent activeAgent={activeAgent} googleAccessToken={googleAccessToken || undefined} />
-      </div>
-    </div>
-  );
+  // 🎙️ Pure Voice Canvas Integration
+  return <PureVoiceCanvas activeAgent={activeAgent} />;
 }
