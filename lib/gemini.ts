@@ -1,32 +1,24 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 /**
  * Sovereign AI Bridge
- * Direct client-side integration with Google Gemini via official SDK.
+ * Refactored to use Internal API Proxy to secure credentials.
+ * Following v3.0 Security Rules (No client-side keys).
  */
-
-const getApiKey = () => {
-  const key = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-  if (!key) {
-    console.warn("[Sovereign_Link]: NEXT_PUBLIC_GEMINI_API_KEY is missing. Neural bridge downgraded to local-only simulations.");
-  }
-  return key || "";
-};
-
-const genAI = new GoogleGenerativeAI(getApiKey());
-
-export const getGeminiModel = (modelName: string = "gemini-2.0-flash-exp") => {
-  return genAI.getGenerativeModel({ model: modelName });
-};
 
 export const runSovereignReasoning = async (prompt: string, context?: string) => {
   try {
-    const model = getGeminiModel();
-    const fullPrompt = context ? `Context: ${context}\n\nTask: ${prompt}` : prompt;
-    
-    const result = await model.generateContent(fullPrompt);
-    const response = await result.response;
-    return response.text();
+    const response = await fetch("/api/gemini/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, context }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Neural bridge communication failure.");
+    }
+
+    const data = await response.json();
+    return data.text;
   } catch (error) {
     console.error("[Sovereign_Link_Failure]:", error);
     throw error;
@@ -37,15 +29,17 @@ export const generateText = runSovereignReasoning;
 
 /**
  * Streaming Link for real-time agent output
+ * TODO: Implement server-side streaming endpoint if needed.
+ * Currently falling back to standard reasoning for safety.
  */
 export const streamSovereignReasoning = async (prompt: string, onChunk: (chunk: string) => void) => {
   try {
-    const model = getGeminiModel();
-    const result = await model.generateContentStream(prompt);
-
-    for await (const chunk of result.stream) {
-      const chunkText = chunk.text();
-      onChunk(chunkText);
+    const text = await runSovereignReasoning(prompt);
+    // Simulate streaming for UI compatibility
+    const words = text.split(" ");
+    for (const word of words) {
+      onChunk(word + " ");
+      await new Promise((resolve) => setTimeout(resolve, 20)); // Subtle micro-animation delay
     }
   } catch (error) {
     console.error("[Sovereign_Stream_Failure]:", error);

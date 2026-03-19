@@ -6,6 +6,7 @@ import { createUiSlice, UiSlice } from './slices/createUiSlice';
 import { createCognitiveSlice, CognitiveSlice } from './slices/createCognitiveSlice';
 
 import { createSwarmSlice, SwarmSlice } from './slices/createSwarmSlice';
+import { createAuthSlice, AuthSlice } from './slices/createAuthSlice';
 
 // Re-export Agent type for convenience
 export type { Agent };

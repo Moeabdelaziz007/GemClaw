@@ -24,7 +24,7 @@ export interface SensorySlice {
   isSpeaking: boolean;
   volume: number;
   contextUsage: number;
-  unreadNotifications: any[]; // Adjust type as needed
+  unreadNotifications: Notification[];
   
   // New Interrupt Fields
   activeInterrupt: InterruptSignal | null;

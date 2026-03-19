@@ -65,38 +65,36 @@ export function getGitHubOAuthUrl(state?: string): string {
 }
 
 /**
- * Exchange authorization code for access token
+ * Exchange authorization code for access token via Sovereign Bridge
  */
 export async function exchangeCodeForToken(code: string, state?: string): Promise<{
   accessToken: string;
   refreshToken?: string;
   expiresIn?: number;
 }> {
-  const response = await fetch(GITHUB_OAUTH_CONFIG.tokenUrl, {
+  const response = await fetch('/api/auth/github/exchange', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      client_id: GITHUB_OAUTH_CONFIG.clientId,
-      client_secret: process.env.NEXT_PUBLIC_GITHUB_CLIENT_SECRET,
       code,
-      redirect_uri: GITHUB_OAUTH_CONFIG.redirectUri,
-      state
+      state,
+      redirectUri: GITHUB_OAUTH_CONFIG.redirectUri
     })
   });
   
   if (!response.ok) {
-    throw new Error('Failed to exchange code for token');
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Failed to exchange code for token via bridge');
   }
   
   const data = await response.json();
   
   return {
-    accessToken: data.access_token,
-    refreshToken: undefined, // GitHub doesn't provide refresh tokens
-    expiresIn: undefined // GitHub tokens don't expire
+    accessToken: data.accessToken,
+    refreshToken: data.refreshToken,
+    expiresIn: data.expiresIn
   };
 }
 

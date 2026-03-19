@@ -1,17 +1,12 @@
-import { GoogleGenAI } from '@google/genai';
 import JSZip from 'jszip';
+import { runSovereignReasoning } from '@/lib/gemini';
 
-// NOTE: Using public API key for the demo client-side analyzer. 
-// In a production production environment, this should be gated or use a proxy if sensitive.
-// But for GemigramOS Zero-Cost Static Export, we use direct browser-to-Gemini connection.
-const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY || '' });
+// NOTE: SECURED — Now using Sovereign AI Bridge (Server-side Proxy).
+// Client-side unzipping remains but generation is routed through the neural bridge.
 
 // Module-level cache for analysis results with size limit (LRU-like behavior)
 const MAX_CACHE_SIZE = 20;
 const analysisCache = new Map<string, { success: boolean; analysis: string; fileCount: number; error?: string }>();
-
-// Cache for Gemini Context Caching
-const geminiContextCache = new Map<string, { name: string, expiresAt: number }>();
 
 function shouldIgnore(filename: string): boolean {
   const ignorePatterns = [
@@ -94,7 +89,7 @@ export async function analyzeRepository(repoUrl: string) {
     let fileCount = 0;
 
     for (const [filename, fileEntry] of Object.entries(zip.files)) {
-      const file = fileEntry as any;
+      const file = fileEntry;
       if (file.dir || shouldIgnore(filename)) continue;
 
       const actualPath = filename.split('/').slice(1).join('/');
@@ -104,53 +99,13 @@ export async function analyzeRepository(repoUrl: string) {
         const content = await file.async('string');
         combinedCode += `\n\n--- File: ${actualPath} ---\n\`\`\`\n${content}\n\`\`\`\n`;
         fileCount++;
-      } catch (err) {
+      } catch {
         console.warn(`Could not read file ${filename}`);
       }
     }
 
     if (fileCount === 0) {
       throw new Error('No readable code files found in the repository.');
-    }
-
-    let cachedContentName: string | undefined;
-
-    if (commitSha) {
-      const cachedData = geminiContextCache.get(commitSha);
-      if (cachedData) {
-        if (Date.now() < cachedData.expiresAt) {
-          cachedContentName = cachedData.name;
-        } else {
-          // Expired, remove from local cache
-          geminiContextCache.delete(commitSha);
-        }
-      }
-    }
-
-    if (!cachedContentName) {
-      try {
-        const cachedContent = await ai.caches.create({
-          model: 'gemini-1.5-flash',
-          config: {
-            contents: [
-              { role: 'user', parts: [{ text: `إليك الكود المصدري للمشروع بالكامل:\n${combinedCode}` }] }
-            ],
-            systemInstruction: { parts: [{ text: "أنت خبير معماريات برمجيات الذكاء الاصطناعي. أجب باللغة العربية دائماً وباحترافية عالية. قدم أكواد وأمثلة دقيقة." }] },
-            ttl: '3600s', // 1 hour cache
-          }
-        });
-        cachedContentName = cachedContent.name;
-        if (commitSha && cachedContentName) {
-          // Store locally with a 55-minute expiration to be safe (remote is 60m)
-          geminiContextCache.set(commitSha, {
-            name: cachedContentName,
-            expiresAt: Date.now() + 55 * 60 * 1000
-          });
-        }
-      } catch (err: any) {
-        console.warn('Failed to create Gemini context cache, falling back to full prompt:', err.message);
-      }
-    } else {
     }
 
     const prompt = `
@@ -160,36 +115,22 @@ export async function analyzeRepository(repoUrl: string) {
 الهدف: تحليل مستودع "Gemigram-Voice-OS" لبناء نظام تشغيل صوتي (Voice-First OS) متطور للفوز بتحدي Gemini Live Agent.
 يجب أن يكون النظام "Zero-UI" (يعتمد على الصوت كلياً مع واجهة محيطية Ambient)، ويستخدم بيئة Google (Gemini Live API, Firebase, Google Workspace).
 
-${!cachedContentName ? `إليك الكود المصدري للمشروع بالكامل:\n${combinedCode}\n\n` : ''}المطلوب منك تقديم تقرير هندسي عميق ومفصل باللغة العربية يغطي النقاط التالية:
+إليك الكود المصدري للمشروع بالكامل:
+${combinedCode}
+
+المطلوب منك تقديم تقرير هندسي عميق ومفصل باللغة العربية يغطي النقاط التالية:
 1. تحليل الكمون (Latency Analysis): أين توجد عنق الزجاجة في مسار الصوت الحالي؟ وكيف نستبدله بـ Gemini Live API (Bidi WebSockets / PCM Audio) للوصول إلى زمن انتقال شبه معدوم؟
 2. معمارية ClawHub (Dynamic Plugins): كيف نبني نظام إضافات ديناميكي باستخدام Firebase Firestore لتخزين OpenAPI Schemas واستدعائها عبر Function Calling بدون إعادة نشر الكود؟
 3. الذاكرة المستمرة (Continuous Memory): كيف ندمج Firestore لتخزين سياق المستخدم وتفضيلاته وتمريرها كـ System Instructions لـ Gemini؟
 4. تبسيط الواجهة (Zero-UI): ما هي المكونات (Components) الحالية التي يجب إزالتها أو تحويلها إلى متخيلات بصرية (Visualizers) بسيطة باستخدام framer-motion؟
 5. خطة عمل تنفيذية (Action Plan): خطوات برمجية واضحة (1، 2، 3) للبدء في التعديل فوراً.
-
-استخدم أداة البحث (Google Search) إذا احتجت للتأكد من أحدث توثيق لـ Gemini Multimodal Live API أو Firebase.
 `;
 
-    const modelConfig: any = {
-      model: 'gemini-1.5-flash',
-      contents: [
-        { role: 'user', parts: [{ text: prompt }] }
-      ],
-    };
-
-    if (cachedContentName) {
-      modelConfig.config = {
-        cachedContent: cachedContentName
-      };
-    } else {
-      modelConfig.contents.unshift({ role: 'user', parts: [{ text: "System Instruction: أنت خبير معماريات برمجيات الذكاء الاصطناعي. أجب باللغة العربية دائماً وباحترافية عالية. قدم أكواد وأمثلة دقيقة." }] });
-    }
-
-    const modelResponse = await ai.models.generateContent(modelConfig);
+    const analysisText = await runSovereignReasoning(prompt, "أنت خبير معماريات برمجيات الذكاء الاصطناعي. أجب باللغة العربية دائماً وباحترافية عالية. قدم أكواد وأمثلة دقيقة.");
 
     const result = {
       success: true,
-      analysis: modelResponse.text as string,
+      analysis: analysisText,
       fileCount,
     };
 

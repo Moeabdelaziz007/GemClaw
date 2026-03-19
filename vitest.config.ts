@@ -8,6 +8,21 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
+    exclude: [
+      '**/node_modules/**',
+      '**/.next/**',
+      '**/.kombai/**',
+      '**/.qoder/**',
+      '**/.npm_cache/**',
+      '**/.firebase/**',
+      '**/.pnpm-store/**',
+      '**/out/**',
+    ],
+    server: {
+      watch: {
+        ignored: ['**/.firebase/**', '**/.pnpm-store/**', '**/.npm_cache/**'],
+      },
+    },
     alias: {
       '@': path.resolve(__dirname, './'),
     },

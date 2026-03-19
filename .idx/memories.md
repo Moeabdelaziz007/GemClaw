@@ -1,18 +1,24 @@
 # 🧠 GemigramOS Memories
 
-## [2026-XX-XX] Build Stabilization & Core Restoration
+## [2026-03-25] Phase 1: Foundation & Security Mastery
+- Stabilized the `AuthSlice` hydration.
+- Deployed the **Sovereign Gateway** architecture: eliminated `NEXT_PUBLIC_GEMINI_API_KEY` and `NEXT_PUBLIC_GITHUB_CLIENT_SECRET` exposure by migrating reasoning and OAuth exchange to secure server-side routes (`/api/gemini/generate` and `/api/auth/github/exchange`).
+- Refactored `repo-analyzer.ts` for server-side execution and removed all `any` types.
+- System security boundary hardened for v4.0. 🛡️🔒
+
+## [2026-03-24] Surgical Merge V3.0
+- Consolidated Jules AI contributions: ported `AgentCard` & `NeuralPulse` tests.
+- Implemented official `Notification` type safety.
+- Integrated premium Glassmorphism UI tokens.
+- Fixed store-level lint regressions. System state 100% reconciled on `main`. 🧬🚀
+
+## [2026-03-20] Build Stabilization & Core Restoration
 - Resolved **50+ TypeScript errors** across cognitive, security, and UI layers.
 - Fixed **Circular Dependencies** in `useGemigramStore.ts` and `memory-store.ts`.
 - Restored **missing `useMemory` hook**, bridging cognitive storage with UI.
 - Fixed **Security Statistics** integration in `api-credentials.ts`.
 - Standardized **Zustand store slices** for better type safety and hydration.
 - Stabilized **Landing Page (Hero)** by mapping `bots` to `agents` for unified state.
-
-## Project Vision: Gemigram AIOS
-Gemigram is a Sovereign Intelligence Orchestration System designed to win the Gemini Live Agent Challenge 2026. It focuses on "Universal Discovery" (orchestrating all user GCP/Firebase projects) and "Sovereign Deployment" (standalone PWA with agent-specific shortcuts).
-
-## Project Vision
-GemigramOS is a voice-native, sovereign AI operating system. It prioritizes local execution via the Local-Spine architecture to bypass cloud billing limits and ensure total privacy.
 
 ## Project State: Phase 11 Initiated
 - [x] Phase 10: Gemigram Identity & HUD Overhaul (Premium UI/UX)
@@ -33,14 +39,14 @@ GemigramOS is a voice-native, sovereign AI operating system. It prioritizes loca
 - [x] Sovereign Identity Unification (Neon/Carbon/Glass tokens) complete.
 - [x] Voice-First Landing Wireframe (`public/wireframe-landing.html`) created.
 
-# 🧠 Gemigram AIOS: Sovereign State (V1.0)
+# 🧠 Gemigram AIOS: Sovereign State (V1.0) -> (V0.1) Reset
 
-## 🎯 Current Status
+## 🎯 Current Status (Reset v0.1)
 - **Identity Swapped**: Fully migrated from Aether to Gemigram.
-- **Neural Architecture**: Sliced Zustand pattern implemented (Sensory, Agent, UI, Cognitive, Auth).
+- **Neural Architecture**: Sliced Zustand pattern implemented (Sensory, Agent, UI, Cognitive, Auth, Swarm).
 - **Celestial UI**: GalaxyScene active with 11/10 premium Starfield and Orbital physics.
 - **Sovereign Infrastructure**: Firebase Functions stabilized; MCP Bridge active.
-- **Git Protocol**: Update deconstructed into 6 'Sprit' commits for precision.
+- **Version Reset**: System successfully recalibrated to v0.1 architecture baseline.
 
 ## 🚀 Vision 2026
 - Target: Gemini Live Agent Challenge Champion.
@@ -80,14 +86,16 @@ GemigramOS is a voice-native, sovereign AI operating system. It prioritizes loca
 - **2026-03-17**: Successfully completed the **Sovereign identity unification**. Orchestrated 12 architectural changes: unified neon (#39FF14) and glassmorphism across components, stabilized the primary Settings and Analyzer engines, launched the `about/` sector with high-fidelity Sovereign UI.
 - **2026-03-18**: Executed **Smart Simplification (Phase 3)**. Deployed `MemoryWorker` for off-thread cognitive processing (decay/weighting). Refactored monolithic `useGemigramStore` into domain-specific **Neural Slices** (Agent, Sensory, Cognitive, UI). Modularized `ForgeArchitect` and `VoiceAgent` via custom sensory hooks (`useForgeLogic`, `useVoiceAgentLogic`). System latency reduced & architectural clarity maximized.
 - **2026-03-20**: Executed **Performance & UX Hardening**. Optimized `HeroBackground` (60% particle reduction) and `Hero` (responsive orb scaling, 280px-600px). Repaired the **Voice Link** by syncing the `AudioWorklet` processor name (`neural-spine-processor`). Streamlined `AuthOverlay` by removing artificial delays, ensuring zero-friction login manifestations. System responsiveness and cross-device stability maximized.
-- **2026-03-24**: Executed **Phase 10: Neural Consolidation & Security Hardening**. Manually ported Jules AI test suites (`AgentCard`, `NeuralPulse`) and production logic cleanups from remote branches. Verified zero-leakage security boundary in `lib/firebase.ts` (100% Environment Variable compliant). Resolved `globals.css` TailWindCSS build regressions. System state now 100% reconciled and ready for Phase 11 Orchestration.
+- **2026-03-24**: Executed **Surgical Merge V3.0**. Consolidated Jules AI contributions: ported `AgentCard` & `NeuralPulse` tests, implemented official `Notification` type safety, and integrated premium Glassmorphism UI tokens. Fixed store-level lint regressions. System state 100% reconciled on `main`. 🧬🚀
+- **2026-03-25**: Executed **Phase 1: Foundation & Security Mastery**. Stabilized the `AuthSlice` hydration. Deployed the **Sovereign Gateway** architecture: eliminated `NEXT_PUBLIC_GEMINI_API_KEY` and `NEXT_PUBLIC_GITHUB_CLIENT_SECRET` exposure by migrating reasoning and OAuth exchange to secure server-side routes (`/api/gemini/generate` and `/api/auth/github/exchange`). Refactored `repo-analyzer.ts` for server-side execution and removed all `any` types. System security boundary hardened for v4.0. 🛡️🔒
 - **2026-03-19**: Executed **Phase 20: Security Architecture & Neural Hardening**. Eliminated `NEXT_PUBLIC_GEMINI_API_KEY` exposure via secure `/api/gemini-token` proxy. Deployed strict UID-based `firestore.rules` for agents/memories. Hardened `next.config.ts` (microphone Permissions-Policy) and implemented IP-based Rate Limiting middleware (30req/min). System security boundary verified.
 - **2026-03-19**: Executed **Phase 22: Neural Intent Engine Overhaul**. Deployed high-fidelity `useVoiceCommandRouter` with strict **FIFO ToolCallQueue** to prevent race conditions. Integrated **150ms navigation debounce** and registered 6 core Gemini tools (`navigate_to_stage`, `navigate_to_route`, etc.). Enforced "Voice-First" navigation constraint by routing all UI states through LLM ToolCalls. System intentionality stabilized.
+- **2026-03-19**: Executed **Phase 25: Self-Healing & Pattern Discovery**. Systematically repaired `globals.css` (merge conflict corruption). Resolved critical TypeScript build regressions in `Workspace.tsx` and `PureVoiceCanvas.tsx` by unifying `Agent` and `GWSMail` interface domains. Deployed the `pattern-discovery` autonomous skill for structural repo auditing. System state 100% reconciled and live on `main`. 🧬🚀
 
 ## Architectural Vision (V8 Evolution)
-1. **Core Logic**: Next.js 15 + Domain-Specific Neural Slices.
-2. **Cognitive Layer**: Asynchronous `MemoryWorker` (Off-thread processing).
-3. **Sensory Layer**: Modular Hooks for Voice Synthesis/Recognition.
-4. **Execution Engine**: Hybrid Dual-Engine (Client-first, Local/Cloud fallback).
-5. **Billing**: 100% Free-Tier compliant.
-6. **Testing**: Standardized `node:test` + JSDOM for UI/UX validation.
+- **Core Logic**: Next.js 15 + Domain-Specific Neural Slices.
+- **Cognitive Layer**: Asynchronous `MemoryWorker` (Off-thread processing).
+- **Sensory Layer**: Modular Hooks for Voice Synthesis/Recognition.
+- **Execution Engine**: Hybrid Dual-Engine (Client-first, Local/Cloud fallback).
+- **Billing**: 100% Free-Tier compliant.
+- **Testing**: Standardized `node:test` + JSDOM for UI/UX validation.

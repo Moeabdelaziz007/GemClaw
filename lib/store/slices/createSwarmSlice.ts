@@ -2,7 +2,10 @@ import { StateCreator } from 'zustand';
 import { SwarmSliceShape, SwarmSession, AgentSession, TaskManifest } from '../types/agentSwarm';
 import { nanoid } from 'nanoid';
 
-export interface SwarmSlice extends SwarmSliceShape {}
+export interface SwarmSlice extends SwarmSliceShape {
+  // Swarm orchestration state
+  isSwarmActive?: boolean;
+}
 
 export const createSwarmSlice: StateCreator<SwarmSlice> = (set, get) => ({
   activeSwarm: null,
