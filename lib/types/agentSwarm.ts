@@ -1,4 +1,4 @@
-import { AgentRole } from '@/lib/store/slices/createAgentSlice';
+import { AgentRole } from '../store/slices/createAgentSlice';
 
 /**
  * 🐝 AgentSwarm Types - GemigramOS V3

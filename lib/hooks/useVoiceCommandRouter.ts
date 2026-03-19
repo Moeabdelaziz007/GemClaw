@@ -1,12 +1,13 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGemigramStore } from '../store/useGemigramStore';
+import { Agent, AgentRole } from '../store/slices/createAgentSlice';
 
 // ─── Interfaces ──────────────────────────────────────────────
 
 export interface ToolCallEvent {
   name: string;
-  args: Record<string, unknown>;
+  args: Record<string, any>;
   callId: string;
 }
 
@@ -78,18 +79,6 @@ export const GEMINI_ROUTER_TOOLS = [
     }
   },
   {
-    name: 'set_nav_visibility',
-    description: 'Controls the visibility of secondary navigation elements.',
-    parameters: {
-      type: 'OBJECT',
-      properties: {
-        visible: { type: 'boolean' },
-        trigger: { type: 'string', enum: ['voice', 'timeout', 'gesture'] }
-      },
-      required: ['visible', 'trigger']
-    }
-  },
-  {
     name: 'system_command',
     description: 'Executes low-level system operations.',
     parameters: {
@@ -125,7 +114,6 @@ export function useVoiceCommandRouter() {
     
     // Log dispatch to Cognitive Session
     store.updateSessionMetadata({ 
-      lastActivity: Date.now(),
       activeWidgets: Array.from(new Set([...(store.sessionMetadata?.activeWidgets || []), name]))
     });
 
@@ -135,8 +123,7 @@ export function useVoiceCommandRouter() {
           const stage = args.stage as 'landing' | 'forge' | 'workspace';
           store.setVoiceSession({ 
             stage, 
-            lastVoiceAction: `NAV_TO_STAGE_${stage.toUpperCase()}`,
-            updatedAt: Date.now()
+            lastVoiceAction: `NAV_TO_STAGE_${stage.toUpperCase()}`
           });
           return { callId, success: true };
         }
@@ -160,23 +147,11 @@ export function useVoiceCommandRouter() {
         }
 
         case 'create_agent': {
-          const manifest = args.manifest as any; // Manifest shape is validated by Gemini
+          const manifest = args.manifest as Partial<Agent>; // Manifest shape is validated by Gemini
           store.setPendingManifest(manifest);
           store.setVoiceSession({ 
             stage: 'forge', 
-            lastVoiceAction: 'INIT_AGENT_SYNTHESIS',
-            updatedAt: Date.now()
-          });
-          return { callId, success: true };
-        }
-
-        case 'set_nav_visibility': {
-          // Note: UiSlice currently doesn't have navVisible. 
-          // We log this as an INTENT for future HUD expansion.
-          store.setVoiceSession({
-            ...store.voiceSession,
-            lastVoiceAction: `HUD_VISIBILITY_${args.visible ? 'ON' : 'OFF'}`,
-            updatedAt: Date.now()
+            lastVoiceAction: 'INIT_AGENT_SYNTHESIS'
           });
           return { callId, success: true };
         }
@@ -209,7 +184,9 @@ export function useVoiceCommandRouter() {
 
       setIsProcessing(true);
       const event = queueRef.current.shift();
-      setQueueLength(queueRef.current.length);
+      if (queueRef.current.length !== queueLength) {
+        setQueueLength(queueRef.current.length);
+      }
 
       if (event) {
         setLastDispatchedTool(event.name);
@@ -225,7 +202,7 @@ export function useVoiceCommandRouter() {
       clearInterval(interval);
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
-  }, [isProcessing, executeToolCall]);
+  }, [isProcessing, executeToolCall, queueLength]);
 
   const dispatchToolCall = useCallback((event: ToolCallEvent) => {
     queueRef.current.push(event);

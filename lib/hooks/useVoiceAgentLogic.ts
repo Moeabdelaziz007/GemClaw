@@ -1,10 +1,8 @@
-```javascript
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLiveAPI } from '@/hooks/useLiveAPI';
 import { useAudioProcessor } from '@/hooks/useAudioProcessor';
 import { useGemigramStore, Agent } from '@/lib/store/useGemigramStore';
 import { bridgeStatusManager } from '@/lib/utils/bridgeStatusManager';
-import { useVoiceCommandRouter } from '@/lib/hooks/useVoiceCommandRouter';
 import { ToolResult, Tool, FunctionDeclaration } from '@/lib/types/live-api';
 
 export interface UseVoiceAgentLogicProps {
@@ -22,7 +20,7 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
   const linkType = useGemigramStore(state => state.linkType);
   const setLinkType = useGemigramStore(state => state.setLinkType);
 
-  // FIX 1: Secure Token Fetching
+  // Secure Token Fetching
   useEffect(() => {
     let isMounted = true;
     const fetchToken = async () => {
@@ -56,7 +54,7 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
     startRecording, 
     stopRecording,
   } = useLiveAPI(apiKey, (call) => {
-    setActiveWidget(call);
+    setActiveWidget(call as ToolResult);
     setIsThinking(false);
   }, googleAccessToken);
 
@@ -127,10 +125,7 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
         tools.push({ functionDeclarations });
       }
       
-      const interruptContext = useGemigramStore.getState().getInterruptContext();
-      const finalPrompt = interruptContext 
-        ? `${activeAgent?.systemPrompt}\n\n${interruptContext}`
-        : activeAgent?.systemPrompt;
+      const finalPrompt = activeAgent?.systemPrompt || '';
 
       connect(finalPrompt, activeAgent?.voiceName, tools);
     }
