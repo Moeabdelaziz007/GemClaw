@@ -1,5 +1,6 @@
 import { StateCreator } from 'zustand';
 import { nanoid } from 'nanoid';
+import type { Notification } from '@/lib/types/models';
 
 export interface TranscriptMessage {
   id: string;
@@ -38,7 +39,7 @@ export interface SensorySlice {
   setIsSpeaking: (speaking: boolean) => void;
   setVolume: (volume: number) => void;
   setContextUsage: (usage: number) => void;
-  setUnreadNotifications: (notifications: any[]) => void;
+  setUnreadNotifications: (notifications: Notification[]) => void;
   clearTranscript: () => void;
 
   // New Interrupt Actions

@@ -8,6 +8,10 @@
     ],
     "rewrites": [
       {
+        "source": "/api/neural/generate",
+        "function": "neuralGenerate"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

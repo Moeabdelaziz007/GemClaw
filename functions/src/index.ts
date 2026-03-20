@@ -2,6 +2,7 @@ import { onRequest } from "firebase-functions/v2/https";
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import * as admin from "firebase-admin";
 import { spawn } from "child_process";
+import { NeuralRouter, NeuralProvider, NeuralMessage, NeuralOptions } from "./neural";
 
 admin.initializeApp();
 
@@ -105,5 +106,50 @@ export const executeAgentTool = onRequest({ timeoutSeconds: 60, memory: "256MiB"
       message: "Neural routing failed.",
       details: errorMessage 
     });
+  }
+});
+
+/**
+ * 🧠 Neural Architecture Endpoint
+ * 
+ * Replaces the Next.js _api routes which are excluded from the static build.
+ * Provides unified access to Gemini, Anthropic, and DeepSeek.
+ */
+export const neuralGenerate = onRequest({ 
+  timeoutSeconds: 60, 
+  memory: "512MiB",
+  secrets: ["GEMINI_API_KEY", "ANTHROPIC_API_KEY", "DEEPSEEK_API_KEY"] 
+}, async (req, res) => {
+  // CORS
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: "Method Not Allowed" });
+    return;
+  }
+
+  try {
+    const { provider, messages, options } = req.body;
+    
+    if (!provider || !messages) {
+      res.status(400).json({ error: "Missing substrate: provider or messages." });
+      return;
+    }
+
+    const router = new NeuralRouter();
+    const response = await router.generate(provider as NeuralProvider, messages as NeuralMessage[], options as NeuralOptions);
+
+    res.json(response);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Neural link failure.";
+    console.error("[Neural_Generate_Error]:", error);
+    res.status(500).json({ error: message });
   }
 });

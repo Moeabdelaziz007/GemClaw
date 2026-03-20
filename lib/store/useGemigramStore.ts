@@ -4,8 +4,6 @@ import { createSensorySlice, SensorySlice } from './slices/createSensorySlice';
 import { createAgentSlice, AgentSlice, Agent } from './slices/createAgentSlice';
 import { createUiSlice, UiSlice } from './slices/createUiSlice';
 import { createCognitiveSlice, CognitiveSlice } from './slices/createCognitiveSlice';
-
-import { createSwarmSlice, SwarmSlice } from './slices/createSwarmSlice';
 import { createAuthSlice, AuthSlice } from './slices/createAuthSlice';
 
 // Re-export Agent type for convenience
@@ -15,8 +13,9 @@ export type { Agent };
  * Gemigram Global State Store
  * Centralized state management for the Gemigram AIOS.
  * Architecture: Sliced Pattern (Zustand)
+ * Rules: 5 Slices - Sensory, Cognitive, Agent, Ui, Auth (Zero Deviation)
  */
-export interface GemigramState extends SensorySlice, AgentSlice, UiSlice, CognitiveSlice, AuthSlice, SwarmSlice {}
+export interface GemigramState extends SensorySlice, AgentSlice, UiSlice, CognitiveSlice, AuthSlice {}
 
 export const useGemigramStore = create<GemigramState>()(
   persist(
@@ -26,17 +25,15 @@ export const useGemigramStore = create<GemigramState>()(
       ...createUiSlice(...a),
       ...createCognitiveSlice(...a),
       ...createAuthSlice(...a),
-      ...createSwarmSlice(...a),
     }),
     {
       name: 'gemigram-storage',
       storage: createJSONStorage(() => localStorage),
-      // Only persist specific slices if needed
       partialize: (state) => ({
         agents: state.agents,
-
-
-
+        activeAgentId: state.activeAgentId,
+        unreadNotifications: state.unreadNotifications,
+        hydratedUserId: state.hydratedUserId,
       }),
     }
   )
