@@ -1,5 +1,4 @@
 'use client';
-export const dynamic = 'force-static';
 
 import { Shield, ChevronRight, Mic, Key, Search, Database } from 'lucide-react';
 import { useAuth } from '@/components/Providers';

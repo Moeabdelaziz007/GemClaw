@@ -1,5 +1,4 @@
 'use client';
-export const dynamic = 'force-static';
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/components/Providers';

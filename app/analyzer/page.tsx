@@ -1,5 +1,4 @@
 'use client';
-export const dynamic = 'force-static';
 
 import { useState, useEffect } from 'react';
 import { analyzeRepository } from '@/lib/tools/repo-analyzer';

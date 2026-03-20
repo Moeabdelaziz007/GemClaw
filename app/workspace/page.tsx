@@ -1,5 +1,4 @@
 'use client';
-export const dynamic = 'force-static';
 
 import { useWorkspaceLogic } from '@/lib/hooks/useWorkspaceLogic';
 import { PureVoiceCanvas } from '@/components/workspace/PureVoiceCanvas';
