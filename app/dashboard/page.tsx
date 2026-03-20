@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { LiquidWidget } from '@/components/ui/LiquidWidget';
 import { fetchDriveFiles, GWSFile } from '@/lib/gws-tools';
-import { Layers, Database, Cpu, HardDrive } from 'lucide-react';
+import { Layers, Database, Cpu, HardDrive, RefreshCcw, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function DashboardPage() {
@@ -42,9 +42,14 @@ export default function DashboardPage() {
           <h1 className="page-title leading-tight">Sovereign_OS <span className="text-gemigram-neon/50 text-sm font-black tracking-[0.3em] ml-2 animate-pulse font-mono">V3.0_LIQUID</span></h1>
           <p className="page-copy max-w-2xl text-white/60">Interaction layer stabilized. Your workspace intelligence is now active and decentralized.</p>
         </div>
-        <button onClick={() => router.push('/hub')} className="btn-primary w-full sm:w-auto shadow-[0_0_30px_rgba(57,255,20,0.3)] hover:shadow-[0_0_50px_rgba(57,255,20,0.5)]">
-          Access_Hub
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button onClick={() => router.push('/forge')} className="btn-primary flex items-center shadow-[0_0_30px_rgba(57,255,20,0.3)] hover:shadow-[0_0_50px_rgba(57,255,20,0.5)]">
+            <Plus className="w-4 h-4 mr-2" /> Create_Agent
+          </button>
+          <button onClick={() => router.push('/hub')} className="btn-secondary flex items-center">
+            Access_Hub
+          </button>
+        </div>
       </section>
 
       {/* Liquid Interaction Layer */}
@@ -126,22 +131,3 @@ export default function DashboardPage() {
   );
 }
 
-const RefreshCcw = ({ className }: { className?: string }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width="24" 
-    height="24" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-    <path d="M3 3v5h5" />
-    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-    <path d="M16 16h5v5" />
-  </svg>
-);

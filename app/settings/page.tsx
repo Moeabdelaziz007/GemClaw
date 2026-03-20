@@ -2,7 +2,10 @@
 
 import { Shield, ChevronRight, Mic, Key, Search, Database } from 'lucide-react';
 import { useAuth } from '@/components/Providers';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { db } from '@/firebase';
+import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SettingsPage() {
@@ -18,6 +21,81 @@ export default function SettingsPage() {
     { id: 'calculator', name: 'Calculator', desc: 'Mathematical computations', enabled: true, color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-400/30' },
     { id: 'semantic_memory', name: 'Semantic Memory', desc: 'Long-term context retention', enabled: true, color: 'text-gemigram-neon', bg: 'bg-gemigram-neon/10', border: 'border-gemigram-neon/30' },
   ]);
+
+  const [voiceSettings, setVoiceSettings] = useState({
+    voice: 'Zephyr (Default)',
+    rate: 1.0,
+  });
+
+  const [apiKeys, setApiKeys] = useState({
+    gemini: '',
+    github: '',
+    weather: '',
+    audit: '',
+  });
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load Settings
+  useEffect(() => {
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
+
+    const loadSettings = async () => {
+      try {
+        const settingsDoc = await getDoc(doc(db, 'users', user.uid, 'settings', 'preferences'));
+        if (settingsDoc.exists()) {
+          const data = settingsDoc.data();
+          
+          if (data.skills) {
+            setSkills(prev => prev.map(s => ({
+              ...s,
+              enabled: data.skills[s.id] ?? s.enabled
+            })));
+          }
+
+          if (data.voiceSettings) {
+            setVoiceSettings(data.voiceSettings);
+          }
+
+          if (data.apiKeys) {
+            setApiKeys(data.apiKeys);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSettings();
+  }, [user]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    setIsSaving(true);
+
+    try {
+      await setDoc(doc(db, 'users', user.uid, 'settings', 'preferences'), {
+        skills: skills.reduce((acc, s) => ({ ...acc, [s.id]: s.enabled }), {}),
+        voiceSettings,
+        apiKeys, // In production, we should probably handle keys more securely
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
+
+      setHasChanges(false);
+      toast.success('Settings synchronized successfully');
+    } catch (error) {
+      console.error('Save error:', error);
+      toast.error('Failed to synchronize settings');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const tabs = [
     { id: 'general', label: 'General', icon: Database },
@@ -123,12 +201,14 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-4">
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                      <div>
-                        <p className="font-medium text-white">Voice Selection</p>
-                        <p className="mt-0.5 text-xs text-white/40">Choose your agent's voice identity</p>
-                      </div>
-                      <select className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-neon-green/50 focus:outline-none">
+                      <select 
+                        value={voiceSettings.voice}
+                        onChange={(e) => {
+                          setVoiceSettings({ ...voiceSettings, voice: e.target.value });
+                          setHasChanges(true);
+                        }}
+                        className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-neon-green/50 focus:outline-none"
+                      >
                         <option>Zephyr (Default)</option>
                         <option>Charon</option>
                         <option>Puck</option>
@@ -146,7 +226,18 @@ export default function SettingsPage() {
                       </div>
                       <div className="flex flex-wrap items-center gap-3">
                         <span className="text-xs text-white/40">Slow</span>
-                        <input type="range" min="0.5" max="2" step="0.1" defaultValue="1" className="w-full max-w-40 accent-neon-green" />
+                        <input 
+                          type="range" 
+                          min="0.5" 
+                          max="2" 
+                          step="0.1" 
+                          value={voiceSettings.rate}
+                          onChange={(e) => {
+                            setVoiceSettings({ ...voiceSettings, rate: parseFloat(e.target.value) });
+                            setHasChanges(true);
+                          }}
+                          className="w-full max-w-40 accent-neon-green" 
+                        />
                         <span className="text-xs text-white/40">Fast</span>
                       </div>
                     </div>
@@ -204,10 +295,24 @@ export default function SettingsPage() {
                 <p className="text-sm text-white/50">Protected credentials and access control stay stacked on smaller screens.</p>
               </div>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {['Gemini API Key', 'GitHub Token', 'Weather Provider Key', 'Audit Webhook'].map((item) => (
-                  <label key={item} className="space-y-2 rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <span className="text-xs font-bold uppercase tracking-wider text-white/60">{item}</span>
-                    <input type="password" placeholder="••••••••••••" className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-gemigram-neon/50" />
+                {[
+                  { label: 'Gemini API Key', key: 'gemini' },
+                  { label: 'GitHub Token', key: 'github' },
+                  { label: 'Weather Provider Key', key: 'weather' },
+                  { label: 'Audit Webhook', key: 'audit' }
+                ].map((item) => (
+                  <label key={item.key} className="space-y-2 rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <span className="text-xs font-bold uppercase tracking-wider text-white/60">{item.label}</span>
+                    <input 
+                      type="password" 
+                      placeholder="••••••••••••" 
+                      value={apiKeys[item.key as keyof typeof apiKeys]}
+                      onChange={(e) => {
+                        setApiKeys({ ...apiKeys, [item.key]: e.target.value });
+                        setHasChanges(true);
+                      }}
+                      className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-gemigram-neon/50" 
+                    />
                   </label>
                 ))}
               </div>
@@ -220,8 +325,27 @@ export default function SettingsPage() {
         <div className="fixed-safe-bottom safe-x fixed left-4 right-4 z-[90] sm:left-auto sm:right-6">
           <div className="ml-auto flex w-full max-w-md flex-col gap-3 rounded-2xl border border-gemigram-neon/20 bg-black/80 p-4 shadow-2xl backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-white/70">You have unsaved settings changes.</p>
-            <button onClick={() => setHasChanges(false)} className="btn-primary w-full sm:w-auto">Save Changes</button>
+            <button 
+              onClick={handleSave} 
+              disabled={isSaving}
+              className="btn-primary w-full sm:w-auto flex items-center justify-center gap-2"
+            >
+              {isSaving ? (
+                <>
+                  <RefreshCcw className="w-3 h-3 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Save Changes'
+              )}
+            </button>
           </div>
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <RefreshCcw className="w-10 h-10 text-gemigram-neon animate-spin" />
         </div>
       )}
     </div>

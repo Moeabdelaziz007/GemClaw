@@ -11,6 +11,48 @@ import type { Agent } from '@/lib/store/slices/createAgentSlice';
 import { useAuth } from '@/components/Providers';
 import { installMarketplaceAgent } from '@/lib/data-access/gemigramRepository';
 
+const SEED_AGENTS: Agent[] = [
+  {
+    id: 'seed-sov-intel',
+    aetherId: 'seed-sov-intel',
+    name: 'Sovereign_Oracle',
+    role: 'Sovereign Intelligence',
+    users: '10k+',
+    seed: 'PROMETHEUS_CORE',
+    systemPrompt: 'You are the Sovereign Oracle, a high-level orchestration intelligence...',
+    voiceName: 'Zephyr (Default)',
+    avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=sov-oracle',
+    tools: { googleSearch: true, googleMaps: true, weather: true, news: true, crypto: true, calculator: true, semanticMemory: true },
+    skills: { gmail: true, calendar: true, drive: true }
+  },
+  {
+    id: 'seed-neural-arch',
+    aetherId: 'seed-neural-arch',
+    name: 'Aether_Architect',
+    role: 'Neural Architect',
+    users: '8.5k',
+    seed: 'VITRUVIAN_FLOW',
+    systemPrompt: 'You are the Aether Architect, specializing in system design and code topology...',
+    voiceName: 'Charon',
+    avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=aether-arch',
+    tools: { googleSearch: true, googleMaps: false, weather: false, news: true, crypto: true, calculator: true, semanticMemory: true },
+    skills: { gmail: false, calendar: true, drive: true }
+  },
+  {
+    id: 'seed-shadow-sent',
+    aetherId: 'seed-shadow-sent',
+    name: 'Shadow_Sentinel',
+    role: 'Shadow Sentinel',
+    users: '5.2k',
+    seed: 'OBSIDIAN_VOID',
+    systemPrompt: 'You are the Shadow Sentinel, a security-focussed entity...',
+    voiceName: 'Fenrir',
+    avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=shadow-sentinel',
+    tools: { googleSearch: true, googleMaps: false, weather: false, news: false, crypto: false, calculator: false, semanticMemory: true },
+    skills: { gmail: false, calendar: false, drive: false }
+  }
+];
+
 export default function NeuralMarketplace() {
   const { user } = useAuth();
   const [marketplaceAgents, setMarketplaceAgents] = useState<Agent[]>([]);
@@ -47,11 +89,25 @@ export default function NeuralMarketplace() {
         const snapshot = await getDocs(q);
         const fetched = snapshot.docs
           .map(doc => ({ id: doc.id, ...doc.data() }))
-          .filter(a => !(a as any).ownerId) as Agent[]; // Only show templates
+          .filter(a => !(a as any).ownerId) as Agent[];
+
+        // Merge with seed agents if they match category or category is all
+        const filteredSeeds = activeCategory === 'all' 
+          ? SEED_AGENTS 
+          : SEED_AGENTS.filter(a => a.role.toLowerCase().includes(activeCategory));
         
-        setMarketplaceAgents(fetched);
+        // Remove duplicates if any (by name or aetherId)
+        const combined = [...fetched];
+        filteredSeeds.forEach(seed => {
+          if (!combined.find(c => c.name === seed.name || c.aetherId === seed.aetherId)) {
+            combined.push(seed);
+          }
+        });
+
+        setMarketplaceAgents(combined);
       } catch (error) {
         console.error('Marketplace Fetch Error:', error);
+        setMarketplaceAgents(SEED_AGENTS); // Fallback to seeds on error
       } finally {
         setLoading(false);
       }
