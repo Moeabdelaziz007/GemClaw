@@ -1,4 +1,4 @@
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   images: {
-    unoptimized: true, // Required for static export
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -29,29 +29,15 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
-  output: 'export', // Re-enabled to generate 'out' directory for Firebase Hosting
   transpilePackages: ['framer-motion'],
-  /*
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://*.google.com https://*.googleapis.com; connect-src 'self' https://*.googleapis.com wss://*.googleapis.com https://*.firebase.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:;",
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'microphone=(self)',
-          },
-        ],
-      },
-    ];
-  },
-  */
 };
 
 export default nextConfig;

@@ -37,7 +37,7 @@ const originalRequire = module.Module.prototype.require;
     };
   }
   // Make sure we match exactly the import in AgentRegistry.ts (`import { db } from '@/firebase';`)
-  if (id === '@/firebase' || id.endsWith('/firebase')) {
+  if (id === @/firebase' || id.endsWith@/firebase')) {
     return {
       db: { type: 'mock-db' },
       app: {}
