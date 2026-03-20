@@ -1,31 +1,32 @@
 'use client';
 
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AlertCircle, Smartphone } from 'lucide-react';
 import { useWorkspaceLogic } from '@/lib/hooks/useWorkspaceLogic';
 import { PureVoiceCanvas } from '@/components/workspace/PureVoiceCanvas';
-import { AlertCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { AddToHomeScreen } from '@/components/ui/AddToHomeScreen';
 
 export default function WorkspacePage() {
-  const { user, googleAccessToken, activeAgent, isLoading, hasError, errorDetails, router } = useWorkspaceLogic();
+  const { user, activeAgent, isLoading, hasError, errorDetails } = useWorkspaceLogic();
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
 
   if (!user) return null;
 
   if (isLoading) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-theme-primary px-4 py-10">
+      <div className="flex h-full w-full items-center justify-center bg-black px-4 py-10">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="space-y-5 text-center">
           <div className="relative mx-auto h-20 w-20 sm:h-24 sm:w-24">
-            <div className="absolute inset-0 rounded-full border-2 border-neon-green/20" />
-            <div className="absolute inset-2 rounded-full border-2 border-neon-blue/30" />
-            <div className="absolute inset-4 rounded-full border-2 border-electric-purple/40" />
+            <div className="absolute inset-0 rounded-full border-2 border-gemigram-neon/20" />
             <motion.div
-              className="absolute inset-0 rounded-full border-t-2 border-neon-green"
+              className="absolute inset-0 rounded-full border-t-2 border-gemigram-neon"
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
             />
           </div>
           <div className="space-y-2">
-            <p className="text-base font-medium text-white/70">Initializing Neural Interface</p>
+            <p className="text-base font-medium text-white/70">Connecting Neural Link</p>
             <p className="text-[10px] uppercase tracking-widest text-white/30">Synchronizing Agent Matrix...</p>
           </div>
         </motion.div>
@@ -35,11 +36,11 @@ export default function WorkspacePage() {
 
   if (hasError) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-theme-primary p-4 sm:p-6 md:p-8">
+      <div className="flex h-full w-full items-center justify-center bg-black p-4 sm:p-6 md:p-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md rounded-2xl border border-red-500/20 bg-gradient-to-br from-red-500/5 to-transparent p-6 glass-medium sm:p-8"
+          className="w-full max-w-md rounded-2xl border border-red-500/20 bg-black/40 p-6 backdrop-blur-xl sm:p-8"
         >
           <div className="mb-5 flex items-center gap-3">
             <AlertCircle className="h-6 w-6 text-red-400" />
@@ -48,7 +49,7 @@ export default function WorkspacePage() {
           <p className="mb-6 text-white/60">{errorDetails || 'Failed to initialize workspace environment.'}</p>
           <button
             onClick={() => window.location.reload()}
-            className="w-full rounded-xl border border-red-500/30 bg-gradient-to-r from-red-500/20 to-red-500/10 px-6 py-3 font-bold uppercase tracking-widest text-red-400 transition-all hover:bg-red-500/20"
+            className="w-full rounded-xl border border-red-500/30 bg-red-500/10 px-6 py-3 font-bold uppercase tracking-widest text-red-400 transition-all hover:bg-red-500/20"
           >
             Reinitialize System
           </button>
@@ -68,6 +69,37 @@ export default function WorkspacePage() {
     );
   }
 
-  // 🎙️ Pure Voice Canvas Integration
-  return <PureVoiceCanvas activeAgent={activeAgent} />;
+  return (
+    <div className="relative h-full w-full bg-black overflow-hidden">
+      {/* 📱 Installation Trigger */}
+      <AnimatePresence>
+        {!showInstallPrompt && (
+          <motion.button
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 50 }}
+            onClick={() => setShowInstallPrompt(true)}
+            className="fixed top-6 right-6 z-50 flex items-center gap-2 rounded-full border border-gemigram-neon/30 bg-[#050B14]/60 p-2 pl-4 pr-4 text-[10px] font-black uppercase tracking-widest text-gemigram-neon backdrop-blur-xl transition-all hover:bg-gemigram-neon hover:text-black active:scale-95 shadow-[0_0_20px_rgba(16,255,135,0.2)]"
+          >
+            <Smartphone className="h-3 w-3" />
+            Deploy Agent
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* 🚀 Add to Home Screen Modal */}
+      <AnimatePresence>
+        {showInstallPrompt && (
+          <AddToHomeScreen 
+            agent={activeAgent} 
+            userId={user.uid} 
+            onClose={() => setShowInstallPrompt(false)} 
+          />
+        )}
+      </AnimatePresence>
+
+      {/* 🎙️ Voice Interface */}
+      <PureVoiceCanvas activeAgent={activeAgent} />
+    </div>
+  );
 }

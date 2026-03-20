@@ -3,7 +3,6 @@
  * Offloads heavy mathematical and filtering operations from the main thread.
  */
 
-/* eslint-disable no-restricted-globals */
 
 interface Memory {
   id?: string;
@@ -31,7 +30,7 @@ self.onmessage = (e: MessageEvent) => {
         
         const createdAt = typeof memory.createdAt === 'number' 
           ? memory.createdAt 
-          : (memory.createdAt as any).seconds * 1000;
+          : (memory.createdAt as { toMillis: () => number }).toMillis();
           
         const hoursSinceCreation = (now - createdAt) / (1000 * 60 * 60);
         

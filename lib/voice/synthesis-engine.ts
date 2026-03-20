@@ -18,7 +18,7 @@ export class SynthesisEngine {
   /**
    * Translates text into high-fidelity neural audio via browser fallback.
    */
-  static async speak(text: string, options: SynthesisOptions = {}): Promise<void> {
+  static async speak(text: string): Promise<void> {
     const { isSpeaking } = useGemigramStore.getState();
     if (isSpeaking) return;
 

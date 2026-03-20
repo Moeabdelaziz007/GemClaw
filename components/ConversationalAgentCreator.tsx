@@ -379,10 +379,10 @@ export default function ConversationalAgentCreator({
             <div>
               <h2 className="text-xl font-black tracking-[0.3em] uppercase text-white flex items-center gap-3">
                 <Sparkles className="w-5 h-5 text-gemigram-neon" />
-                Conversational Genesis
+                Aether Forge
               </h2>
               <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest mt-1">
-                Step: {currentStep.replace('_', ' ')}
+                Sovereign Intelligence Materialization Chamber
               </p>
             </div>
           </div>

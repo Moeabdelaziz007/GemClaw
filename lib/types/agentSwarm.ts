@@ -93,7 +93,7 @@ export interface SwarmCompletionResult {
   completedTasks: string[];
   failedTasks: string[];
   /** Key-value store of task IDs to their respective outputs */
-  outputs: Record<string, any>;
+  outputs: Record<string, unknown>;
   totalDurationMs: number;
 }
 

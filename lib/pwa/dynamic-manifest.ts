@@ -69,8 +69,8 @@ export async function installAgentAsPWA(config: AgentManifestConfig): Promise<bo
   try {
     const { agent } = config;
     
-    // Use the permanent manifest route instead of blob URL
-    const manifestUrl = `/manifest/${agent.id}`;
+    // Use the dynamic manifest route
+    const manifestUrl = `/api/manifest/${agent.id}`;
     
     // Update or create manifest link
     updateManifestLink(manifestUrl);

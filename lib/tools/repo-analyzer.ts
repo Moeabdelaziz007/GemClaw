@@ -145,11 +145,12 @@ ${combinedCode}
 
     return result;
 
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'An unknown error occurred during analysis.';
     console.error('Analysis error:', error);
     return {
       success: false,
-      error: error.message || 'An unknown error occurred during analysis.',
+      error: message,
     };
   }
 }

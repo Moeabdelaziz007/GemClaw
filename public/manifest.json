@@ -1,18 +1,37 @@
 {
-  "name": "Gemigram AIOS",
+  "name": "GemigramOS",
   "short_name": "Gemigram",
   "description": "Sovereign Intelligence Orchestration System",
   "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#050B14",
-  "theme_color": "#050B14",
+  "theme_color": "#10ff87",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "/assets/branding/logo.png",
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities", "ai"],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icons/shortcut-dashboard.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Aether Forge",
+      "url": "/forge",
+      "icons": [{ "src": "/icons/shortcut-forge.png", "sizes": "96x96" }]
     }
   ]
 }

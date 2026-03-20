@@ -68,7 +68,7 @@ class BridgeStatusManager {
       } else {
         throw new Error('Bridge responded with error');
       }
-    } catch (error) {
+    } catch (_error) {
       this.updateStatus('stateless');
       // Exponential backoff
       this.retryDelay = Math.min(this.retryDelay * 2, this.MAX_RETRY_DELAY);

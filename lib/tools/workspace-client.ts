@@ -5,13 +5,16 @@
  * Bypasses backend requirements for $0 cost orchestration.
  */
 
-export async function executeGWSClientAction(toolId: string, action: string, params: any, accessToken: string) {
+export async function executeGWSClientAction(
+  toolId: string, 
+  action: string, 
+  params: Record<string, any>, 
+  accessToken: string
+) {
   const service = toolId.replace('workspace_', '');
 
   const API_BASE = "https://www.googleapis.com";
   let url = "";
-  let method = "GET";
-  let body: any = null;
 
   try {
     switch (service) {
@@ -52,8 +55,9 @@ export async function executeGWSClientAction(toolId: string, action: string, par
       method: "Client-Spine Direct"
     };
 
-  } catch (err: any) {
-    console.warn(`[GWS-Client] Direct execution failed, falling back to neural bridge: ${err.message}`);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn(`[GWS-Client] Direct execution failed, falling back to neural bridge: ${message}`);
     throw err; // Allow neural-handlers to catch and fallback
   }
 }
