@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLiveAPI } from '@/hooks/useLiveAPI';
+import { useNeuralFallback } from '@/hooks/useNeuralFallback';
 import { useAudioProcessor } from '@/hooks/useAudioProcessor';
 import { useGemigramStore, Agent } from '@/lib/store/useGemigramStore';
 import { bridgeStatusManager } from '@/lib/utils/bridgeStatusManager';
@@ -39,10 +40,10 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
 
   useEffect(() => {
     const currentStatus = bridgeStatusManager.getStatus();
-    setLinkType(currentStatus === 'unknown' ? 'stateless' : currentStatus as any);
+    setLinkType(currentStatus === 'unknown' ? 'stateless' : currentStatus as 'stateless' | 'bridge' | 'hibernating');
     
     const unsub = bridgeStatusManager.subscribe((status) => {
-      setLinkType(status === 'unknown' ? 'stateless' : status as any);
+      setLinkType(status === 'unknown' ? 'stateless' : status as 'stateless' | 'bridge' | 'hibernating');
     });
     
     void bridgeStatusManager.probe();
@@ -58,10 +59,22 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
     disconnect, 
     startRecording, 
     stopRecording,
+    sab // Exposed from useLiveAPI
   } = useLiveAPI(apiKey, (call) => {
     setActiveWidget(call as ToolResult);
     setIsThinking(false);
   }, googleAccessToken);
+
+  // Neural Fallback: Local Whisper-tiny Edge AI
+  const { transcription: localText } = useNeuralFallback(sab, !isConnected && isRecording);
+
+  useEffect(() => {
+    if (localText && !isConnected) {
+       console.log("[Neural Fallback] Local Transcript:", localText);
+       // Sync local text to transcript store if cloud is dead
+       useGemigramStore.getState().addTranscriptMessage("user", `(Local) ${localText}`);
+    }
+  }, [localText, isConnected]);
 
   const { getVolume, isWasmLoaded, isSpeaking } = useAudioProcessor();
 

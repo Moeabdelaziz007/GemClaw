@@ -13,11 +13,9 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
   const [volume, setVolume] = useState(0);
   const wsRef = useRef<WebSocket | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const addTranscriptMessage = useGemigramStore(state => state.addTranscriptMessage);
-  const setStreamingBuffer = useGemigramStore(state => state.setStreamingBuffer);
   const setInterrupted = useGemigramStore(state => state.setInterrupted);
   const setContextUsage = useGemigramStore(state => state.setContextUsage);
 
@@ -376,6 +374,10 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
 
   // 2. Core Logic Callbacks (Reconnection & Circular Handling)
   const workletNodeRef = useRef<AudioWorkletNode | null>(null);
+  const sabRef = useRef<SharedArrayBuffer | null>(null);
+  const writePtrRef = useRef<Int32Array | null>(null);
+  const readPtrRef = useRef<Int32Array | null>(null);
+  const sabBufferRef = useRef<Int16Array | null>(null);
 
   const startRecording = useCallback(async () => {
     try {
@@ -400,10 +402,22 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
       const source = audioContext.createMediaStreamSource(stream);
       workletNodeRef.current = new AudioWorkletNode(audioContext, 'neural-spine-processor');
       
+      // Setup SharedArrayBuffer (Size: 8192 samples = ~340ms at 24kHz)
+      const SAB_SIZE = 8 + (8192 * 2); 
+      const sab = new SharedArrayBuffer(SAB_SIZE);
+      sabRef.current = sab;
+      writePtrRef.current = new Int32Array(sab, 0, 1);
+      readPtrRef.current = new Int32Array(sab, 4, 1); // Gemini Read
+      // Reserved: new Int32Array(sab, 8, 1) for Whisper read
+      sabBufferRef.current = new Int16Array(sab, 16);
+      
+      workletNodeRef.current.port.postMessage({ type: 'sab_setup', sab });
+      
       // Load Silero VAD locally
       try {
         const vad = await import('@ricky0123/vad-web');
         const myvad = await vad.MicVAD.new({
+          // @ts-expect-error - compatibility with certain vad versions
           stream: stream,
           onSpeechStart: () => {
             console.log("[VAD] User speaking -> Barge-in initiated");
@@ -419,12 +433,12 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
               }));
             }
           },
-          onSpeechEnd: (audio) => {
+          onSpeechEnd: () => {
              console.log("[VAD] Speech ended.");
           }
         });
         myvad.start();
-        // @ts-ignore - store VAD instance on ref to destroy later 
+        // @ts-expect-error - store VAD instance on ref to destroy later 
         workletNodeRef.current._vadInstance = myvad;
         addLog("Neural Spine: VAD (Silero) initialized.", "system");
       } catch (vadError) {
@@ -432,16 +446,34 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
       }
       
       workletNodeRef.current.port.onmessage = (event) => {
-        if (event.data.type === 'audio_chunk') {
-          const rawPcm = event.data.payload;
+        if (event.data.type === 'buffer_update') {
+          if (!sabBufferRef.current || !readPtrRef.current || !writePtrRef.current) return;
           
-          // Convert Float32 to Int16 for Gemini
-          const pcm16 = new Int16Array(rawPcm.length);
-          for (let i = 0; i < rawPcm.length; i++) {
-            pcm16[i] = Math.max(-1, Math.min(1, rawPcm[i])) * 0x7FFF;
+          const readPtr = readPtrRef.current[0];
+          const writePtr = writePtrRef.current[0];
+          const buffer = sabBufferRef.current;
+          
+          if (readPtr === writePtr) return;
+          
+          let dataToRead = 0;
+          if (writePtr > readPtr) {
+            dataToRead = writePtr - readPtr;
+          } else {
+            dataToRead = buffer.length - readPtr + writePtr;
+          }
+
+          // We only send if we have a significant chunk or if we want ultra-low latency
+          // Gemini likes small chunks (20-40ms). 24000Hz * 0.04s = 960 samples.
+          if (dataToRead < 960) return;
+
+          const pcm16 = new Int16Array(dataToRead);
+          for (let i = 0; i < dataToRead; i++) {
+            pcm16[i] = buffer[(readPtr + i) % buffer.length];
           }
           
-          // ─── Sovereign Encoding (Fix Gem #4: PCM Overflow) ────
+          // Update read pointer
+          readPtrRef.current[0] = (readPtr + dataToRead) % buffer.length;
+          
           const uint8 = new Uint8Array(pcm16.buffer);
           let binary = "";
           const chunk_size = 8192;
@@ -474,9 +506,9 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
 
   const stopRecording = useCallback(() => {
     if (workletNodeRef.current) {
-      // @ts-ignore
+      // @ts-expect-error - vad instance added dynamically 
       if (workletNodeRef.current._vadInstance) {
-        // @ts-ignore
+        // @ts-expect-error - vad instance access 
         workletNodeRef.current._vadInstance.pause();
       }
       workletNodeRef.current.disconnect();
@@ -498,12 +530,13 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
     isRecording, 
     logs, 
     volume, 
-    connect, 
-    disconnect, 
-    startRecording, 
+    connect,
+    disconnect,
+    startRecording,
     stopRecording,
     isCapturing,
     startPulse,
-    stopPulse
+    stopPulse,
+    sab: sabRef.current
   };
 }
