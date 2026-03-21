@@ -228,3 +228,58 @@ export const getPreviousStep = (currentStep: ConversationStep): ConversationStep
   
   return stepOrder[currentIndex - 1];
 };
+
+export const parseToolSelection = (input: string): Record<string, boolean> => {
+  const lower = input.toLowerCase();
+  const allTools = {
+    googleSearch: true,
+    googleMaps: true,
+    weather: true,
+    news: true,
+    crypto: true,
+    calculator: true,
+    semanticMemory: true,
+  };
+  
+  if (lower.includes('all')) return allTools;
+  if (lower.includes('none') || lower.includes('skip')) {
+    return Object.keys(allTools).reduce((acc, key) => ({ ...acc, [key]: false }), {});
+  }
+  
+  // Parse individual tools
+  return {
+    googleSearch: lower.includes('search'),
+    googleMaps: lower.includes('maps'),
+    weather: lower.includes('weather'),
+    news: lower.includes('news'),
+    crypto: lower.includes('crypto') || lower.includes('chain'),
+    calculator: lower.includes('calculator') || lower.includes('math'),
+    semanticMemory: lower.includes('memory') || lower.includes('rag'),
+  };
+};
+
+export const parseSkillSelection = (input: string): Record<string, boolean> => {
+  const lower = input.toLowerCase();
+  const allSkills = { gmail: true, calendar: true, drive: true };
+  
+  if (lower.includes('all')) return allSkills;
+  if (lower.includes('none') || lower.includes('skip')) {
+    return { gmail: false, calendar: false, drive: false };
+  }
+  
+};
+
+export const getStepDataUpdate = (step: ConversationStep, input: string): Record<string, any> => {
+  switch (step) {
+    case 'ENTITY_NAME': return { name: input };
+    case 'CORE_PURPOSE': return { description: input };
+    case 'VOICE_SELECTION': return { voiceName: input };
+    case 'COMPUTE_TIER': return { computeTier: input };
+    case 'PERSONA_DIRECTIVE': return { systemPrompt: input };
+    case 'ETHICAL_RULES': return { rules: input };
+    case 'SOUL_PERSONALITY': return { soul: input };
+    case 'TOOL_SELECTION': return { tools: parseToolSelection(input) };
+    case 'WORKSPACE_BRIDGES': return { skills: parseSkillSelection(input) };
+    default: return {};
+  }
+};

@@ -111,6 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     try {
       clearUserScopedState();
+      useGemigramStore.setState({ agents: [], activeAgentId: null, transcript: [] });
       setHydratedUserId(null);
       setGoogleAccessToken(null);
       await firebaseAuth.signOut();

@@ -13,7 +13,8 @@ import {
   CONVERSATION_FLOW, 
   ConversationStep, 
   getNextStep, 
-  getPreviousStep 
+  getPreviousStep,
+  getStepDataUpdate
 } from '../lib/agents/conversationFlow';
 import { Button } from './ui/Button';
 
@@ -54,6 +55,13 @@ export default function ConversationalAgentCreator({
   const setVoiceSession = useGemigramStore(state => state.setVoiceSession);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
   
   // Voice hooks
   const { 
@@ -164,7 +172,7 @@ export default function ConversationalAgentCreator({
       });
 
       const data = await response.json();
-      if (data.blueprint) {
+      if (isMounted.current && data.blueprint) {
         setBlueprint(data.blueprint);
         
         // Update agent data with blueprint results
@@ -188,14 +196,18 @@ export default function ConversationalAgentCreator({
         speak(pitchMessage.text).then(() => {
           // Auto-advance to voice selection after synthesis pitch
           setTimeout(() => {
-            setCurrentStep('VOICE_SELECTION');
+            if (isMounted.current) {
+              setCurrentStep('VOICE_SELECTION');
+            }
           }, 2000);
         });
       }
     } catch (error) {
       console.error('Synthesis failed:', error);
     } finally {
-      setIsSynthesizing(false);
+      if (isMounted.current) {
+        setIsSynthesizing(false);
+      }
     }
   };
 
@@ -221,7 +233,10 @@ export default function ConversationalAgentCreator({
     }
 
     // Store data based on step
-    storeStepData(currentStep, input);
+    const updates = getStepDataUpdate(currentStep, input);
+    if (Object.keys(updates).length > 0) {
+      setAgentData(prev => ({ ...prev, ...updates }));
+    }
 
     // Move to next step
     const next = getNextStep(currentStep);
@@ -234,83 +249,6 @@ export default function ConversationalAgentCreator({
       // Final step - submit form
       finalizeCreation();
     }
-  };
-
-  const storeStepData = (step: ConversationStep, input: string) => {
-    switch (step) {
-      case 'ENTITY_NAME':
-        setAgentData(prev => ({ ...prev, name: input }));
-        break;
-      case 'CORE_PURPOSE':
-        setAgentData(prev => ({ ...prev, description: input }));
-        break;
-      case 'VOICE_SELECTION':
-        setAgentData(prev => ({ ...prev, voiceName: input }));
-        break;
-      case 'COMPUTE_TIER':
-        setAgentData(prev => ({ ...prev, computeTier: input as any }));
-        break;
-      case 'PERSONA_DIRECTIVE':
-        setAgentData(prev => ({ ...prev, systemPrompt: input }));
-        break;
-      case 'ETHICAL_RULES':
-        setAgentData(prev => ({ ...prev, rules: input }));
-        break;
-      case 'SOUL_PERSONALITY':
-        setAgentData(prev => ({ ...prev, soul: input }));
-        break;
-      case 'TOOL_SELECTION':
-        setAgentData(prev => ({ ...prev, tools: parseToolSelection(input) }));
-        break;
-      case 'WORKSPACE_BRIDGES':
-        setAgentData(prev => ({ ...prev, skills: parseSkillSelection(input) }));
-        break;
-    }
-  };
-
-  const parseToolSelection = (input: string): Record<string, boolean> => {
-    const lower = input.toLowerCase();
-    const allTools = {
-      googleSearch: true,
-      googleMaps: true,
-      weather: true,
-      news: true,
-      crypto: true,
-      calculator: true,
-      semanticMemory: true,
-    };
-    
-    if (lower.includes('all')) return allTools;
-    if (lower.includes('none') || lower.includes('skip')) {
-      return Object.keys(allTools).reduce((acc, key) => ({ ...acc, [key]: false }), {});
-    }
-    
-    // Parse individual tools
-    return {
-      googleSearch: lower.includes('search'),
-      googleMaps: lower.includes('maps'),
-      weather: lower.includes('weather'),
-      news: lower.includes('news'),
-      crypto: lower.includes('crypto') || lower.includes('chain'),
-      calculator: lower.includes('calculator') || lower.includes('math'),
-      semanticMemory: lower.includes('memory') || lower.includes('rag'),
-    };
-  };
-
-  const parseSkillSelection = (input: string): Record<string, boolean> => {
-    const lower = input.toLowerCase();
-    const allSkills = { gmail: true, calendar: true, drive: true };
-    
-    if (lower.includes('all')) return allSkills;
-    if (lower.includes('none') || lower.includes('skip')) {
-      return { gmail: false, calendar: false, drive: false };
-    }
-    
-    return {
-      gmail: lower.includes('gmail'),
-      calendar: lower.includes('calendar'),
-      drive: lower.includes('drive'),
-    };
   };
 
   const finalizeCreation = () => {

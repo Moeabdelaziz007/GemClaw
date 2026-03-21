@@ -36,7 +36,8 @@ export class ExecutionEngine {
 
         try {
           const planRaw = await runSovereignReasoning(currentContext, planPrompt);
-          const plan = JSON.parse(planRaw);
+          const cleanJson = planRaw.replace(/```(?:json)?\n?/g, '').replace(/```\n?/g, '').trim();
+          const plan = JSON.parse(cleanJson);
 
           if (plan.done || !plan.toolId) break;
 

@@ -32,6 +32,8 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
     delay: Math.random() * 2
   })));
   
+  const autoDeployTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  
   // Generate agent ID for deployment
   const agentId = pendingManifest?.name ? pendingManifest.name.toLowerCase().replace(/\s+/g, '-') : null;
 
@@ -76,7 +78,7 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
           console.log('[Forge] Auto-deploying Sovereign Agent...');
           // In a real PWA context, we would trigger the install prompt or redirect
           // For now, we simulate the completion
-          setTimeout(() => {
+          autoDeployTimerRef.current = setTimeout(() => {
             setActiveAgentId(agentId || '');
             onComplete();
           }, 3000);
@@ -86,6 +88,7 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
       return () => {
         clearTimeout(timer);
         clearTimeout(flashTimer);
+        if (autoDeployTimerRef.current) clearTimeout(autoDeployTimerRef.current);
       };
     }
   }, [currentStepIndex, pendingManifest, agentId, setActiveAgentId, onComplete]);
