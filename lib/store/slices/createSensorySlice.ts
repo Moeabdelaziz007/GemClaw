@@ -26,10 +26,6 @@ export interface SensorySlice {
   volume: number;
   contextUsage: number;
   unreadNotifications: Notification[];
-  
-  // New Interrupt Fields
-  activeInterrupt: InterruptSignal | null;
-  interruptHistory: InterruptSignal[];  // max 10 items
 
   addTranscriptMessage: (role: 'user' | 'agent', content: string) => void;
   addBulkTranscriptMessages: (messages: { role: 'user' | 'agent', content: string }[]) => void;
@@ -41,14 +37,9 @@ export interface SensorySlice {
   setContextUsage: (usage: number) => void;
   setUnreadNotifications: (notifications: Notification[]) => void;
   clearTranscript: () => void;
-
-  // New Interrupt Actions
-  triggerBargein: (lastChunk: string, framesDropped?: number) => void;
-  resolveInterrupt: (tokenId: string) => void;
-  getInterruptContext: () => string;
 }
 
-export const INITIAL_SENSORY_STATE: Pick<SensorySlice, 'transcript' | 'streamingBuffer' | 'isInterrupted' | 'isThinking' | 'isSpeaking' | 'volume' | 'contextUsage' | 'unreadNotifications' | 'activeInterrupt' | 'interruptHistory'> = {
+export const INITIAL_SENSORY_STATE: Pick<SensorySlice, 'transcript' | 'streamingBuffer' | 'isInterrupted' | 'isThinking' | 'isSpeaking' | 'volume' | 'contextUsage' | 'unreadNotifications'> = {
   transcript: [],
   streamingBuffer: '',
   isInterrupted: false,
@@ -57,8 +48,6 @@ export const INITIAL_SENSORY_STATE: Pick<SensorySlice, 'transcript' | 'streaming
   volume: 0,
   contextUsage: 0,
   unreadNotifications: [],
-  activeInterrupt: null,
-  interruptHistory: [],
 };
 
 export const createSensorySlice: StateCreator<SensorySlice> = (set, get) => ({
@@ -94,37 +83,4 @@ export const createSensorySlice: StateCreator<SensorySlice> = (set, get) => ({
   setContextUsage: (usage) => set({ contextUsage: usage }),
   setUnreadNotifications: (notifications) => set({ unreadNotifications: notifications }),
   clearTranscript: () => set({ transcript: [] }),
-
-  // New Interrupt Implementation
-  triggerBargein: (lastChunk, framesDropped = 0) =>
-    set({
-      activeInterrupt: {
-        tokenId: nanoid(),
-        interruptedAt: Date.now(),
-        audioFramesDropped: framesDropped,
-        lastValidTranscriptChunk: lastChunk,
-        resolvedAt: null,
-      },
-      isInterrupted: true
-    }),
-
-  resolveInterrupt: (tokenId) =>
-    set((state) => {
-      if (state.activeInterrupt?.tokenId !== tokenId) return state;
-
-      const resolved = { ...state.activeInterrupt, resolvedAt: Date.now() };
-      const newHistory = [resolved, ...state.interruptHistory].slice(0, 10);
-
-      return {
-        activeInterrupt: null,
-        interruptHistory: newHistory,
-        isInterrupted: false
-      };
-    }),
-
-  getInterruptContext: () => {
-    const active = get().activeInterrupt;
-    if (!active) return '';
-    return `[INTERRUPT@${active.interruptedAt}] User barged in after: '${active.lastValidTranscriptChunk}'. Resume from this point.`;
-  }
 });

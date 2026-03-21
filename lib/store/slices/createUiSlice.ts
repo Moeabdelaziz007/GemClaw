@@ -20,8 +20,6 @@ export interface UiSlice {
   setVoiceProfile: (profile: Partial<UiSlice['voiceProfile']>) => void;
   setVoiceSession: (session: Partial<UiSlice['voiceSession']>) => void;
   setPendingManifest: (manifest: Partial<Agent> | null) => void;
-  locale: 'en' | 'ar';
-  setLocale: (locale: 'en' | 'ar') => void;
   setLastSyncedAt: (time: number | null) => void;
 }
 
@@ -39,7 +37,6 @@ export const INITIAL_UI_STATE = {
   },
   pendingManifest: null,
   lastSyncedAt: null,
-  locale: 'en' as const,
 };
 
 export const createUiSlice: StateCreator<UiSlice> = (set) => ({
@@ -57,5 +54,4 @@ export const createUiSlice: StateCreator<UiSlice> = (set) => ({
   })),
   setPendingManifest: (manifest) => set({ pendingManifest: manifest }),
   setLastSyncedAt: (time) => set({ lastSyncedAt: time }),
-  setLocale: (locale) => set({ locale }),
 });

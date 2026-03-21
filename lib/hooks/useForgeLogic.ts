@@ -163,6 +163,15 @@ export function useForgeLogic() {
       setCurrentStep('description');
       setStatus('idle');
     },
+    speak: (text: string) => {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.1;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+      addLog(`[Forge] Logic: ${text}`, "system");
+    },
     handleManualSubmit: handleSynthesis // For fallback/testing
   };
 }
