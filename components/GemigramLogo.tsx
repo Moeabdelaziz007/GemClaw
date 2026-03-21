@@ -30,7 +30,7 @@ export function GemigramLogo({
     return (
       <div 
         className={`relative flex items-center justify-center ${className}`} 
-        style={{ '--logo-size': `${size}px`, width: 'var(--logo-size)', height: 'var(--logo-size)' } as React.CSSProperties}
+        style={{ width: size, height: size }}
       >
         {/* Ambient Neural Glow */}
         <motion.div

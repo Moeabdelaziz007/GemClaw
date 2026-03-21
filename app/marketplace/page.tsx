@@ -89,17 +89,20 @@ export default function NeuralMarketplace() {
         }
         
         const snapshot = await getDocs(q);
-        const fetched = snapshot.docs
-          .map(doc => ({ id: doc.id, ...(doc.data() as Record<string, unknown>) }))
-          .filter(a => !(a as any).ownerId) as Agent[];
+        const fetched = snapshot.docs.map((doc: any) => ({ 
+          id: doc.id, 
+          ...doc.data() 
+        })) as Agent[];
+        
+        const filtered = fetched.filter(a => !a.ownerId);
 
         // Merge with seed agents if they match category or category is all
         const filteredSeeds = activeCategory === 'all' 
           ? SEED_AGENTS 
-          : SEED_AGENTS.filter(a => a.role.toLowerCase().includes(activeCategory));
+          : SEED_AGENTS.filter(a => a.role.toLowerCase().includes(activeCategory.toLowerCase()));
         
         // Remove duplicates if any (by name or aetherId)
-        const combined = [...fetched];
+        const combined = [...filtered];
         filteredSeeds.forEach(seed => {
           if (!combined.find(c => c.name === seed.name || c.aetherId === seed.aetherId)) {
             combined.push(seed);
@@ -188,7 +191,7 @@ export default function NeuralMarketplace() {
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              aria-pressed={activeCategory === cat.id}
+              aria-pressed={activeCategory === cat.id ? "true" : "false"}
               className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest border transition-all whitespace-nowrap ${
                 activeCategory === cat.id 
                 ? 'bg-gemigram-neon border-gemigram-neon text-black shadow-[0_0_15px_rgba(16,255,135,0.4)]' 

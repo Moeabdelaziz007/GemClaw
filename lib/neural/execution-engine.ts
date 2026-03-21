@@ -29,7 +29,7 @@ export class ExecutionEngine {
             Current Progress: ${JSON.stringify(steps)}
             
             Determine the NEXT logical tool call needed.
-            AVAILABLE TOOLS: browse_url, create_agent, store_memory, search_memory, workspace_gmail, workspace_calendar, workspace_drive.
+            AVAILABLE TOOLS: browse_url, create_agent, store_memory, search_memory, workspace_gmail, workspace_calendar, workspace_drive, stitch_ui_gen, jules_cloud_deploy, nano_asset_gen.
             
             Output ONLY a JSON object: { "toolId": "string", "args": {}, "done": boolean }
         `;

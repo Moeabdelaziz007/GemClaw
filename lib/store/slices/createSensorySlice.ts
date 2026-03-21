@@ -1,5 +1,4 @@
 import { StateCreator } from 'zustand';
-import { nanoid } from 'nanoid';
 import type { Notification } from '@/lib/types/models';
 
 export interface TranscriptMessage {
@@ -10,8 +9,8 @@ export interface TranscriptMessage {
 }
 
 export interface InterruptSignal {
-  tokenId: string;           // nanoid()
-  interruptedAt: number;     // performance.now()
+  tokenId: string;           
+  interruptedAt: number;     
   audioFramesDropped: number;
   lastValidTranscriptChunk: string;
   resolvedAt: number | null;
@@ -50,7 +49,7 @@ export const INITIAL_SENSORY_STATE: Pick<SensorySlice, 'transcript' | 'streaming
   unreadNotifications: [],
 };
 
-export const createSensorySlice: StateCreator<SensorySlice> = (set, get) => ({
+export const createSensorySlice: StateCreator<SensorySlice> = (set) => ({
   ...INITIAL_SENSORY_STATE,
   addTranscriptMessage: (role, content) =>
     set((state) => {

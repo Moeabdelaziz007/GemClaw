@@ -70,9 +70,8 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
 
   return (
     <div 
-      className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden" 
+      className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden [---orbit-radius:clamp(140px,40vw,440px)]" 
       ref={containerRef}
-      style={{ '--orbit-radius': 'clamp(140px, 40vw, 440px)' } as React.CSSProperties}
     >
       {/* Liquid Gooey Filters */}
       <svg className="absolute w-0 h-0 invisible">
@@ -145,10 +144,7 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
           >
             {/* The Head - Liquid Singularity */}
             <motion.div 
-              className="relative w-24 sm:w-32 h-28 sm:h-36 mb-4 sm:mb-6 rounded-[40px] sm:rounded-[50px] bg-black/90 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] border border-white/5 flex items-center justify-center overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, #050505 0%, #1a1a1a 100%)'
-              }}
+              className="relative w-24 sm:w-32 h-28 sm:h-36 mb-4 sm:mb-6 rounded-[40px] sm:rounded-[50px] bg-black/90 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] border border-white/5 flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#050505] to-[#1a1a1a]"
             >
               {/* Internal Refraction Surface */}
               <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none" />
@@ -204,10 +200,10 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
               {/* The Singularity Light */}
               <motion.div
                 className="absolute w-32 h-32 rounded-full blur-[50px]"
-                style={{ backgroundColor: stateConfig.accent }}
                 animate={{ 
                   scale: [1, stateConfig.corePulse, 1],
                   opacity: [0.2, 0.6, 0.2],
+                  backgroundColor: stateConfig.accent
                 }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
               />
@@ -283,12 +279,9 @@ export function DigitalEntity({ state, volume, agentName, linkType = 'stateless'
         ].map((sys, i) => (
           <motion.div
             key={sys.id}
-            className="absolute top-1/2 left-1/2 w-28 sm:w-32 h-12 sm:h-14 rounded-full quantum-glass border border-white/5 flex items-center justify-center gap-2 sm:gap-3 group/sat"
+            className="absolute top-1/2 left-1/2 w-28 sm:w-32 h-12 sm:h-14 rounded-full quantum-glass border border-white/5 flex items-center justify-center gap-2 sm:gap-3 group/sat [transform:translate(-50%,-50%)_rotate(calc(var(--index)*90deg))_translateY(var(--orbit-radius))_rotate(calc(var(--index)*-90deg))]"
             style={{ 
               '--index': i,
-              left: '50%',
-              top: '50%',
-              transform: `translate(-50%, -50%) rotate(${i * 90}deg) translateY(var(--orbit-radius)) rotate(-${i * 90}deg)`
             } as React.CSSProperties}
             animate={{ 
               rotate: [0, 360],
