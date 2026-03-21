@@ -66,10 +66,12 @@ export default function ConversationalAgentCreator({
   // Voice hooks
   const { 
     transcript, 
+    confidence,
     isListening, 
     startListening, 
     stopListening,
-    isSupported: speechRecognitionSupported 
+    isSupported: speechRecognitionSupported,
+    resetTranscript
   } = useVoiceInteraction();
   
   const { speak, cancel: cancelSpeech, isSpeaking } = useTextToSpeech();
@@ -82,9 +84,33 @@ export default function ConversationalAgentCreator({
   // Handle transcript from voice input
   useEffect(() => {
     if (transcript && isListening === false) {
-      setUserInput(transcript);
+      if (confidence > 0.90) {
+        // >90% -> auto-fill and advance
+        setUserInput(transcript);
+        handleSendMessage(transcript);
+      } else if (confidence >= 0.70 && confidence <= 0.90) {
+        // 70-90% -> warn and allow override
+        setUserInput(transcript);
+        setMessages(prev => [...prev, {
+          speaker: 'ASTRAEUS',
+          text: `[WARNING] Confidence ${Math.round(confidence * 100)}%. I heard: "${transcript}". You may override or submit.`,
+          timestamp: new Date()
+        }]);
+        // Do not auto handleSendMessage, let user verify visually (visual warning) and then user can manually confirm if they want, but since no text input, wait how to override? 
+        // User just says "confirm" or re-speaks. Actually, we can just populate UI and wait.
+      } else if (confidence > 0 && confidence < 0.70) {
+        // <70% -> re-ask
+        const msg = "I didn't quite catch that. Could you repeat?";
+        setMessages(prev => [...prev, {
+          speaker: 'ASTRAEUS',
+          text: msg,
+          timestamp: new Date()
+        }]);
+        speak(msg);
+        resetTranscript();
+      }
     }
-  }, [transcript, isListening]);
+  }, [transcript, confidence, isListening]);
 
   useEffect(() => {
     setVoiceSession({ stage: 'forge', lastVoiceAction: 'Conversational forge opened. Checking microphone permission.' });

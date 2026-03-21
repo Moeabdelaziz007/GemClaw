@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 interface VoiceRecognition extends EventTarget {
   continuous: boolean;
@@ -58,6 +58,7 @@ export function useVoiceInteraction() {
   const [isSupported, setIsSupported] = useState(false);
   const [recognition, setRecognition] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [confidence, setConfidence] = useState(0);
 
   useEffect(() => {
     // Check for browser support
@@ -83,16 +84,29 @@ export function useVoiceInteraction() {
       recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
         let finalTranscript = '';
         let interimTranscript = '';
+        let maxConfidence = 0;
 
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
             finalTranscript += event.results[i][0].transcript;
+            maxConfidence = Math.max(maxConfidence, event.results[i][0].confidence);
           } else {
             interimTranscript += event.results[i][0].transcript;
           }
         }
 
-        setTranscript(finalTranscript || interimTranscript);
+        const newTranscript = finalTranscript || interimTranscript;
+        setTranscript(newTranscript);
+        if (finalTranscript) {
+          setConfidence(maxConfidence);
+        }
+        
+        // Sync transcript to SensorySlice per Forge rules
+        if (newTranscript) {
+           import('../lib/store/useGemigramStore').then(({ useGemigramStore }) => {
+             useGemigramStore.getState().setStreamingBuffer(newTranscript);
+           });
+        }
       };
 
       recognitionInstance.onerror = (event: SpeechRecognitionErrorEvent) => {
@@ -108,12 +122,68 @@ export function useVoiceInteraction() {
     }
   }, []);
 
+  // Mic Level Processing
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const micStreamRef = useRef<MediaStream | null>(null);
+  const frameRef = useRef<number | null>(null);
+
+  const startMicLevelTracking = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      micStreamRef.current = stream;
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContext();
+      }
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      analyserRef.current.fftSize = 256;
+      const source = audioContextRef.current.createMediaStreamSource(stream);
+      source.connect(analyserRef.current);
+
+      const updateMicLevel = () => {
+        if (!analyserRef.current) return;
+        const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+        analyserRef.current.getByteFrequencyData(dataArray);
+        const average = dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
+        // Normalize 0-255 to 0-1
+        const level = average / 255;
+        
+        // Sync to CognitiveSlice
+        import('../lib/store/useGemigramStore').then(({ useGemigramStore }) => {
+           useGemigramStore.setState({ micLevel: level });
+        });
+
+        frameRef.current = requestAnimationFrame(updateMicLevel);
+      };
+      
+      updateMicLevel();
+    } catch (err) {
+      console.error("Mic level tracking failed:", err);
+    }
+  };
+
+  const stopMicLevelTracking = () => {
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    if (micStreamRef.current) {
+      micStreamRef.current.getTracks().forEach((t: MediaStreamTrack) => t.stop());
+      micStreamRef.current = null;
+    }
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+    import('../lib/store/useGemigramStore').then(({ useGemigramStore }) => {
+      useGemigramStore.setState({ micLevel: 0 });
+    });
+  };
+
   const startListening = useCallback(() => {
     if (recognition && !isListening) {
       try {
         recognition.start();
         setTranscript('');
         setError(null);
+        startMicLevelTracking();
       } catch (err) {
         console.error('Failed to start recognition:', err);
         setError('Failed to start voice recognition');
@@ -125,11 +195,19 @@ export function useVoiceInteraction() {
     if (recognition && isListening) {
       try {
         recognition.stop();
+        stopMicLevelTracking();
       } catch (err) {
         console.error('Failed to stop recognition:', err);
       }
     }
   }, [recognition, isListening]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopMicLevelTracking();
+    };
+  }, []);
 
   const resetTranscript = useCallback(() => {
     setTranscript('');
@@ -138,6 +216,7 @@ export function useVoiceInteraction() {
   return {
     isListening,
     transcript,
+    confidence,
     isSupported,
     error,
     startListening,

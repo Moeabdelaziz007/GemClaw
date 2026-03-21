@@ -4,7 +4,7 @@ import { useVisionPulse } from './useVisionPulse';
 import { handleNeuralTool } from '../lib/tools/neural-handlers';
 import { ToolResult, Tool } from '../lib/types/live-api';
 
-const MODEL = "models/gemini-2.5-flash-native-audio-preview-09-2025";
+const MODEL = "models/gemini-2.5-flash"; // Upgraded to stable model
 
 export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) => void, accessToken?: string | null) {
   const [isConnected, setIsConnected] = useState(false);
@@ -96,7 +96,11 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
     isPlayingRef.current = true;
     const chunk = audioQueueRef.current.shift()!;
     await playAudio(chunk);
-    playNextInQueue();
+    
+    // Only continue if we are still marked as playing
+    if (isPlayingRef.current) {
+      playNextInQueue();
+    }
   }, [playAudio]);
 
   const enqueueAudio = useCallback((base64Data: string) => {
@@ -105,6 +109,21 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
       playNextInQueue();
     }
   }, [playNextInQueue]);
+
+  const flushAudioQueue = useCallback(() => {
+    audioQueueRef.current = [];
+    isPlayingRef.current = false;
+    
+    // Attempt to quickly suspend and resume the context to halt any currently playing BufferSource
+    if (audioContextRef.current && audioContextRef.current.state === 'running') {
+      audioContextRef.current.suspend().then(() => {
+          if (audioContextRef.current) {
+               audioContextRef.current.resume();
+          }
+      });
+    }
+    addLog("Audio queue flushed (Interrupt).", "system");
+  }, [addLog]);
 
   const sendVisionFrame = useCallback((base64Data: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -258,7 +277,8 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
         }
         if (message.serverContent?.interrupted) {
           setInterrupted(true);
-          addLog("Interruption detected.", "system");
+          flushAudioQueue(); // Immediately flush the queue on server interrupt
+          addLog("Server Interruption detected.", "system");
         }
 
         if (message.usageMetadata) {
@@ -359,7 +379,16 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
 
   const startRecording = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // 10x Architecture: Hardware AEC, Noise Suppression, and AGC
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          channelCount: 1,
+          sampleRate: 24000
+        } 
+      });
       
       if (!audioContextRef.current) {
         audioContextRef.current = new AudioContext({ sampleRate: 24000 });
@@ -370,6 +399,37 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
       
       const source = audioContext.createMediaStreamSource(stream);
       workletNodeRef.current = new AudioWorkletNode(audioContext, 'neural-spine-processor');
+      
+      // Load Silero VAD locally
+      try {
+        const vad = await import('@ricky0123/vad-web');
+        const myvad = await vad.MicVAD.new({
+          stream: stream,
+          onSpeechStart: () => {
+            console.log("[VAD] User speaking -> Barge-in initiated");
+            flushAudioQueue();
+            
+            // Notify API of client interrupt to cancel current gemini generation
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+              wsRef.current.send(JSON.stringify({
+                clientContent: {
+                  turnComplete: false,
+                  turns: [] // Empty turn acts as a break signal
+                }
+              }));
+            }
+          },
+          onSpeechEnd: (audio) => {
+             console.log("[VAD] Speech ended.");
+          }
+        });
+        myvad.start();
+        // @ts-ignore - store VAD instance on ref to destroy later 
+        workletNodeRef.current._vadInstance = myvad;
+        addLog("Neural Spine: VAD (Silero) initialized.", "system");
+      } catch (vadError) {
+        console.warn("[VAD] Failed to load Silero VAD. Falling back to continuous streaming.", vadError);
+      }
       
       workletNodeRef.current.port.onmessage = (event) => {
         if (event.data.type === 'audio_chunk') {
@@ -414,6 +474,11 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
 
   const stopRecording = useCallback(() => {
     if (workletNodeRef.current) {
+      // @ts-ignore
+      if (workletNodeRef.current._vadInstance) {
+        // @ts-ignore
+        workletNodeRef.current._vadInstance.pause();
+      }
       workletNodeRef.current.disconnect();
       workletNodeRef.current = null;
     }
