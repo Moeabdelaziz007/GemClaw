@@ -14,6 +14,15 @@
 - Integrated premium Glassmorphism UI tokens.
 - Fixed store-level lint regressions. System state 100% reconciled on `main`. 🧬🚀
 
+## [2026-03-24] ConversationalAgentCreator Build Hotfix
+- What was built/fixed: Fixed TypeScript 'GEMINI' to 'ASTRAEUS' type mismatches and added missing 'Loader2' imports. Re-added missing 'isSynthesizing' state to enable successful TS compilation.
+- Files modified: `components/ConversationalAgentCreator.tsx`
+- Slices affected: None
+- New patterns discovered: Enforced strict enum matching for speakers in voice tools.
+- System state post-change: `npm run build` successfully compiles without TS overlap errors.
+- Open PRs status: Evaluating PRs 37, 39, 41, 42, 43 for clean up.
+- Performance Optimizer Check: Maintained fast renders; no new bundles added.
+
 ## [2026-03-20] Build Stabilization & Core Restoration
 - Resolved **50+ TypeScript errors** across cognitive, security, and UI layers.
 - Fixed **Circular Dependencies** in `useGemigramStore.ts` and `memory-store.ts`.
@@ -113,3 +122,14 @@
 - **Execution Engine**: Hybrid Dual-Engine (Client-first, Local/Cloud fallback).
 - **Billing**: 100% Free-Tier compliant.
 - **Testing**: Standardized `node:test` + JSDOM for UI/UX validation.
+
+## 🩺 MVP System Diagnostic & Code Health Assessment (Current State)
+- **Build Quality**: The system successfully compiles the production build (Next.js `/out`), but generates warnings for `any` types and unused variables (e.g., `SynthesisOptions`, `requestsPerHour`, `error` handles) indicating a need for a targeted Code Health sprint.
+- **Complexity Hotspots**: Identified large cognitive components that could be abstracted or offloaded to specialized hooks or smaller chunks:
+  - `lib/mcp/mcp-client.ts` (~700 lines)
+  - `components/ConversationalAgentCreator.tsx` (~600 lines)
+  - `lib/api-marketplace/marketplace-client.ts` (~560 lines)
+- **Resolved UI/UX Issues**: Missing accessible tags (`aria-label`) in Settings form controls, and TypeScript strictness (`GEMINI` vs `ASTRAEUS` union match in `ConversationalAgentCreator.tsx`).
+- **Next Tactical Steps**:
+  1. **Phase: Smart Simplification II**: Utilize the `pr-code-health` and `performance-optimizer` skills to systematically eradicate unused code and chunk complex component files.
+  2. **Public API (v1.0) & Marketplace Beta Launch**: Once complexity is normalized, transition the Neural Marketplace into public beta mode with robust E2E test coverage.

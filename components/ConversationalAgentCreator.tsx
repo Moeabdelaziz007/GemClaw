@@ -4,8 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useGemigramStore } from '@/lib/store/useGemigramStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Mic, MicOff, Send, SkipForward, ChevronLeft, Sparkles,
-  Brain, Zap, CheckCircle, Clock, Activity
+  Mic, MicOff, SkipForward, ChevronLeft,
+  Brain, Zap, Activity, Loader2
 } from 'lucide-react';
 import { useVoiceInteraction } from '../hooks/useVoiceInteraction';
 import { useTextToSpeech } from '../lib/agents/ttsService';
@@ -41,7 +41,7 @@ export default function ConversationalAgentCreator({
   const [currentStep, setCurrentStep] = useState<ConversationStep>('GREETING');
   const [userInput, setUserInput] = useState('');
   const [messages, setMessages] = useState<Array<{
-    speaker: 'GEMINI' | 'USER';
+    speaker: 'ASTRAEUS' | 'USER';
     text: string;
     timestamp: Date;
   }>>([]);
@@ -119,7 +119,7 @@ export default function ConversationalAgentCreator({
       synthesizeBlueprint();
     }
 
-    if (message.speaker === 'GEMINI' && message.voicePrompt) {
+    if (message.speaker === 'ASTRAEUS' && message.voicePrompt) {
       // Small delay for natural flow
       const timer = setTimeout(() => {
         speak(message.voicePrompt!, { rate: 0.95, pitch: 1.0 });
@@ -179,7 +179,7 @@ export default function ConversationalAgentCreator({
 
         // Present the pitch
         const pitchMessage = {
-          speaker: 'GEMINI' as const,
+          speaker: 'ASTRAEUS' as const,
           text: `Neural Synthesis complete. I have architected "${data.blueprint.name}", target role: ${data.blueprint.role}. I've pre-configured your entity with ${Object.values(data.blueprint.tools).filter(Boolean).length} sensory tools and ${Object.values(data.blueprint.skills).filter(Boolean).length} workspace bridges. Does this align with your vision?`,
           timestamp: new Date(),
         };
@@ -208,7 +208,7 @@ export default function ConversationalAgentCreator({
       if (!result.valid) {
         // Show error and re-ask question
         const errorMessage = {
-          speaker: 'GEMINI' as const,
+          speaker: 'ASTRAEUS' as const,
           text: `I need clarification: ${result.error}. ${message.text}`,
           timestamp: new Date(),
         };
@@ -329,7 +329,7 @@ export default function ConversationalAgentCreator({
 
     // Announce completion
     const completionMessage = {
-      speaker: 'GEMINI' as const,
+      speaker: 'ASTRAEUS' as const,
       text: "Consciousness matrix initialized. Your sovereign AI entity awakens now.",
       timestamp: new Date(),
     };
@@ -363,26 +363,27 @@ export default function ConversationalAgentCreator({
       <motion.div 
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="w-full max-w-5xl h-[80vh] glass-strong rounded-[40px] shadow-2xl relative overflow-hidden flex flex-col"
+        className="w-full max-w-5xl h-[85vh] bg-bg-primary/90 border border-border-color rounded-[40px] shadow-[0_0_100px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col"
       >
-        {/* Animated Header Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-aether-neon/50 to-transparent" />
-        <div className="absolute -top-40 -left-40 w-80 h-80 bg-aether-neon/5 blur-[100px] rounded-full" />
-        <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-fuchsia-500/5 blur-[100px] rounded-full" />
+        {/* Obsidian Depth Gradients */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-[30%] bg-gradient-to-b from-gemigram-neon/5 to-transparent" />
+          <div className="absolute bottom-0 right-0 w-80 h-80 bg-accent-purple/5 blur-[120px] rounded-full" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-[0.02] carbon-fiber" />
+        </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-8 py-6 border-b border-white/5 shrink-0">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gemigram-neon/10 border border-gemigram-neon/30 flex items-center justify-center">
-              <Brain className="w-6 h-6 text-gemigram-neon animate-pulse" />
+        <div className="flex items-center justify-between px-10 py-8 border-b border-white/5 shrink-0 relative z-10">
+          <div className="flex items-center gap-6">
+            <div className="w-14 h-14 rounded-2xl bg-black border border-gemigram-neon/40 flex items-center justify-center shadow-[0_0_20px_rgba(142,255,113,0.15)]">
+              <Brain className="w-7 h-7 text-gemigram-neon" />
             </div>
             <div>
-              <h2 className="text-xl font-black tracking-[0.3em] uppercase text-white flex items-center gap-3">
-                <Sparkles className="w-5 h-5 text-gemigram-neon" />
-                Aether Forge
+              <h2 className="text-2xl font-black tracking-[0.4em] uppercase text-white flex items-center gap-4">
+                <span className="text-gemigram-neon">Aether</span> Forge
               </h2>
-              <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest mt-1">
-                Sovereign Intelligence Materialization Chamber
+              <p className="text-[11px] font-mono text-text-secondary uppercase tracking-[0.4em] mt-1.5 mix-blend-plus-lighter">
+                Neural Synthesis & Materialization
               </p>
             </div>
           </div>
@@ -421,26 +422,26 @@ export default function ConversationalAgentCreator({
               {messages.map((msg, idx) => (
                 <motion.div
                   key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, x: msg.speaker === 'USER' ? 20 : -20 }}
+                  animate={{ opacity: 1, x: 0 }}
                   className={`flex ${msg.speaker === 'USER' ? 'justify-end' : 'justify-start'}`}
               >
-                  <div className={`max-w-[80%] rounded-3xl px-6 py-4 ${
+                  <div className={`max-w-[85%] rounded-[24px] px-7 py-5 ${
                     msg.speaker === 'USER' 
-                      ? 'bg-gemigram-neon/20 border border-gemigram-neon/30 text-white' 
-                      : 'glass-medium border border-white/10 text-white'
+                      ? 'bg-gemigram-neon/10 border border-gemigram-neon/20 text-white shadow-[0_0_30px_rgba(142,255,113,0.05)]' 
+                      : 'bg-surface-container-low border border-white/5 text-white shadow-xl'
                   }`}>
-                    <p className="text-sm leading-relaxed">{msg.text}</p>
-                    <p className="text-[9px] font-mono text-white/30 mt-2">
-                      {msg.timestamp.toLocaleTimeString()}
+                    <p className="text-[15px] leading-relaxed font-medium tracking-wide">{msg.text}</p>
+                    <p className="text-[10px] font-mono text-text-tertiary mt-3 uppercase tracking-widest">
+                      {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} — {msg.speaker}
                     </p>
                   </div>
                 </motion.div>
               ))}
             </AnimatePresence>
             
-            {/* Current Gemini Message */}
-            {currentMessage.speaker === 'GEMINI' && !messages.find(m => m.text === currentMessage.text) && (
+            {/* Current Astraeus Message */}
+            {currentMessage.speaker === 'ASTRAEUS' && !messages.find(m => m.text === currentMessage.text) && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -450,7 +451,7 @@ export default function ConversationalAgentCreator({
                   <div className="flex items-center gap-2 mb-2">
                     <Activity className="w-3 h-3 text-gemigram-neon animate-pulse" />
                     <span className="text-[8px] font-black uppercase tracking-widest text-gemigram-neon">
-                      Gemini Speaking
+                      Astraeus Speaking
                     </span>
                   </div>
                   <p className="text-sm leading-relaxed text-white">{currentMessage.text}</p>
@@ -471,7 +472,7 @@ export default function ConversationalAgentCreator({
                         <div className="space-y-1">
                           <p className="text-[8px] text-white/30 uppercase font-black">Core Tools</p>
                           <div className="flex flex-wrap gap-1">
-                            {Object.entries(blueprint.tools).filter(([_, v]) => v).map(([k]) => (
+                            {Object.entries(blueprint.tools).filter(([, v]) => v).map(([k]) => (
                               <span key={k} className="px-2 py-0.5 rounded-md bg-gemigram-neon/10 border border-gemigram-neon/20 text-[8px] text-gemigram-neon uppercase">
                                 {k}
                               </span>
@@ -481,7 +482,7 @@ export default function ConversationalAgentCreator({
                         <div className="space-y-1">
                           <p className="text-[8px] text-white/30 uppercase font-black">Neural Skills</p>
                           <div className="flex flex-wrap gap-1">
-                            {Object.entries(blueprint.skills).filter(([_, v]) => v).map(([k]) => (
+                            {Object.entries(blueprint.skills).filter(([, v]) => v).map(([k]) => (
                               <span key={k} className="px-2 py-0.5 rounded-md bg-fuchsia-500/10 border border-fuchsia-500/20 text-[8px] text-fuchsia-400 uppercase">
                                 {k}
                               </span>
@@ -522,64 +523,81 @@ export default function ConversationalAgentCreator({
         {/* Input Area */}
         <div className="border-t border-white/5 px-8 py-6 shrink-0">
           <div className="max-w-3xl mx-auto space-y-4">
-            {/* Status Indicators */}
-            <div className="flex items-center justify-center gap-6 text-[9px] font-mono uppercase tracking-widest">
-              <div className="flex items-center gap-2 text-white/40">
-                <Clock className="w-3 h-3" />
-                <span>Step {Object.keys(CONVERSATION_FLOW).indexOf(currentStep) + 1}/11</span>
+            {/* Status Indicators */}            <div className="flex items-center justify-center gap-10 text-[10px] font-mono uppercase tracking-[0.3em] pb-2 border-b border-white/5 mb-6">
+              <div className="flex items-center gap-3 text-text-secondary">
+                <span className="text-gemigram-neon font-black">STEP</span>
+                <span className="text-white bg-white/10 px-2 py-0.5 rounded-md">
+                  {Math.min(Object.keys(CONVERSATION_FLOW).indexOf(currentStep) + 1, 11)}/11
+                </span>
               </div>
-              <div className={`flex items-center gap-2 ${speechRecognitionSupported ? 'text-gemigram-neon' : 'text-red-400'}`}>
-                <Mic className="w-3 h-3" />
-                <span>Voice: {!speechRecognitionSupported ? 'UNSUPPORTED' : micPermission === 'granted' ? 'READY' : micPermission === 'denied' ? 'DENIED' : 'CHECKING'}</span>
+              <div className={`flex items-center gap-3 ${speechRecognitionSupported ? 'text-gemigram-neon' : 'text-red-400'}`}>
+                <div className={`w-1.5 h-1.5 rounded-full ${isListening ? 'bg-red-500 animate-ping' : 'bg-gemigram-neon'}`} />
+                <span>LINK: {micPermission === 'granted' ? 'STABLE' : 'FAILED'}</span>
               </div>
-              <div className={`flex items-center gap-2 ${isSpeaking() ? 'text-fuchsia-400' : 'text-white/40'}`}>
+              <div className={`flex items-center gap-3 ${isSpeaking() ? 'text-accent-purple' : 'text-text-tertiary'}`}>
                 <Activity className="w-3 h-3" />
-                <span>TTS: {isSpeaking() ? 'SPEAKING' : 'IDLE'}</span>
+                <span>BIO-FEEDBACK: {isSpeaking() ? 'ACTIVE' : 'IDLE'}</span>
               </div>
             </div>
 
             {permissionChecked && micPermission === 'denied' && (
-              <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-xs text-amber-200">
-                Microphone permission is denied. You can continue typing every answer below, or enable mic permissions in your browser and press the mic button to retry.
+              <div className="rounded-2xl border border-red-500/20 bg-red-500/5 px-6 py-4 text-[11px] text-red-300 font-mono text-center uppercase tracking-widest leading-relaxed">
+                [SYSTEM ERROR] MIC_PERMISSION_DENIED. ESTABLISHING TEXTUAL INTERFACE FALLBACK.
               </div>
             )}
 
             {/* Input Controls */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={isListening ? stopListening : startListening}
-                disabled={!speechRecognitionSupported || micPermission === 'denied'}
-                className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
-                  isListening 
-                    ? 'bg-red-500/20 border-2 border-red-500 animate-pulse' 
-                    : micPermission === 'denied' || !speechRecognitionSupported
-                    ? 'bg-white/5 border-2 border-white/10 text-white/30 cursor-not-allowed'
-                    : 'bg-gemigram-neon/10 border-2 border-gemigram-neon/30 hover:bg-gemigram-neon/20'
-                }`}
-              >
-                {isListening ? (
-                  <MicOff className="w-6 h-6 text-red-500" />
-                ) : (
-                  <Mic className="w-6 h-6 text-gemigram-neon" />
-                )}
-              </button>
+            <div className="flex items-center gap-6">
+              <div className="relative">
+                <motion.div 
+                  initial={false}
+                  animate={isListening ? { scale: [1, 1.1, 1] } : { scale: 1 }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute inset-0 bg-gemigram-neon/20 rounded-full blur-xl opacity-50" 
+                />
+                <button
+                  onClick={isListening ? stopListening : startListening}
+                  disabled={!speechRecognitionSupported || micPermission === 'denied'}
+                  className={`w-20 h-20 rounded-full flex items-center justify-center transition-all relative z-10 ${
+                    isListening 
+                      ? 'bg-black border-2 border-red-500 shadow-[0_0_40px_rgba(239,68,68,0.3)]' 
+                      : micPermission === 'denied' || !speechRecognitionSupported
+                      ? 'bg-black border-2 border-white/10 text-white/30 cursor-not-allowed opacity-40'
+                      : 'bg-black border-2 border-gemigram-neon shadow-[0_0_40px_rgba(142,255,113,0.2)] hover:shadow-[0_0_60px_rgba(142,255,113,0.3)]'
+                  }`}
+                >
+                  {isListening ? (
+                    <MicOff className="w-8 h-8 text-red-500" />
+                  ) : (
+                    <Mic className="w-8 h-8 text-gemigram-neon" />
+                  )}
+                </button>
+              </div>
 
               <div className="flex-1 relative">
-                <div className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-white/40 font-mono text-sm min-h-[56px] flex items-center">
+                <div className="w-full bg-black border border-white/10 rounded-3xl px-8 py-6 text-text-secondary font-mono text-sm min-h-[80px] flex items-center shadow-inner">
                   {isListening ? (
-                    <motion.span 
-                      animate={{ opacity: [0.3, 1, 0.3] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      Listening to your neural imprint...
-                    </motion.span>
+                    <div className="flex items-center gap-3">
+                      <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                      <motion.span 
+                        animate={{ opacity: [0.4, 1, 0.4] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="tracking-[0.1em] text-white"
+                      >
+                        ANALYZING NEURAL IMPRINT...
+                      </motion.span>
+                    </div>
                   ) : isProcessing ? (
-                    <span>Sequencing conscious data...</span>
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="w-4 h-4 animate-spin text-gemigram-neon" />
+                      <span className="tracking-[0.1em]">SEQUENCING COGNITIVE DATA...</span>
+                    </div>
                   ) : (
-                    <span>Awaiting voice link...</span>
+                    <span className="tracking-[0.2em] opacity-30 italic">AWAITING NEURAL LINK COMMAND...</span>
                   )}
                 </div>
               </div>
+
 
               {/* Text input removed to enforce VOICE-ONLY challenge rules */}
             </div>

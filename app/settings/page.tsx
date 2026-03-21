@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, ChevronRight, Mic, Key, Search, Database } from 'lucide-react';
+import { Shield, ChevronRight, Mic, Key, Search, Database, RefreshCcw } from 'lucide-react';
 import { useAuth } from '@/components/Providers';
 import { useState, useEffect } from 'react';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
@@ -203,6 +203,7 @@ export default function SettingsPage() {
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
                       <select 
                         value={voiceSettings.voice}
+                        aria-label="Select Voice Profile"
                         onChange={(e) => {
                           setVoiceSettings({ ...voiceSettings, voice: e.target.value });
                           setHasChanges(true);
@@ -231,6 +232,7 @@ export default function SettingsPage() {
                           max="2" 
                           step="0.1" 
                           value={voiceSettings.rate}
+                          aria-label="Adjust Speech Rate"
                           onChange={(e) => {
                             setVoiceSettings({ ...voiceSettings, rate: parseFloat(e.target.value) });
                             setHasChanges(true);

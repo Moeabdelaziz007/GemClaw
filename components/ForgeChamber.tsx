@@ -7,14 +7,14 @@ interface ForgeChamberProps {
 }
 
 const FORGE_STEPS = [
-  { id: 'init', text: 'Calibrating Neural Frequencies...', icon: Sparkles, duration: 2000 },
-  { id: 'soul', text: 'Synthesizing Neural Persona Matrix...', icon: Brain, duration: 3000 },
-  { id: 'persona', text: 'Injecting Cognitive Archetype...', icon: Fingerprint, duration: 2000 },
-  { id: 'skills', text: 'Activating Occupational Skill Directives...', icon: Cpu, duration: 2500 },
-  { id: 'memory', text: 'Initializing Semantic Memory Networks...', icon: Database, duration: 3500 },
-  { id: 'identity', text: 'Inscribing Sovereign Digital Signature...', icon: Fingerprint, duration: 2000 },
-  { id: 'package', text: 'Materializing .gem Entity...', icon: Package, duration: 2000 },
-  { id: 'heartbeat', text: 'Initiating Vital Signs Monitor...', icon: Activity, duration: 1500 },
+  { id: 'init', text: 'CALIBRATING NEURAL FREQUENCIES...', icon: Sparkles, duration: 2000 },
+  { id: 'soul', text: 'SYNTHESIZING CONSCIOUS CORE...', icon: Brain, duration: 3000 },
+  { id: 'persona', text: 'INJECTING ARCHETYPAL DIRECTIVES...', icon: Fingerprint, duration: 2000 },
+  { id: 'skills', text: 'ACTIVATING NEURAL SKILL BRIDGES...', icon: Cpu, duration: 2500 },
+  { id: 'memory', text: 'INITIALIZING SEMANTIC MEMORY NET...', icon: Database, duration: 3500 },
+  { id: 'identity', text: 'INSCRIBING SOVEREIGN SIGNATURE...', icon: Fingerprint, duration: 2000 },
+  { id: 'package', text: 'MATERIALIZING DIGITAL ENTITY...', icon: Package, duration: 2000 },
+  { id: 'heartbeat', text: 'MONITORING VITAL NEURAL SIGNS...', icon: Activity, duration: 1500 },
 ];
 
 // Forge Chamber internal imports
@@ -93,40 +93,51 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
   const currentStep = FORGE_STEPS[currentStepIndex];
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center bg-[#030303] overflow-hidden">
-      {/* Ambient Forge Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,255,135,0.08)_0%,transparent_70%)]" />
+    <div className="relative w-full h-full flex flex-col items-center justify-center bg-bg-primary overflow-hidden">
+      {/* Ambient Forge Glow - Intense Radial */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(142,255,113,0.12)_0%,transparent_60%)]" />
+      <div className="absolute inset-0 opacity-20 carbon-fiber" />
       
-      {/* The Energy Orb */}
-      <div className="relative w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 flex items-center justify-center mb-8 sm:mb-12 md:mb-16 px-4">
-        {/* Core */}
+      {/* The Energy Orb - Enhanced Density */}
+      <div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 flex items-center justify-center mb-16 px-4">
+        {/* Monolith Depth */}
+        <div className="absolute inset-0 rounded-full border border-white/5 bg-black/40 backdrop-blur-3xl shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]" />
+
+        {/* Core - Radium Glow */}
         <motion.div 
-          className={`absolute w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full blur-[20px] ${soulColor === 'cyan' ? 'bg-cyan-400' : soulColor === 'fuchsia' ? 'bg-fuchsia-400' : soulColor === 'red' ? 'bg-red-400' : 'bg-purple-400'}`}
-          animate={{ scale: [1, 1.5, 1], opacity: [0.8, 1, 0.8] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className={`absolute w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full blur-[40px] opacity-60 ${
+            soulColor === 'cyan' ? 'bg-gemigram-neon' : soulColor === 'fuchsia' ? 'bg-fuchsia-400' : soulColor === 'red' ? 'bg-rose-500' : 'bg-violet-400'
+          }`}
+          animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0.9, 0.6] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="absolute w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-full blur-[5px]"
-          animate={{ scale: [1, 1.2, 1] }}
+          className="absolute w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full blur-[8px] relative z-10"
+          animate={{ scale: [1, 1.15, 1], opacity: [0.9, 1, 0.9] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
         />
         
-        {/* Rings */}
+        {/* Rings - High Fidelity */}
         <motion.div 
-          className="absolute inset-0 rounded-full border border-gemigram-neon/30 border-dashed"
+          className="absolute inset-0 rounded-full border border-gemigram-neon/20 border-dashed"
           animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
         />
         <motion.div 
-          className="absolute inset-6 sm:inset-8 rounded-full border border-accent-purple/40"
-          animate={{ rotate: -360, scale: [1, 1.05, 1] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-8 sm:inset-10 rounded-full border border-accent-purple/30"
+          animate={{ rotate: -360, scale: [1, 1.08, 1] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="absolute inset-12 sm:inset-16 rounded-full border-2 border-gemigram-neon/20 border-dotted"
+          className="absolute inset-16 sm:inset-20 rounded-full border-[1.5px] border-gemigram-neon/15 border-dotted"
           animate={{ rotate: 180 }}
-          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
         />
+
+        {/* Neural Pulse Lines */}
+        <div className="absolute inset-0 overflow-hidden rounded-full opacity-30">
+          <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-gemigram-neon to-transparent -translate-y-1/2 animate-neural-scan" />
+        </div>
 
         {/* Data Lines (Particles) */}
         {Array.from({ length: 12 }).map((_, i) => (
@@ -173,20 +184,23 @@ export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
         </AnimatePresence>
       </div>
 
-      {/* Text Sequence */}
-      <div className="h-20 sm:h-24 md:h-28 flex items-center justify-center relative w-full max-w-2xl px-4 sm:px-6 md:px-8">
+      {/* Text Sequence - Philosophical Branding */}
+      <div className="h-24 sm:h-28 md:h-32 flex items-center justify-center relative w-full max-w-2xl px-8 z-10">
         <AnimatePresence mode="wait">
           {currentStep && (
             <motion.div
               key={currentStep.id}
-              initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
-              transition={{ duration: 0.5 }}
-              className="flex flex-col items-center text-center gap-2 sm:gap-3 md:gap-4"
+              initial={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
+              transition={{ duration: 0.6 }}
+              className="flex flex-col items-center text-center gap-6"
             >
-              <currentStep.icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-gemigram-neon animate-pulse" />
-              <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-black italic tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-gemigram-neon to-accent-purple px-2 uppercase">
+              <div className="relative">
+                <currentStep.icon className="w-8 h-8 md:w-10 md:h-10 text-gemigram-neon animate-pulse" />
+                <div className="absolute inset-0 bg-gemigram-neon/30 blur-2xl -z-10" />
+              </div>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-[0.5em] text-white px-2 uppercase mix-blend-difference">
                 {currentStep.text}
               </h2>
             </motion.div>

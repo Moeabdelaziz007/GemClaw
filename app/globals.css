@@ -58,32 +58,37 @@
 
 /* Dark Mode Variables — THE AMBIENT AETHER (Liquid Luxury) */
 [data-theme='dark'] {
-  --bg-primary: #050608;
-  --bg-secondary: #0a0c10;
-  --bg-tertiary: #10141a;
-  --bg-surface: #0c1016;
+  --bg-primary: #0e0e0e;
+  --bg-secondary: #000000;
+  --bg-tertiary: #131313;
+  --bg-surface: #0e0e0e;
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.70);
-  --text-tertiary: rgba(255, 255, 255, 0.45);
-  --text-disabled: rgba(255, 255, 255, 0.25);
-  --border-color: rgba(255, 255, 255, 0.08);
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-bg-subtle: rgba(10, 12, 16, 0.4);
-  --glass-bg-medium: rgba(10, 12, 16, 0.6);
-  --glass-bg-strong: rgba(10, 12, 16, 0.82);
+  --text-secondary: #adaaaa;
+  --text-tertiary: #777575;
+  --text-disabled: #494847;
+  --border-color: #262626;
+  --glass-border: rgba(119, 117, 117, 0.2);
+  --glass-bg-subtle: rgba(14, 14, 14, 0.4);
+  --glass-bg-medium: rgba(14, 14, 14, 0.6);
+  --glass-bg-strong: rgba(14, 14, 14, 0.85);
 
-  /* Deep High-Density Blurs */
-  --glass-blur-sm: 24px;
-  --glass-blur-md: 40px;
-  --glass-blur-lg: 64px;
+  /* Obsidian Density Blurs */
+  --glass-blur-sm: 16px;
+  --glass-blur-md: 32px;
+  --glass-blur-lg: 48px;
 
-  --glass-border-light: rgba(255, 255, 255, 0.08);
-  --glass-border-medium: rgba(255, 255, 255, 0.12);
-  --glass-border-strong: rgba(255, 255, 255, 0.20);
+  --glass-border-light: rgba(119, 117, 117, 0.1);
+  --glass-border-medium: rgba(119, 117, 117, 0.2);
+  --glass-border-strong: rgba(119, 117, 117, 0.3);
   
-  --gemigram-neon: #00FFC2; /* Refined Mint-Teal */
-  --gemigram-glow: rgba(0, 255, 194, 0.4);
-  --accent-purple: #9D50FF;
+  --gemigram-neon: #8eff71; /* Radium Glow */
+  --gemigram-glow: rgba(142, 255, 113, 0.4);
+  --accent-purple: #17eefa; /* Cyber Cyan */
+
+  /* Sovereign Metadata */
+  --surface-container-low: #131313;
+  --surface-container-high: #201f1f;
+  --surface-container-highest: #262626;
 }
 
 :root {

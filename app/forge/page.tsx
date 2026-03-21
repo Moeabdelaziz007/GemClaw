@@ -129,11 +129,13 @@ export default function ForgePage() {
   };
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-theme-primary">
+    <div className="relative h-full w-full overflow-hidden bg-bg-primary">
+      {/* Sovereign Background Layers */}
       <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute -left-1/4 top-1/4 h-[50vw] w-[50vw] rounded-full bg-gemigram-neon/5 blur-[150px] mix-blend-screen transition-all duration-1000" />
-        <div className="absolute -right-1/4 bottom-1/4 h-[50vw] w-[50vw] rounded-full bg-neon-blue/5 blur-[150px] mix-blend-screen transition-all duration-1000" />
-        <div className="absolute inset-0 opacity-[0.03] carbon-fiber" />
+        <div className="absolute -left-1/4 top-1/4 h-[60vw] w-[60vw] rounded-full bg-gemigram-neon/10 blur-[180px] mix-blend-screen opacity-50" />
+        <div className="absolute -right-1/4 bottom-1/4 h-[60vw] w-[60vw] rounded-full bg-accent-purple/10 blur-[180px] mix-blend-screen opacity-50" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
+        <div className="absolute inset-0 opacity-[0.05] carbon-fiber" />
       </div>
 
       <div className="relative z-10 h-full w-full overflow-y-auto pb-nav-safe transition-opacity duration-1000">
