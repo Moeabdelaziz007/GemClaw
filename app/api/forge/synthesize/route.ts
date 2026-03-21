@@ -59,8 +59,9 @@ export async function POST(req: Request) {
     const response = await result.response;
     const text = response.text();
     
-    // Parse the JSON blueprint
-    const blueprint = JSON.parse(text);
+    // Parse the JSON blueprint safely (strip markdown if present)
+    const cleanText = text.replace(/```json/gi, '').replace(/```/gi, '').trim();
+    const blueprint = JSON.parse(cleanText);
 
     return NextResponse.json({ blueprint });
   } catch (error: any) {
