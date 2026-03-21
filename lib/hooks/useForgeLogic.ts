@@ -80,7 +80,7 @@ export function useForgeLogic() {
   }, []);
 
   const { connect, disconnect, isRecording, startRecording, stopRecording } = useLiveAPI(
-    process.env.NEXT_PUBLIC_GEMINI_API_KEY || '', 
+    '', // Security: Empty string triggers server-side proxy token fetch
     onFunctionCall
   );
 

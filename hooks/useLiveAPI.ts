@@ -143,8 +143,22 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
   // We use a forward reference for reconnect to avoid TDZ in connect ws.onclose
   const scheduleReconnectRef = useRef<() => void>(() => {});
 
-  const connect = useCallback((systemInstruction?: string, voiceName: string = "Zephyr", tools?: Tool[]) => {
-    if (!apiKey) return;
+  const connect = useCallback(async (systemInstruction?: string, voiceName: string = "Zephyr", tools?: Tool[]) => {
+    let activeKey = apiKey;
+    
+    if (!activeKey && !accessToken) {
+      addLog("Fetching secure neural token...", "system");
+      try {
+        const response = await fetch('/api/gemini-token');
+        if (!response.ok) throw new Error('Failed to fetch secure token');
+        const data = await response.json();
+        activeKey = data.token;
+      } catch (err) {
+        addLog("Security Error: Failed to acquire neural token.", "system");
+        console.error(err);
+        return;
+      }
+    }
 
     lastConnectArgsRef.current = { systemInstruction, voiceName, tools };
     intentionalDisconnectRef.current = false;
@@ -153,7 +167,7 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
     
     const wsUrl = accessToken 
       ? `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?accessToken=${accessToken}`
-      : `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
+      : `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${activeKey}`;
     
     const ws = new WebSocket(wsUrl);
     const transcript = useGemigramStore.getState().transcript;

@@ -12,7 +12,6 @@ export interface UseVoiceAgentLogicProps {
 }
 
 export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceAgentLogicProps) {
-  const [apiKey, setApiKey] = useState<string>('');
   const [activeWidget, setActiveWidget] = useState<ToolResult | null>(null);
   const [isThinking, setIsThinking] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
@@ -20,23 +19,6 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
   const transcript = useGemigramStore(state => state.transcript);
   const linkType = useGemigramStore(state => state.linkType);
   const setLinkType = useGemigramStore(state => state.setLinkType);
-
-  // Secure Token Fetching
-  useEffect(() => {
-    let isMounted = true;
-    const fetchToken = async () => {
-      try {
-        const res = await fetch('/api/gemini-token');
-        if (!res.ok) throw new Error('Failed to fetch Gemini token');
-        const data = await res.json();
-        if (isMounted) setApiKey(data.token);
-      } catch (err) {
-        console.error('[VoiceAgent] Security: Token fetch failed:', err);
-      }
-    };
-    void fetchToken();
-    return () => { isMounted = false; };
-  }, []);
 
   useEffect(() => {
     const currentStatus = bridgeStatusManager.getStatus();
@@ -49,7 +31,7 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
     void bridgeStatusManager.probe();
     return unsub;
   }, [setLinkType]);
-
+  
   const { 
     isConnected, 
     isRecording, 
@@ -60,7 +42,7 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
     startRecording, 
     stopRecording,
     sab // Exposed from useLiveAPI
-  } = useLiveAPI(apiKey, (call) => {
+  } = useLiveAPI('', (call) => {
     setActiveWidget(call as ToolResult);
     setIsThinking(false);
   }, googleAccessToken);

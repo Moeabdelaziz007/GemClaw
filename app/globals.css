@@ -58,37 +58,37 @@
 
 /* Dark Mode Variables — THE AMBIENT AETHER (Liquid Luxury) */
 [data-theme='dark'] {
-  --bg-primary: #0e0e0e;
+  --bg-primary: #050505; /* Absolute Deep Black */
   --bg-secondary: #000000;
-  --bg-tertiary: #131313;
-  --bg-surface: #0e0e0e;
+  --bg-tertiary: #080808;
+  --bg-surface: #050505;
   --text-primary: #ffffff;
   --text-secondary: #adaaaa;
   --text-tertiary: #777575;
   --text-disabled: #494847;
-  --border-color: #262626;
-  --glass-border: rgba(119, 117, 117, 0.2);
-  --glass-bg-subtle: rgba(14, 14, 14, 0.4);
-  --glass-bg-medium: rgba(14, 14, 14, 0.6);
-  --glass-bg-strong: rgba(14, 14, 14, 0.85);
+  --border-color: rgba(16, 255, 135, 0.1); 
+  --glass-border: rgba(16, 255, 135, 0.2);
+  --glass-bg-subtle: rgba(5, 5, 5, 0.4);
+  --glass-bg-medium: rgba(5, 5, 5, 0.6);
+  --glass-bg-strong: rgba(5, 5, 5, 0.85);
 
-  /* Obsidian Density Blurs */
-  --glass-blur-sm: 16px;
-  --glass-blur-md: 32px;
-  --glass-blur-lg: 48px;
+  /* Tactical Blurs */
+  --glass-blur-sm: 8px;
+  --glass-blur-md: 16px;
+  --glass-blur-lg: 24px;
 
-  --glass-border-light: rgba(119, 117, 117, 0.1);
-  --glass-border-medium: rgba(119, 117, 117, 0.2);
-  --glass-border-strong: rgba(119, 117, 117, 0.3);
+  --glass-border-light: rgba(16, 255, 135, 0.1);
+  --glass-border-medium: rgba(16, 255, 135, 0.2);
+  --glass-border-strong: rgba(16, 255, 135, 0.3);
   
-  --gemigram-neon: #8eff71; /* Radium Glow */
-  --gemigram-glow: rgba(142, 255, 113, 0.4);
-  --accent-purple: #17eefa; /* Cyber Cyan */
+  --gemigram-neon: #10FF87; /* Radium Green 2026 */
+  --gemigram-glow: rgba(16, 255, 135, 0.3);
+  --accent-cyan: #17eefa; 
 
-  /* Sovereign Metadata */
-  --surface-container-low: #131313;
-  --surface-container-high: #201f1f;
-  --surface-container-highest: #262626;
+  /* Sovereign Surface Architecture */
+  --surface-container-low: #0a0a0a;
+  --surface-container-high: #131313;
+  --surface-container-highest: #1a1a1a;
 }
 
 :root {
@@ -134,37 +134,48 @@
 
 @layer utilities {
   .sovereign-glass {
-    background: linear-gradient(165deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-    backdrop-filter: blur(var(--glass-blur-lg));
+    background: linear-gradient(165deg, rgba(16, 255, 135, 0.05) 0%, rgba(5, 5, 5, 0.8) 100%);
     -webkit-backdrop-filter: blur(var(--glass-blur-lg));
+    backdrop-filter: blur(var(--glass-blur-lg));
     border: 1px solid var(--glass-border-medium);
-    border-radius: 2rem;
+    border-top: 1px solid rgba(16, 255, 135, 0.3);
+    border-radius: 0.5rem;
     box-shadow:
-      inset 0 1px 1px 0 rgba(255, 255, 255, 0.1),
-      0 30px 60px rgba(0, 0, 0, 0.5),
-      0 0 100px rgba(0, 0, 0, 0.4);
+      0 30px 60px rgba(0, 0, 0, 0.8),
+      0 0 40px rgba(16, 255, 135, 0.05);
     position: relative;
+    overflow: hidden;
+  }
+
+  .glass-holographic {
+    background: linear-gradient(135deg, rgba(16, 255, 135, 0.08) 0%, rgba(5, 5, 5, 0.45) 100%);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(16, 255, 135, 0.15);
+    box-shadow: 
+      inset 0 0 20px rgba(16, 255, 135, 0.05),
+      0 10px 30px rgba(0, 0, 0, 0.5);
   }
 
   .glass-subtle {
     background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(var(--glass-blur-sm));
     -webkit-backdrop-filter: blur(var(--glass-blur-sm));
+    backdrop-filter: blur(var(--glass-blur-sm));
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .glass-medium {
     background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(var(--glass-blur-md));
     -webkit-backdrop-filter: blur(var(--glass-blur-md));
+    backdrop-filter: blur(var(--glass-blur-md));
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: inset 0 0.5px 0 0 rgba(255, 255, 255, 0.1);
   }
 
   .glass-strong {
     background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(var(--glass-blur-lg));
     -webkit-backdrop-filter: blur(var(--glass-blur-lg));
+    backdrop-filter: blur(var(--glass-blur-lg));
     border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
   }

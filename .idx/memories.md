@@ -1,5 +1,12 @@
 # 🧠 GemigramOS Memories
 
+## [2026-03-21] Phase 5: Neural Router Security Overhaul (Sovereign Proxy)
+
+- **Sovereign Edge Proxy**: Successfully built the `/app/api/neural/router/route.ts` Edge API route, stripping client-side exposure of Google, Anthropic, and DeepSeek SDKs.
+- **Security Hardening**: Eliminated `NEXT_PUBLIC_` prefixed API keys across `.env.local` and removed all `dangerouslyAllowBrowser: true` flags from the codebase.
+- **Resource Efficiency ($0 Cost)**: Engineered an in-memory Token Bucket for 30req/min IP-based Rate Limiting and an LRU Caching mechanism for identical semantic requests, operating entirely within the Vercel Edge runtime constraints.
+- **Self-Healing Fallback Grid**: Architected the `Anthropic` endpoint to silently failover to `gemini-2.5-flash` to prevent disruption of the cognitive pipeline during provider outages.
+
 ## [2026-03-21] Phase 3: Forge System Evolution (Neural Materialization)
 
 - **Neural Architecture Upgrade**: Refactored `useForgeLogic.ts` to integrate the **Sovereign Neural Spine** (`useLiveAPI`), replacing legacy Web Speech dependencies with our Zero-Copy audio pipeline.
