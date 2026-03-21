@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, ChevronRight, Mic, Key, Search, Database, RefreshCcw } from 'lucide-react';
+import { Shield, ChevronRight, Mic, Database, RefreshCcw } from 'lucide-react';
 import { useAuth } from '@/components/Providers';
 import { useState, useEffect } from 'react';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
@@ -9,13 +9,13 @@ import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SettingsPage() {
-  const { login, user } = useAuth();
+  const { login, user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('general');
   const [searchQuery, setSearchQuery] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
   const [skills, setSkills] = useState([
     { id: 'google_search', name: 'Google Search', desc: 'Real-time web information', enabled: true, color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/30' },
-    { id: 'weather', name: 'Weather Data', desc: 'Current conditions and forecasts', enabled: true, color: 'text-cyan-400', bg: 'bg-cyan-400/10', border: 'border-cyan-400/30' },
+    { id: 'weather', name: 'Weather Data', desc: 'Current conditions and forecasts', enabled: true, color: 'text-gemigram-neon', bg: 'bg-gemigram-neon/10', border: 'border-gemigram-neon/30' },
     { id: 'crypto', name: 'Crypto Prices', desc: 'Live cryptocurrency rates', enabled: false, color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/30' },
     { id: 'maps', name: 'Google Maps', desc: 'Location and navigation data', enabled: false, color: 'text-green-400', bg: 'bg-green-400/10', border: 'border-green-400/30' },
     { id: 'calculator', name: 'Calculator', desc: 'Mathematical computations', enabled: true, color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-400/30' },
@@ -25,13 +25,6 @@ export default function SettingsPage() {
   const [voiceSettings, setVoiceSettings] = useState({
     voice: 'Zephyr (Default)',
     rate: 1.0,
-  });
-
-  const [apiKeys, setApiKeys] = useState({
-    gemini: '',
-    github: '',
-    weather: '',
-    audit: '',
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -60,10 +53,6 @@ export default function SettingsPage() {
           if (data.voiceSettings) {
             setVoiceSettings(data.voiceSettings);
           }
-
-          if (data.apiKeys) {
-            setApiKeys(data.apiKeys);
-          }
         }
       } catch (error) {
         console.error('Failed to load settings:', error);
@@ -83,7 +72,6 @@ export default function SettingsPage() {
       await setDoc(doc(db, 'users', user.uid, 'settings', 'preferences'), {
         skills: skills.reduce((acc, s) => ({ ...acc, [s.id]: s.enabled }), {}),
         voiceSettings,
-        apiKeys, // In production, we should probably handle keys more securely
         updatedAt: new Date().toISOString(),
       }, { merge: true });
 
@@ -101,7 +89,6 @@ export default function SettingsPage() {
     { id: 'general', label: 'General', icon: Database },
     { id: 'voice', label: 'Voice', icon: Mic },
     { id: 'skills', label: 'Skills & Tools', icon: Shield },
-    { id: 'security', label: 'API & Security', icon: Key },
   ];
 
   const toggleSkill = (id: string) => {
@@ -113,21 +100,10 @@ export default function SettingsPage() {
     <div className="page-shell page-stack py-4 sm:py-6 md:py-8">
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
         <h2 className="page-title bg-gradient-to-r from-neon-green via-cyan-400 to-electric-purple bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(16,255,135,0.3)]">Settings</h2>
-        <p className="page-copy">Configure your workspace and permissions.</p>
+        <p className="page-copy text-white/50">Configure your sovereign intelligence and neural links.</p>
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="relative">
-        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/30" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search settings..."
-          className="w-full rounded-2xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white placeholder:text-white/30 transition-all focus:border-neon-green/50 focus:outline-none focus:ring-2 focus:ring-neon-green/20"
-        />
-      </motion.div>
-
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="flex gap-2 overflow-x-auto rounded-2xl border border-white/10 p-1.5 cyber-panel no-scrollbar">
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="flex gap-2 overflow-x-auto rounded-2xl border border-white/10 p-1.5 cyber-panel no-scrollbar">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -148,39 +124,42 @@ export default function SettingsPage() {
             <div className="space-y-6">
               <div className="rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-white/5 to-transparent p-5 glass-strong sm:p-6 md:p-8">
                 <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
-                    <Database className="h-7 w-7 text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" />
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-gemigram-neon/30 bg-gradient-to-br from-gemigram-neon/20 to-green-500/20">
+                    <Database className="h-7 w-7 text-gemigram-neon drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white">Workspace Integrations</h3>
-                    <p className="text-sm text-white/40">Connect external services and manage data sources.</p>
+                    <h3 className="text-2xl font-bold text-white">Sovereign Identity</h3>
+                    <p className="text-sm text-white/40">Manage your seamless Google integration for all AI services.</p>
                   </div>
                 </div>
                 {user ? (
-                  <div className="relative flex flex-col gap-4 rounded-2xl border border-cyan-500/30 p-5 glass-medium sm:flex-row sm:items-center sm:justify-between">
+                  <div className="relative flex flex-col gap-4 rounded-2xl border border-gemigram-neon/30 p-5 glass-medium sm:flex-row sm:items-center sm:justify-between hover:border-gemigram-neon/50 transition-colors">
                     <div className="flex items-center gap-4">
                       <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-white/20 bg-white/10">
                         <img src={user.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.uid}`} alt="Profile" className="h-10 w-10 rounded-lg" />
                       </div>
                       <div className="text-left">
-                        <p className="font-bold tracking-wide text-white">{user.displayName || 'Sovereign Agent'}</p>
-                        <p className="mt-0.5 text-xs font-mono text-cyan-400/80">Connected: {user.email}</p>
+                        <p className="font-bold tracking-wide text-white">{user.displayName || 'Authorized Architect'}</p>
+                        <p className="mt-0.5 text-xs font-mono text-gemigram-neon">Authorized: {user.email}</p>
                       </div>
                     </div>
-                    <div className="w-fit rounded-full border border-cyan-500/50 bg-cyan-500/20 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-cyan-400">Verified</div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-fit rounded-full border border-gemigram-neon bg-gemigram-neon/20 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-gemigram-neon">Linked</div>
+                      <button onClick={logout} className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors bg-white/5 py-1.5 px-3 rounded-full border border-red-500/20 hover:bg-white/10 uppercase tracking-widest">Disconnect</button>
+                    </div>
                   </div>
                 ) : (
-                  <button onClick={login} className="group relative flex w-full flex-col gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 text-left transition-all hover:border-cyan-400/50 hover:bg-white/10 sm:flex-row sm:items-center sm:justify-between">
+                  <button onClick={login} className="group relative flex w-full flex-col gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 text-left transition-all hover:border-gemigram-neon/50 hover:bg-white/10 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-5">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-red-500/30 bg-red-500/20 transition-transform group-hover:scale-110">
-                        <span className="text-xl font-black text-red-400">G</span>
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/20 bg-white/10 transition-transform group-hover:scale-110">
+                        <span className="text-xl font-black text-white">G</span>
                       </div>
                       <div>
-                        <p className="font-bold tracking-wide text-white">Connect Google Workspace</p>
-                        <p className="mt-1 text-sm text-white/40">Access Gmail, Calendar, and Drive integration</p>
+                        <p className="font-bold tracking-wide text-white">Connect Universal Identity</p>
+                        <p className="mt-1 text-sm text-white/40">Sign in with Google to automatically unlock Gemini, Firebase, and Jules integrations securely without API keys.</p>
                       </div>
                     </div>
-                    <ChevronRight className="h-6 w-6 text-white/20 transition-colors group-hover:text-cyan-400" />
+                    <ChevronRight className="h-6 w-6 text-white/20 transition-colors group-hover:text-gemigram-neon" />
                   </button>
                 )}
               </div>
@@ -189,10 +168,10 @@ export default function SettingsPage() {
 
           {activeTab === 'voice' && (
             <div className="space-y-6">
-              <div className="rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-neon-green/5 to-transparent p-5 glass-strong sm:p-6 md:p-8">
+              <div className="rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-gemigram-neon/5 to-transparent p-5 glass-strong sm:p-6 md:p-8">
                 <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-neon-green/30 bg-gradient-to-br from-neon-green/20 to-cyan-500/20">
-                    <Mic className="h-7 w-7 text-neon-green drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]" />
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-gemigram-neon/30 bg-gradient-to-br from-gemigram-neon/20 to-cyan-500/20">
+                    <Mic className="h-7 w-7 text-gemigram-neon drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-white">Voice Configuration</h3>
@@ -208,7 +187,7 @@ export default function SettingsPage() {
                           setVoiceSettings({ ...voiceSettings, voice: e.target.value });
                           setHasChanges(true);
                         }}
-                        className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-neon-green/50 focus:outline-none"
+                        className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white focus:border-gemigram-neon/50 focus:outline-none w-full"
                       >
                         <option>Zephyr (Default)</option>
                         <option>Charon</option>
@@ -237,7 +216,7 @@ export default function SettingsPage() {
                             setVoiceSettings({ ...voiceSettings, rate: parseFloat(e.target.value) });
                             setHasChanges(true);
                           }}
-                          className="w-full max-w-40 accent-neon-green" 
+                          className="w-full max-w-40 accent-gemigram-neon" 
                         />
                         <span className="text-xs text-white/40">Fast</span>
                       </div>
@@ -250,7 +229,7 @@ export default function SettingsPage() {
                         <p className="font-medium text-white">Voice Cloning</p>
                         <p className="mt-0.5 text-xs text-white/40">Create custom voice profiles</p>
                       </div>
-                      <button className="btn-primary w-full md:w-auto">Clone Voice</button>
+                      <button className="btn-secondary w-full md:w-auto">Clone Voice</button>
                     </div>
                   </div>
                 </div>
@@ -260,19 +239,19 @@ export default function SettingsPage() {
 
           {activeTab === 'skills' && (
             <div className="space-y-6">
-              <div className="rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-electric-purple/5 to-transparent p-5 glass-strong sm:p-6 md:p-8">
+              <div className="rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-gemigram-neon/5 to-transparent p-5 glass-strong sm:p-6 md:p-8">
                 <div className="relative z-10 mb-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-electric-purple/30 bg-gradient-to-br from-electric-purple/20 to-pink-500/20">
-                    <Shield className="h-7 w-7 text-electric-purple drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-gemigram-neon/30 bg-gradient-to-br from-gemigram-neon/20 to-green-500/20">
+                    <Shield className="h-7 w-7 text-gemigram-neon drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-black tracking-tight text-white sm:text-3xl">Agent Skills & Tools</h3>
-                    <p className="mt-1 text-sm font-medium tracking-wide text-white/50">Enable or disable neural capabilities for your sovereign agents.</p>
+                    <p className="mt-1 text-sm font-medium tracking-wide text-white/50">Enable or disable neural capabilities for your sovereign agents. API usage is securely authorized via your Google login.</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {skills.map((skill) => (
-                    <motion.div key={skill.id} whileHover={{ y: -5 }} className={`relative overflow-hidden rounded-2xl border p-5 glass-medium transition-all duration-300 ${skill.enabled ? 'border-electric-purple/40 bg-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]' : 'border-white/10 bg-black/40'}`}>
+                    <motion.div key={skill.id} whileHover={{ y: -5 }} className={`relative overflow-hidden rounded-2xl border p-5 glass-medium transition-all duration-300 ${skill.enabled ? 'border-gemigram-neon/40 bg-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]' : 'border-white/10 bg-black/40'}`}>
                       <div className="mb-4 flex items-start justify-between gap-4">
                         <div>
                           <h4 className="text-base font-black uppercase tracking-tight text-white">{skill.name}</h4>
@@ -288,44 +267,13 @@ export default function SettingsPage() {
               </div>
             </div>
           )}
-
-          {activeTab === 'security' && (
-            <div className="rounded-[1.75rem] border border-white/10 p-5 glass-strong sm:p-6 md:p-8">
-              <div className="mb-6 space-y-2">
-                <h3 className="text-2xl font-black text-white">API & Security</h3>
-                <p className="text-sm text-white/50">Protected credentials and access control stay stacked on smaller screens.</p>
-              </div>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {[
-                  { label: 'Gemini API Key', key: 'gemini' },
-                  { label: 'GitHub Token', key: 'github' },
-                  { label: 'Weather Provider Key', key: 'weather' },
-                  { label: 'Audit Webhook', key: 'audit' }
-                ].map((item) => (
-                  <label key={item.key} className="space-y-2 rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <span className="text-xs font-bold uppercase tracking-wider text-white/60">{item.label}</span>
-                    <input 
-                      type="password" 
-                      placeholder="••••••••••••" 
-                      value={apiKeys[item.key as keyof typeof apiKeys]}
-                      onChange={(e) => {
-                        setApiKeys({ ...apiKeys, [item.key]: e.target.value });
-                        setHasChanges(true);
-                      }}
-                      className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-gemigram-neon/50" 
-                    />
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
         </motion.div>
       </AnimatePresence>
 
       {hasChanges && (
         <div className="fixed-safe-bottom safe-x fixed left-4 right-4 z-[90] sm:left-auto sm:right-6">
-          <div className="ml-auto flex w-full max-w-md flex-col gap-3 rounded-2xl border border-gemigram-neon/20 bg-black/80 p-4 shadow-2xl backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-white/70">You have unsaved settings changes.</p>
+          <div className="ml-auto flex w-full max-w-md flex-col gap-3 rounded-2xl border border-gemigram-neon/40 bg-black/90 p-4 shadow-2xl backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-white/70 font-medium">Unsaved configuration changes.</p>
             <button 
               onClick={handleSave} 
               disabled={isSaving}
@@ -333,8 +281,8 @@ export default function SettingsPage() {
             >
               {isSaving ? (
                 <>
-                  <RefreshCcw className="w-3 h-3 animate-spin" />
-                  Saving...
+                  <RefreshCcw className="w-4 h-4 animate-spin text-black" />
+                  Saving
                 </>
               ) : (
                 'Save Changes'
@@ -345,8 +293,11 @@ export default function SettingsPage() {
       )}
 
       {isLoading && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <RefreshCcw className="w-10 h-10 text-gemigram-neon animate-spin" />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md">
+          <div className="flex flex-col items-center gap-4">
+            <RefreshCcw className="w-10 h-10 text-gemigram-neon animate-spin" />
+            <p className="text-gemigram-neon font-bold tracking-widest text-sm uppercase">Loading Neural State</p>
+          </div>
         </div>
       )}
     </div>

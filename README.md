@@ -1,4 +1,8 @@
-# 🌌 Gemigram — Voice-First AI Agent Creation Platform
+<p align="center">
+  <img src="./public/gemigram_hero_cover.png" alt="Gemigram AIOS Hero Banner" width="800"/>
+</p>
+
+# 🌌 Gemigram AIOS — Sovereign Intelligence Orchestration System
 > **Built entirely on the Google & Gemini Ecosystem** | **تم البناء بالكامل على منظومة جوجل وجيمناي**
 > Create, deploy, and interact with sovereign AI agents using nothing but your voice. | أنشئ وانشر وتفاعل مع الوكلاء الأذكياء باستخدام صوتك فقط.
 
@@ -8,9 +12,9 @@
 
 ## 🎯 Vision | الرؤية
 
-**Eng:** Gemigram is an AI-first, voice-only agent creation platform inspired by Telegram bots and BotFather — but powered entirely by Google's Gemini ecosystem. Users create AI agents through natural voice conversation with "Aether Forge", our AI architect.
+**Eng:** Gemigram is an AI-first, voice-only agent creation platform inspired by Telegram bots and BotFather — but powered entirely by Google's Gemini ecosystem. Users create AI agents through natural voice conversation with "Aether Forge", our AI architect. **Zero manual API keys are required:** user authentication automatically gates and securely provisions system-level Gemini Live sessions.
 
-**Ar:** جيميجزام (Gemigram) هي منصة مدعومة بالذكاء الاصطناعي لإنشاء الوكلاء الأذكياء عبر الصوت فقط، مستوحاة من روبوتات تيليجرام (BotFather) ولكنها مبنية بالكامل أدوات ومنظومة جوجل جيمناي. يقوم المستخدمون بإنشاء وكلاء ذكاء اصطناعي من خلال محادثة صوتية طبيعية مع "Aether Forge"، المهندس الذكي الخاص بنا.
+**Ar:** جيميجزام (Gemigram) هي منصة مدعومة بالذكاء الاصطناعي لإنشاء الوكلاء الأذكياء عبر الصوت فقط. مبنية بالكامل على منظومة جوجل جيمناي. يقوم المستخدمون بإنشاء وكلاء ذكاء اصطناعي من خلال محادثة صوتية طبيعية مع "Aether Forge". **لا يلزم إدخال أي مفاتيح API يدوياً:** بمجرد تسجيل الدخول الآمن، يتم تهيئة مفاتيح النظام والجلسات تلقائياً عبر الخادم الخلفي (Backend).
 
 ## 🏗️ Google Ecosystem Integration | التكامل مع منظومة جوجل
 
@@ -22,36 +26,27 @@
 | **Cloud Firestore** | Agent storage, user data, memories | ✅ Free (1GB storage) | تخزين الوكلاء، البيانات، والذكريات |
 | **Firebase Storage** | File uploads, agent assets | ✅ Free (5GB) | رفع الملفات والأصول الرقمية |
 | **Firebase Hosting** | Web app deployment | ✅ Free (10GB/month) | نشر التطبيق الخادم على الويب |
-| **Cloudflare** | CDN, DNS, edge caching | ✅ Free plan | إدارة النطاقات والسرعة |
 
 ## ✨ Key Features | الميزات الأساسية
 
 ### 🎙️ Voice-First Agent Creation (Aether Forge) | إنشاء وكلاء بالصوت
 - **Eng:** Create AI agents entirely through voice conversation. AI-powered blueprint synthesis via Gemini with an 11-step conversational onboarding flow. Automatically assigns persona, tools, and skills.
-- **Ar:** قم بإنشاء وكلاء ذكاء اصطناعي بالكامل عبر المحادثة الصوتية. يتم بناء المخطط الذكي بفضل جيمناي عبر 11 خطوة حوارية لتعيين الشخصية والأدوات والمهارات تلقائياً بدون تدخل يدوي.
+- **Ar:** قم بإنشاء وكلاء ذكاء اصطناعي بالكامل عبر المحادثة الصوتية. يتم بناء المخطط الذكي بفضل جيمناي واستنتاج الأدوات والمهارات المخصصة لكل وكيل.
 
-### 🧠 Gemini Live API Integration | دمج Gemini Live API
-- **Eng:** Native audio streaming via WebSocket (PCM 24kHz), Real-time voice input/output, Tool calling during live conversation, and Automatic reconnection with context recovery.
-- **Ar:** بث صوتي مباشر عبر WebSocket بجودة (PCM 24kHz)، إدخال وإخراج صوتي فوري، استدعاء الأدوات أثناء المحادثة الحية، وإعادة اتصال تلقائي مع استعادة السياق.
-
-### 📱 Smart Agent Deployment (PWA) | النشر الذكي للوكلاء
-- **Eng:** Add any created agent as a home screen shortcut with a Dynamic PWA manifest per agent and AI-generated agent avatars. Works on Android, iOS, and Desktop.
-- **Ar:** أضف أي وكيل كاختصار على الشاشة الرئيسية بفضل متصفحات الويب التقدمية (PWA)، مع صور رمزية مُولدة بالذكاء الاصطناعي. متوافق مع أندرويد وiOS وسطح المكتب.
+### 🧠 Gemini Live API Integration (Secure Router) | دمج Gemini Live
+- **Eng:** Native audio streaming via WebSocket (PCM 24kHz). Our secure `app/api/neural/router` automatically provisions connections for authenticated Firebase users without exposing secret keys client-side.
+- **Ar:** بث صوتي مباشر عبر WebSocket بجودة (PCM 24kHz). يقوم موجّهنا الآمن بتكوين الاتصالات تلقائياً للمستخدمين المصادقين دون كشف المفاتيح السرية في طرف العميل.
 
 ### 🌐 Neural Marketplace | المتجر العصبي
-- **Eng:** Browse and install pre-built agent templates, category filtering and search, one-click agent installation.
-- **Ar:** تصفح وقم بتثبيت قوالب جاهزة للوكلاء، تصفية الفئات والبحث، وتثبيت الوكيل في سجلك الخاص بنقرة واحدة.
-
-### 🔧 Agent Skills & Tools | مهارات وأدوات الوكلاء
-- **Eng:** Google Search, Maps, Weather, Crypto, Semantic Memory (long-term context), Google Workspace integration (Gmail, Calendar, Drive), and MCP Protocol support.
-- **Ar:** بحث جوجل، الخرائط، الطقس، العملات الرقمية، الذاكرة الدلالية (سياق طويل الأمد)، وتكامل جوجل ورك سبيس (جيميل، التقويم، درايف)، ودعم بروتوكول MCP العالمي.
+- **Eng:** Browse and install pre-built agent templates crafted with a stunning Neo-Brutalist, Cyberpunk UI (Neon Green, Glassmorphism).
+- **Ar:** تصفح وقم بتثبيت قوالب جاهزة للوكلاء، مصنوعة بواجهات زجاجية (Glassmorphism) وألوان نيون سيبرانية حديثة.
 
 ## 🚀 Quick Start | البدء السريع
 
 ### Prerequisites | المتطلبات الأساسية
 - Node.js 18+
-- Firebase project (free Spark plan) | مشروع فايربيس
-- Gemini API key (free at https://aistudio.google.com) | مفتاح جيمناي
+- Firebase project (free Spark plan)
+- Single System Gemini API key
 
 ### 1. Clone & Install | النسخ والتثبيت
 ```bash
@@ -64,44 +59,60 @@ npm install
 ```bash
 cp .env.example .env.local
 ```
-**Eng:** Fill in your Firebase and Gemini credentials (No billing required).  
-**Ar:** قم بملء بيانات الاعتماد الخاصة بفايربيس وجيمناي (المستوى المجاني يكفي).
+**Eng:** Fill in your Firebase config and place your SYSTEM `GEMINI_API_KEY` in the `.env.local`. Users will NOT need API keys.  
+**Ar:** ضع إعدادات Firebase ومفتاح نظام `GEMINI_API_KEY` الخاص بالمشروع الرئيسي. لن يحتاج المستخدمون لإدخال أي مفتاح بل سيعتمدون على تسجيل الدخول فقط.
 
 ### 3. Launch Development | إطلاق التطبيق
 ```bash
 npm run dev
 ```
 
-## 📂 Architecture | البنية الهندسية
+## 📂 Architecture Index | فهرس البنية الهندسية
 
 ```
 gemigram/
 ├── app/                          # Next.js 15 App Router
-│   ├── api/                      # Server API Routes (مسارات الخادم العصبية)
-│   ├── dashboard/                # Agent overview & metrics (لوحة التحكم السريادية)
-│   ├── forge/                    # Voice agent creation (مصنع توليد الوكلاء)
-│   ├── workspace/                # Voice interaction canvas (مساحة التفاعل الكونية)
-│   ├── hub/                      # Agent registry browser (سجل الوكلاء التابعين)
-│   ├── marketplace/              # Public agent templates (المتجر العصبي)
-│   ├── galaxy/                   # 3D agent visualization (تصور الوكلاء ثلاثي الأبعاد)
-│   └── settings/                 # User preferences (تكوين تفضيلات النظام)
-├── components/                   # React Components (مكونات الواجهة المادية)
-├── hooks/                        # Core UI Hooks (أدوات الربط الأساسية)
-├── lib/                          # Business Logic (المنطق البرمجي)
-│   ├── store/                    # Zustand 6-Slice Neural Store (مخزن الحالة السداسي)
-│   ├── memory/                   # Semantic memory engine (محرك الذاكرة الدلالية)
-│   ├── neural/                   # Intent engine & command routing (محرك التوجيه والنوايا)
-│   └── voice/                    # TTS synthesis & voice biometrics (توليد ومعالجة الصوت)
-└── functions/                    # Firebase Cloud Functions (دوال السحابة المستقلة)
+│   ├── api/                      # 🔐 Server API Routes & Secure Gemini Router
+│   ├── dashboard/                # Agent overview & metrics
+│   ├── forge/                    # 🎙️ Voice agent creation (Aether Forge)
+│   ├── workspace/                # 🧠 Voice interaction canvas
+│   ├── hub/                      # Agent registry browser
+│   ├── marketplace/              # 🛒 Neural Marketplace
+│   ├── galaxy/                   # 3D agent visualization
+│   └── settings/                 # Fully automated user settings (No API Keys)
+├── components/                   # React Components (MarketplaceCard, ForgeChamber...)
+├── lib/                          # Business Logic
+│   ├── store/                    # 🧠 Zustand 6-Slice Neural Store
+│   ├── neural/                   # Execution Engine & Cognitive routers
+│   └── voice/                    # Synthesis Engine
+└── public/                       # Assets & gemigram_hero_cover.png
 ```
 
-## 🎙️ Voice Architecture | هيكلية الصوت
-
-**Eng:** Gemigram utilizes a Neural-Spine Voice Protocol (NSVP) that routes raw PCM audio (24kHz) from the user directly into a dedicated `AudioWorklet`. This bypasses traditional UI limits, streaming seamlessly to the `Gemini Live API` via WebSockets for sub-second, ultra-low latency intelligent interactions.
-
-**Ar:** يستخدم جيميجزام بروتوكولًا صوتيًا عصبيًا (NSVP) يوجه الصوت الخام (PCM بمسار 24kHz) صعودًا من المستخدم إلى مسار معالجة يعمل في الخلفية (`AudioWorklet`). وبهذا نتجاوز قيود واجهة المستخدم التقليدية لنرسل البيانات بسلاسة إلى واجهة `Gemini Live` عبر WebSocket لاستجابات فائقة السرعة وأزمنة انتقال شبه معدومة.
-
 ## 🧠 State Management (6-Slice Neural Store) | إدارة الحالة العصبية
+
+| Slice | Purpose |
+|-------|---------|
+| **Auth** | Hydrated User Session (`hydratedUserId` only) |
+| **Agent** | Active Agent Registry & Metadata |
+| **Cognitive** | Session state, token usage, `micLevel` |
+| **Sensory** | `unreadNotifications`, transcript buffer |
+| **UI** | Link type, voice session stages |
+| **Swarm** | Inter-agent communication protocols |
+
+## 🤝 Contributing | المساهمة
+**Eng:** See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.  
+**Ar:** راجع ملف المساهمة (CONTRIBUTING.md) لمزيد من التعليمات والشروط.
+
+## 📄 License | الترخيص
+MIT License — See [LICENSE](./LICENSE)
+
+---
+
+<div align="center">
+  <strong>Built with ❤️ on the Google & Gemini Ecosystem</strong><br/>
+  <strong>تم البناء بحب على منظومة أدوات جوجل وجيمناي</strong><br/>
+  <sub>Gemigram AIOS — Where Voice Meets Intelligence | حيث يلتقي الصوت بالذكاء</sub>
+</div>) | إدارة الحالة العصبية
 
 | Slice (الشريحة) | Purpose | الغرض |
 |-----------------|---------|--------|
