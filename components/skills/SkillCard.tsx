@@ -26,7 +26,7 @@ export default function SkillCard({
   onViewDetails 
 }: SkillCardProps) {
   // Get Lucide icon dynamically
-  const IconComponent = (LucideIcons as Record<string, React.ComponentType<unknown>>)[skill.metadata.icon] || LucideIcons.Puzzle;
+  const IconComponent = (LucideIcons as unknown as Record<string, React.ElementType>)[skill.metadata.icon] || LucideIcons.Puzzle;
   
   return (
     <motion.div

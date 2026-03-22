@@ -14,7 +14,7 @@ export const runSovereignReasoning = async (
   context?: string,
   options: { userId?: string; agentId?: string; useRAG?: boolean } = {}
 ) => {
-  const provider = useGemigramStore.getState().activeProvider;
+  const provider = 'google';
   
   if (options.useRAG && options.userId && options.agentId) {
     const messages = [];

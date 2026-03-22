@@ -14,12 +14,13 @@ interface MarketplaceCardProps {
 }
 
 export const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ 
-  agent, 
+  agent: baseAgent, 
   onInstall, 
   isInstalled = false, 
   isInstalling = false 
 }) => {
   const { t } = useTranslation();
+  const agent = baseAgent as Agent & { rating?: string; creatorNickname?: string; category?: string };
 
   return (
     <motion.div

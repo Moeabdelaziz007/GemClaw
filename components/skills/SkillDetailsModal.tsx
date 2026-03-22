@@ -25,7 +25,7 @@ export default function SkillDetailsModal({
   onClose 
 }: SkillDetailsModalProps) {
   // Get Lucide icon dynamically
-  const IconComponent = (LucideIcons as Record<string, React.ComponentType<unknown>>)[skill.metadata.icon] || LucideIcons.Puzzle;
+  const IconComponent = (LucideIcons as unknown as Record<string, React.ElementType>)[skill.metadata.icon] || LucideIcons.Puzzle;
   
   /**
    * Format capability name for display

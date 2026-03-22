@@ -272,7 +272,7 @@ export default function ForgeArchitect({ onComplete, onCancel }: ForgeArchitectP
           </motion.div>
         ) : (
           <CinematicDeploy 
-            agentName={formData.name} 
+            agentName={formData.name || 'Agent'} 
             onComplete={() => onComplete(formData)} 
           />
         )}

@@ -24,8 +24,25 @@ interface MCPServerBrowserProps {
   onServerUninstall?: (serverId: string) => void;
 }
 
+export interface MCPServerMetadata {
+  id: string;
+  name: string;
+  version: string;
+  description: string;
+  rating?: number;
+  installCount?: number;
+  lastUpdated: number;
+  tags?: string[];
+  capabilities?: string[];
+  requirements?: {
+    environmentVars?: string[];
+    apiKeys?: string[];
+  };
+  [key: string]: unknown;
+}
+
 interface ServerCardProps {
-  server: Record<string, unknown>;
+  server: MCPServerMetadata;
   isInstalled: boolean;
   onInstall: () => void;
   onUninstall: () => void;
@@ -243,7 +260,7 @@ export default function MCPServerBrowser({
   onServerInstall,
   onServerUninstall
 }: MCPServerBrowserProps) {
-  const [servers, setServers] = useState<Record<string, unknown>[]>([]);
+  const [servers, setServers] = useState<MCPServerMetadata[]>([]);
   const [installedServers, setInstalledServers] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -260,12 +277,12 @@ export default function MCPServerBrowser({
       setLoading(true);
       
       // Fetch from marketplace
-      const allServers = await mcpMarketplaceConnector.fetchFromOfficialRegistry();
+      const allServers = await mcpMarketplaceConnector.fetchFromOfficialRegistry() as unknown as MCPServerMetadata[];
       setServers(allServers);
       
       // Get installed servers
       const installed = mcpMarketplaceConnector.getInstalledServers();
-      setInstalledServers(new Set(installed.map(s => s.id)));
+      setInstalledServers(new Set(installed.map((s: any) => s.id)));
       
       // Load categories
       const cats = await mcpMarketplaceConnector.getCategories();

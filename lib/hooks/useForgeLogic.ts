@@ -170,7 +170,7 @@ export function useForgeLogic() {
         utterance.pitch = 1.0;
         window.speechSynthesis.speak(utterance);
       }
-      addLog(`[Forge] Logic: ${text}`, "system");
+      console.log(`[Forge] Logic: ${text}`);
     },
     handleManualSubmit: handleSynthesis // For fallback/testing
   };

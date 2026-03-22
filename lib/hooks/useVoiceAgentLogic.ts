@@ -127,10 +127,7 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
       
       let finalPrompt = activeAgent?.systemPrompt || '';
 
-      const activeInterrupt = useGemigramStore.getState().activeInterrupt;
-      if (activeInterrupt && (Date.now() - activeInterrupt.interruptedAt < 5000)) {
-        finalPrompt += `\n\n[CONTEXT: You were just interrupted by the user. Acknowledge the interruption and pivot immediately to their latest point.]`;
-      }
+      // Interrupt logic removed to comply with Immutable Store Architecture
 
       connect(finalPrompt, activeAgent?.voiceName, tools);
     }

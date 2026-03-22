@@ -12,8 +12,7 @@ const PROVIDERS = [
 ] as const;
 
 export const ModelSelector: React.FC = () => {
-  const activeProvider = useGemigramStore((state) => state.activeProvider);
-  const setNeuralSelection = useGemigramStore((state) => state.setNeuralSelection);
+  const [activeProvider, setActiveProvider] = React.useState('google');
   const [isOpen, setIsOpen] = React.useState(false);
 
   const activeInfo = PROVIDERS.find((p) => p.id === activeProvider) || PROVIDERS[0];
@@ -53,7 +52,7 @@ export const ModelSelector: React.FC = () => {
                 <button
                   key={provider.id}
                   onClick={() => {
-                    setNeuralSelection(provider.id, provider.model);
+                    setActiveProvider(provider.id);
                     setIsOpen(false);
                   }}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group

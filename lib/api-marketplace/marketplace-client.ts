@@ -125,7 +125,7 @@ class APIMarketplaceClient {
       const data = await res.json();
       
       // Convert APIs.guru format to our APIMetadata
-      const apis: APIMetadata[] = Object.entries(data).slice(0, 50).map(([id, details]: [string, Record<string, any>]) => {
+      const apis: APIMetadata[] = Object.entries(data).slice(0, 50).map(([id, details]: [string, any]) => {
         const latest = details.versions[details.preferred];
         const info = latest.info;
         return {

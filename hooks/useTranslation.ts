@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useGemigramStore } from '@/lib/store/useGemigramStore';
 import { translations } from '@/lib/i18n/dict';
 
@@ -9,7 +9,7 @@ import { translations } from '@/lib/i18n/dict';
  * Handles multi-language string retrieval with 'Sovereign Intelligence' persona.
  */
 export function useTranslation() {
-  const locale = useGemigramStore(state => state.locale);
+  const [locale] = useState<'en' | 'ar'>('en');
 
   const t = useCallback((path: string): string => {
     const keys = path.split('.');

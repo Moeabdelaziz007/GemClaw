@@ -1,13 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, Smartphone } from 'lucide-react';
 import { useWorkspaceLogic } from '@/lib/hooks/useWorkspaceLogic';
 import { PureVoiceCanvas } from '@/components/workspace/PureVoiceCanvas';
 import { AddToHomeScreen } from '@/components/ui/AddToHomeScreen';
 
-export default function WorkspacePage() {
+/**
+ * 🛰️ Workspace Content Component
+ * Encapsulates the neural logic and voice interface.
+ * Separated to allow for a Suspense boundary at the page level.
+ */
+function WorkspaceContent() {
   const { user, activeAgent, isLoading, hasError, errorDetails } = useWorkspaceLogic();
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
 
@@ -101,5 +106,24 @@ export default function WorkspacePage() {
       {/* 🎙️ Voice Interface */}
       <PureVoiceCanvas activeAgent={activeAgent} />
     </div>
+  );
+}
+
+export default function WorkspacePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-full w-full items-center justify-center bg-black">
+        <div className="relative h-20 w-20">
+          <div className="absolute inset-0 rounded-full border-2 border-gemigram-neon/20" />
+          <motion.div
+            className="absolute inset-0 rounded-full border-t-2 border-gemigram-neon"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          />
+        </div>
+      </div>
+    }>
+      <WorkspaceContent />
+    </Suspense>
   );
 }
