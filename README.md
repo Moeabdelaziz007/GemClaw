@@ -5,7 +5,7 @@
 Gemclaw is a sovereign intelligence orchestration system designed for high-performance, voice-first AI agent creation and management. Built on a foundation of Next.js 15 and a high-concurrency Go backend, it leverages the Gemini Live WebSocket API to provide a zero-friction, multi-agent swarm experience.
 
 ## 🚀 Vision 2026
-Gemclaw aims to be the definitive platform for autonomous agent orchestration, winning the Gemini Live Agent Challenge by providing:
+Gemclaw aims to be the definitive platform for autonomous agent orchestration providing:
 - **Voice-First Interaction**: Pure voice-to-voice communication via the Neural-Spine Protocol.
 - **ClawHub Orchestration**: A powerful multi-agent manager (Swarm) built in Go.
 - **Spatial Workspace**: A dynamic, drag-and-drop canvas for managing complex agent hierarchies.
