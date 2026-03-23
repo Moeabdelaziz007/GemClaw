@@ -17,7 +17,7 @@ echo "
 "
 
 echo "------------------------------------------------"
-echo "🌐 GemclawAIOS V3.0: INITIALIZING SOVEREIGN NEURAL SPINE"
+echo "🌐 GemclawAIOS v0.1.0: INITIALIZING SOVEREIGN NEURAL SPINE"
 echo "------------------------------------------------"
 
 # 1. Directory Lock

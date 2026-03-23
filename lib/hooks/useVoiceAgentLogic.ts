@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLiveAPI } from '@/hooks/useLiveAPI';
 import { useNeuralFallback } from '@/hooks/useNeuralFallback';
 import { useAudioProcessor } from '@/hooks/useAudioProcessor';
+import { useThalamicGate } from '@/hooks/useThalamicGate';
 import { useGemclawStore, Agent } from '@/lib/store/useGemclawStore';
 import { bridgeStatusManager } from '@/lib/utils/bridgeStatusManager';
 import { ToolResult, Tool, FunctionDeclaration } from '@/lib/types/live-api';
@@ -41,11 +42,28 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
     disconnect, 
     startRecording, 
     stopRecording,
-    sab // Exposed from useLiveAPI
+    sab,
+    wsRef,
+    analyserRef
   } = useLiveAPI('', (call) => {
     setActiveWidget(call as ToolResult);
     setIsThinking(false);
   }, googleAccessToken);
+
+  // Thalamic Gate: Proactive Intervention System
+  const { startMonitoring, stopMonitoring } = useThalamicGate(
+    analyserRef.current,
+    wsRef,
+    { silenceThreshold: 0.02, frustrationStreak: 45 }
+  );
+
+  useEffect(() => {
+    if (isConnected) {
+      startMonitoring();
+    } else {
+      stopMonitoring();
+    }
+  }, [isConnected, startMonitoring, stopMonitoring]);
 
   // Neural Fallback: Local Whisper-tiny Edge AI
   const { transcription: localText } = useNeuralFallback(sab, !isConnected && isRecording);
