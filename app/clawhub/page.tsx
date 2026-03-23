@@ -119,7 +119,7 @@ const SEED_AGENTS: Agent[] = [
   }
 ];
 
-export default function NeuralMarketplace() {
+export default function ClawHub() {
   const { user } = useAuth();
   const [marketplaceAgents, setMarketplaceAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -238,7 +238,7 @@ export default function NeuralMarketplace() {
               <span className="text-xs font-bold uppercase tracking-widest">{t('marketplace.registry')}</span>
             </motion.div>
             <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-4 italic">
-              NEURAL <span className="text-transparent bg-clip-text bg-gradient-to-r from-gemigram-neon to-green-600">{t('marketplace.marketplace')}</span>
+              NEURAL <span className="text-transparent bg-clip-text bg-gradient-to-r from-gemigram-neon to-green-600">CLAW HUB</span>
             </h1>
             <p className="text-zinc-400 max-w-xl text-lg font-medium">
               {t('marketplace.tagline')}
@@ -265,7 +265,7 @@ export default function NeuralMarketplace() {
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              aria-pressed={activeCategory === cat.id ? "true" : "false"}
+              aria-pressed={activeCategory === cat.id}
               className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest border transition-all whitespace-nowrap ${
                 activeCategory === cat.id 
                 ? 'bg-gemigram-neon border-gemigram-neon text-black shadow-[0_0_15px_rgba(16,255,135,0.4)]' 

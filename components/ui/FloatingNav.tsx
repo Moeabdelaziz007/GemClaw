@@ -49,11 +49,11 @@ const ORBS_CONFIG = [
     label: BRAND.labels.nav.workspace,
   },
   {
-    id: 'marketplace',
-    path: '/marketplace',
+    id: 'clawhub',
+    path: '/clawhub',
     color: 'bg-gemigram-neon',
     icon: <Globe aria-hidden="true" className="h-5 w-5" />,
-    label: BRAND.labels.nav.marketplace,
+    label: BRAND.labels.nav.clawhub || 'ClawHub',
   },
   {
     id: 'settings',

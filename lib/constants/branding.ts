@@ -10,7 +10,7 @@ export const BRAND = {
     galaxy: 'Gemclaw Galaxy',
     hub: 'Neural Hub',
     workspace: 'Neural Workspace',
-    marketplace: 'Gemclaw Market',
+    clawhub: 'ClawHub',
   },
   naming: {
     aether: {
@@ -27,7 +27,7 @@ export const BRAND = {
       forge: 'Gemclaw Forge',
       galaxy: 'Gemclaw Galaxy',
       about: 'About Gemclaw',
-      marketplace: 'Gemclaw Market',
+      clawhub: 'ClawHub',
     },
     nav: {
       home: 'SOVEREIGN_CORE',
@@ -35,7 +35,7 @@ export const BRAND = {
       hub: 'NEURAL_HUB',
       forge: 'GEMIGRAM_FORGE',
       workspace: 'WORKSPACE',
-      marketplace: 'GEMIGRAM_MARKET',
+      clawhub: 'CLAW_HUB',
       settings: 'CONFIG',
       about: 'ABOUT',
     },

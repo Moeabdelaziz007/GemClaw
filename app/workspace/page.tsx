@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, Smartphone } from 'lucide-react';
 import { useWorkspaceLogic } from '@/lib/hooks/useWorkspaceLogic';
 import { PureVoiceCanvas } from '@/components/workspace/PureVoiceCanvas';
+import { SpatialCanvas } from '@/components/spatial/SpatialCanvas';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { AddToHomeScreen } from '@/components/ui/AddToHomeScreen';
 
 /**
@@ -103,8 +106,19 @@ function WorkspaceContent() {
         )}
       </AnimatePresence>
 
-      {/* 🎙️ Voice Interface */}
-      <PureVoiceCanvas activeAgent={activeAgent} />
+      <DndProvider backend={HTML5Backend}>
+        {/* ✨ Spatial Drag & Drop Workspace */}
+        <div className="absolute inset-0 z-0">
+          <SpatialCanvas />
+        </div>
+
+        {/* 🎙️ Voice Interface */}
+        <div className="absolute inset-0 z-10 pointer-events-none">
+          <div className="pointer-events-auto h-full w-full">
+            <PureVoiceCanvas activeAgent={activeAgent} />
+          </div>
+        </div>
+      </DndProvider>
     </div>
   );
 }
