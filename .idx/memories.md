@@ -1,5 +1,12 @@
 # 🧠 GemigramOS Memories
 
+## [2026-03-24] Phase 31: Sovereign Deployment & SSR Optimization
+- **SSR Architecture Pivot**: Transitioned from Static Export to **Firebase WebFrameworks (SSR)** to support secure server-side Neural Proxies while maintaining 100% build health.
+- **Suspense Hardening**: Eradicated "CSR bailout" errors by wrapping `useSearchParams()` in `<Suspense>` boundaries across the Landing Page and Workspace.
+- **CI/CD Pipeline**: Deployed `.github/workflows/sovereign-pipeline.yml`, consolidating all build, lint, and deployment logic into a single, high-fidelity automation flow.
+- **Build Status**: Verified 100% success rate on `npm run build` (Exit Code 0). All 18 routes optimized for production.
+- **Security Persistence**: Verified zero exposure of sensitive keys (`NEXT_PUBLIC_` purged) and confirmed IP-based rate limiting via middleware.
+
 ## [2026-03-24] Phase 30: Deep Dive & Code Health Purge
 - **Architectural Sanctity**: Enforced the Voice-to-Voice (V2V) only constraint, ensuring zero text-input vectors remain in `/forge` and core interaction flows.
 - **TypeScript & Lint Eradication**: Sliced through 50+ type warnings across `MarketplaceClient`, `SkillTypes`, `SovereignGuard`, and UI elements. Re-engineered `ForgeArchitect` render mapping for strict string-split validation.
