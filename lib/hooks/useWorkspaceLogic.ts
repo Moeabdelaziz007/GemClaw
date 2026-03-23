@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/Providers';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import { useSearchParams } from 'next/navigation';
 
 export function useWorkspaceLogic() {
   const { user, googleAccessToken } = useAuth();
-  const { agents, activeAgentId } = useGemigramStore();
+  const { agents, activeAgentId } = useGemclawStore();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const agentParam = searchParams.get('agent');
-  const setActiveAgentId = useGemigramStore(state => state.setActiveAgentId);
+  const setActiveAgentId = useGemclawStore(state => state.setActiveAgentId);
 
   useEffect(() => {
     if (!user) {

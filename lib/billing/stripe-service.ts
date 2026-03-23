@@ -1,7 +1,7 @@
 // import { loadStripe } from "@stripe/stripe-js";
 
 /**
- * Commercial Backbone for GemigramOS.
+ * Commercial Backbone for GemclawOS.
  * @note Currently dormant - awaiting @stripe/stripe-js dependency installation.
  */
 export class StripeService {

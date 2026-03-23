@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LayoutDashboard, Users, Settings, Plus, User as UserIcon, LogOut, Globe, Home } from 'lucide-react';
 
 import Image from 'next/image';
-import { GemigramLogo } from '@/components/GemigramLogo';
+import { GemclawLogo } from '@/components/GemclawLogo';
 import { useRouter } from 'next/navigation';
 import { BRAND } from '@/lib/constants/branding';
-import { useUnreadNotificationsCount } from '@/lib/store/useGemigramStore';
+import { useUnreadNotificationsCount } from '@/lib/store/useGemclawStore';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { User } from 'firebase/auth';
 
@@ -134,7 +134,7 @@ export function FloatingNav({ currentView, user, onLogin, onLogout }: FloatingNa
       >
         <div className="mb-8 px-4 xl:mb-10">
           <div className="flex items-center gap-3">
-            <GemigramLogo size={28} />
+            <GemclawLogo size={28} />
             <span className="hidden text-sm font-black uppercase tracking-[0.2em] text-white xl:block">{BRAND.product.platformName}</span>
           </div>
         </div>

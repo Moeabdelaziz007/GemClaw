@@ -1,10 +1,10 @@
 import React from 'react';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import { Database, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function ProjectSwitcher() {
-  const { userProjects, activeProjectId, setActiveProjectId } = useGemigramStore();
+  const { userProjects, activeProjectId, setActiveProjectId } = useGemclawStore();
   const [isOpen, setIsOpen] = React.useState(false);
 
   if (userProjects.length === 0) return null;

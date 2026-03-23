@@ -39,7 +39,7 @@ export const CONTENT_CREATION_SKILL: SkillDefinition = {
     estimatedSetupTime: '10 minutes',
     tags: ['creative', 'generation', 'content', 'art', 'writing', 'multimedia'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/content-creation'
   }
 };
@@ -77,7 +77,7 @@ export const TRANSLATION_SKILL: SkillDefinition = {
     estimatedSetupTime: '5 minutes',
     tags: ['translation', 'language', 'communication', 'international', 'multilingual', 'localization'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://cloud.google.com/translate'
   }
 };
@@ -151,7 +151,7 @@ export const SOCIAL_MEDIA_SKILL: SkillDefinition = {
     estimatedSetupTime: '15 minutes',
     tags: ['social', 'marketing', 'posting', 'engagement', 'twitter', 'linkedin'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://buffer.com/developers'
   }
 };
@@ -189,7 +189,7 @@ export const TASK_MANAGEMENT_SKILL: SkillDefinition = {
     estimatedSetupTime: '8 minutes',
     tags: ['tasks', 'productivity', 'organization', 'todo', 'management', 'planning'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://developer.todoist.com/'
   }
 };
@@ -226,7 +226,7 @@ export const NOTE_TAKING_SKILL: SkillDefinition = {
     estimatedSetupTime: '5 minutes',
     tags: ['notes', 'productivity', 'organization', 'knowledge', 'documentation'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://dev.evernote.com/'
   }
 };
@@ -263,7 +263,7 @@ export const CODE_ASSISTANT_SKILL: SkillDefinition = {
     estimatedSetupTime: '15 minutes',
     tags: ['coding', 'programming', 'development', 'debugging', 'software', 'engineering'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://docs.github.com/en/rest'
   }
 };
@@ -299,7 +299,7 @@ export const FILE_CONVERTER_SKILL: SkillDefinition = {
     estimatedSetupTime: '5 minutes',
     tags: ['conversion', 'files', 'format', 'media', 'documents', 'utility'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://cloudconvert.com/api'
   }
 };

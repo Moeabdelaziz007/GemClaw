@@ -5,7 +5,7 @@
  * to Gemini Native Audio.
  */
 
-import { useGemigramStore } from '../store/useGemigramStore';
+import { useGemclawStore } from '../store/useGemclawStore';
 
 
 
@@ -14,16 +14,16 @@ export class SynthesisEngine {
    * Translates text into high-fidelity neural audio via browser fallback.
    */
   static async speak(text: string): Promise<void> {
-    const { isSpeaking } = useGemigramStore.getState();
+    const { isSpeaking } = useGemclawStore.getState();
     if (isSpeaking) return;
 
     try {
-      useGemigramStore.setState({ isSpeaking: true });
+      useGemclawStore.setState({ isSpeaking: true });
       await this.speakBrowser(text);
     } catch (error) {
       console.error('[SynthesisEngine_Error]:', error);
     } finally {
-      useGemigramStore.setState({ isSpeaking: false });
+      useGemclawStore.setState({ isSpeaking: false });
     }
   }
 

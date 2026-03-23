@@ -153,7 +153,7 @@ Agents can produce professional video content, create podcasts, design graphics,
 - **Documentation:** Complete JSDoc comments for all skills
 - **Dependencies:** Properly validated through skillRegistry
 - **Conflicts:** No circular dependencies detected
-- **Code Style:** Consistent with existing Gemigram standards
+- **Code Style:** Consistent with existing Gemclaw standards
 - **Testing Ready:** Modular design enables unit testing
 
 ---

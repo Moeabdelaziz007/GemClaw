@@ -1,6 +1,6 @@
 'use client';
 
-import { Agent } from '@/lib/store/useGemigramStore';
+import { Agent } from '@/lib/store/useGemclawStore';
 
 /**
  * Avatar Styles from DiceBear

@@ -1,7 +1,7 @@
 /**
  * 🧬 Aether Neural Spine - Local Bridge Protocol
  * ------------------------------------------------
- * This script serves as the local connectivity layer for Gemigram AIOS.
+ * This script serves as the local connectivity layer for Gemclaw AIOS.
  * It manages the 'Bridge' link type and provides a sovereign local substrate
  * for aetheric communications.
  */

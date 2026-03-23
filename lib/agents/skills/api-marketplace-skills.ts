@@ -37,7 +37,7 @@ export const PUBLIC_API_DISCOVERY_SKILL: SkillDefinition = {
     estimatedSetupTime: '5 minutes',
     tags: ['api', 'discovery', 'free', 'public', 'open-data'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/public-api-discovery'
   }
 };
@@ -72,7 +72,7 @@ export const ENTERPRISE_API_GATEWAY_SKILL: SkillDefinition = {
     estimatedSetupTime: '20 minutes',
     tags: ['enterprise', 'api-gateway', 'apigee', 'kong', 'aws', 'corporate'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/enterprise-api-gateway'
   }
 };
@@ -109,7 +109,7 @@ export const API_AUTHENTICATION_SKILL: SkillDefinition = {
     estimatedSetupTime: '15 minutes',
     tags: ['authentication', 'oauth2', 'jwt', 'security', 'api', 'tokens'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/api-authentication'
   }
 };
@@ -145,7 +145,7 @@ export const API_RATE_LIMITING_SKILL: SkillDefinition = {
     estimatedSetupTime: '12 minutes',
     tags: ['rate-limiting', 'throttling', 'quota', 'api-management', 'optimization'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/api-rate-limiting'
   }
 };

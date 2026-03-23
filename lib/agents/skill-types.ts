@@ -1,7 +1,7 @@
 /**
  * 🛠️ Comprehensive Skill Type System
  * 
- * Core type definitions for the Gemigram GemigramOS skill architecture.
+ * Core type definitions for the Gemclaw GemclawOS skill architecture.
  * Provides strong typing for skill definitions, configurations, and runtime instances.
  */
 

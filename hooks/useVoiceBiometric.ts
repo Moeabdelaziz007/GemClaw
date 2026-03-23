@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { EnrollmentSession, EnrollmentState } from '../lib/types/voiceBiometric';
-import { useGemigramStore } from '../lib/store/useGemigramStore';
+import { useGemclawStore } from '../lib/store/useGemclawStore';
 
 /**
  * useVoiceBiometric
@@ -11,7 +11,7 @@ export function useVoiceBiometric() {
   const [session, setSession] = useState<EnrollmentSession | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const chunks = useRef<Blob[]>([]);
-  const addTranscript = useGemigramStore(s => s.addTranscriptMessage);
+  const addTranscript = useGemclawStore(s => s.addTranscriptMessage);
 
   const startEnrollment = useCallback((userId: string) => {
     setSession({

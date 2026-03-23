@@ -1,5 +1,5 @@
 /**
- * GemigramOS Branding Constants
+ * GemclawOS Branding Constants
  * Programmatic source of truth for design tokens.
  */
 

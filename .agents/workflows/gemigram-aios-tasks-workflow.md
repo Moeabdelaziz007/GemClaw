@@ -86,7 +86,7 @@ Auto-diagnose common errors:
 
 - AudioWorklet not found → verify name: 'neural-spine-processor'
 - Type 'any' error → find correct interface in lib/store/slices/
-- Circular dependency → check useGemigramStore.ts imports
+- Circular dependency → check useGemclawStore.ts imports
 - bg-theme-primary not found → verify in app/globals.css
 - Firestore permission denied → check hydratedUserId in AuthSlice
 - Build fails → run npm run lint first to isolate TS errors

@@ -40,7 +40,7 @@ export const SYSTEM_ARCHITECT_SKILL: SkillDefinition = {
     estimatedSetupTime: '25 minutes',
     tags: ['architecture', 'system-design', 'patterns', 'scalability', 'engineering', 'ddd'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/system-architect'
   }
 };
@@ -78,7 +78,7 @@ export const CODE_QUALITY_SKILL: SkillDefinition = {
     estimatedSetupTime: '15 minutes',
     tags: ['quality', 'testing', 'best-practices', 'refactoring', 'clean-code', 'linting'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/code-quality'
   }
 };
@@ -116,7 +116,7 @@ export const SECURITY_ENGINEERING_SKILL: SkillDefinition = {
     estimatedSetupTime: '20 minutes',
     tags: ['security', 'cybersecurity', 'encryption', 'vulnerability', 'compliance', 'owasp'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/security-engineering'
   }
 };
@@ -153,7 +153,7 @@ export const TECHNICAL_WRITING_SKILL: SkillDefinition = {
     estimatedSetupTime: '12 minutes',
     tags: ['documentation', 'writing', 'technical', 'api-docs', 'specifications'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/technical-writing'
   }
 };
@@ -190,7 +190,7 @@ export const AGILE_PM_SKILL: SkillDefinition = {
     estimatedSetupTime: '15 minutes',
     tags: ['agile', 'scrum', 'kanban', 'project-management', 'sprint', 'planning'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/agile-project-management'
   }
 };

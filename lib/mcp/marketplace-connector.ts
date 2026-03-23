@@ -530,7 +530,7 @@ export const MARKETPLACE_BROWSER_SKILL: SkillDefinition = {
     estimatedSetupTime: '5 minutes',
     tags: ['mcp', 'marketplace', 'discovery', 'installation', 'servers'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/mcp-marketplace-browser'
   }
 };

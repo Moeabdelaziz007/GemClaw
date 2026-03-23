@@ -1,4 +1,4 @@
-# 🧬 GemigramOS Architecture
+# 🧬 GemclawOS Architecture
 
 ## 1. The Neural Store (Zustand 5-Slice)
 We utilize a fragmented but unified store to manage high-frequency voice data without re-rendering the entire dependency tree.
@@ -13,7 +13,7 @@ We utilize a fragmented but unified store to manage high-frequency voice data wi
 ---
 
 ## 2. Voice-First Intent Engine
-GemigramOS follows a strict **Anti-Parsing** policy. All navigation is driven by Gemini ToolCalls.
+GemclawOS follows a strict **Anti-Parsing** policy. All navigation is driven by Gemini ToolCalls.
 
 ```mermaid
 sequenceDiagram

@@ -11,7 +11,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: 'Gemigram',
+  title: 'Gemclaw',
   description: 'The Voice-Native AI Social Nexus.',
 };
 

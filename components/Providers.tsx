@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, type User } from 'firebase/auth';
 import { auth as firebaseAuth, googleProvider } from '@/firebase';
 import { fetchGoogleCloudProjects, subscribeToUnreadNotifications } from '@/lib/data-access/gemigramRepository';
-import { useGemigramStore, useUnreadNotifications } from '@/lib/store/useGemigramStore';
+import { useGemclawStore, useUnreadNotifications } from '@/lib/store/useGemclawStore';
 
 interface AuthContextType {
   user: User | null;
@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setActiveProjectId,
     clearUserScopedState,
     setHydratedUserId,
-  } = useGemigramStore();
+  } = useGemclawStore();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, (nextUser) => {
@@ -111,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     try {
       clearUserScopedState();
-      useGemigramStore.setState({ agents: [], activeAgentId: null, transcript: [] });
+      useGemclawStore.setState({ agents: [], activeAgentId: null, transcript: [] });
       setHydratedUserId(null);
       setGoogleAccessToken(null);
       await firebaseAuth.signOut();

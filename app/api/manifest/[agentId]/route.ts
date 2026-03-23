@@ -19,9 +19,9 @@ export async function GET(
     const seed = agentData?.seed || agentName;
 
     const manifest = {
-      name: `${agentName} - Gemigram AI`,
+      name: `${agentName} - Gemclaw AI`,
       short_name: agentName,
-      description: agentData?.role || 'Gemigram AI Assistant',
+      description: agentData?.role || 'Gemclaw AI Assistant',
       start_url: `/?agent=${agentId}`,
       display: 'standalone',
       orientation: 'portrait',
@@ -61,7 +61,7 @@ export async function GET(
     console.error('[ManifestAPI] Error generating manifest:', error);
     // Return a default manifest if fetch fails
     return NextResponse.json({
-      name: 'Gemigram AI Agent',
+      name: 'Gemclaw AI Agent',
       short_name: 'Agent',
       start_url: `/?agent=${agentId}`,
       display: 'standalone',

@@ -1,7 +1,7 @@
 import { AgentRole } from '../store/slices/createAgentSlice';
 
 /**
- * 🐝 AgentSwarm Types - GemigramOS V3
+ * 🐝 AgentSwarm Types - GemclawOS V3
  * Sovereign Intelligence Orchestration
  */
 

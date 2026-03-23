@@ -526,7 +526,7 @@ export const RAPIDAPI_CONNECTOR_SKILL: SkillDefinition = {
     estimatedSetupTime: '10 minutes',
     tags: ['rapidapi', 'api', 'marketplace', 'integration', 'saas'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/rapidapi-connector'
   }
 };
@@ -561,7 +561,7 @@ export const APILAYER_INTEGRATION_SKILL: SkillDefinition = {
     estimatedSetupTime: '8 minutes',
     tags: ['apilayer', 'api', 'premium', 'business', 'validation'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/apilayer-integration'
   }
 };

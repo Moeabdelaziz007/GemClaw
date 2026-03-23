@@ -69,7 +69,7 @@ export function EnterpriseFooter() {
           </div>
 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6 md:gap-8">
-            <Link href="https://github.com/Moeabdelaziz007/Gemigram" target="_blank" className="w-fit rounded-lg border border-white/5 px-4 py-2 text-[9px] font-black uppercase tracking-[0.35em] text-white/20 transition-colors hover:text-white">
+            <Link href="https://github.com/Moeabdelaziz007/Gemclaw" target="_blank" className="w-fit rounded-lg border border-white/5 px-4 py-2 text-[9px] font-black uppercase tracking-[0.35em] text-white/20 transition-colors hover:text-white">
               Source_Code::v2.4.0
             </Link>
             <div className="hidden h-6 w-px bg-white/5 sm:block" />

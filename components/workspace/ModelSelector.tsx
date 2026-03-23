@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import { Cpu, Brain, Sparkles } from 'lucide-react';
 
 const PROVIDERS = [

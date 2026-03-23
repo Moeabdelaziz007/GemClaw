@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/components/Providers';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { LiquidWidget } from '@/components/ui/LiquidWidget';
@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 
 export default function DashboardPage() {
   const { user, googleAccessToken } = useAuth();
-  const { agents } = useGemigramStore();
+  const { agents } = useGemclawStore();
   const router = useRouter();
   const [driveFiles, setDriveFiles] = useState<GWSFile[]>([]);
 

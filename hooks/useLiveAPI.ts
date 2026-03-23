@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useGemigramStore } from '../lib/store/useGemigramStore';
+import { useGemclawStore } from '../lib/store/useGemclawStore';
 import { useVisionPulse } from './useVisionPulse';
 import { handleNeuralTool } from '../lib/tools/neural-handlers';
 import { ToolResult, Tool } from '../lib/types/live-api';
@@ -15,9 +15,9 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-  const addTranscriptMessage = useGemigramStore(state => state.addTranscriptMessage);
-  const setInterrupted = useGemigramStore(state => state.setInterrupted);
-  const setContextUsage = useGemigramStore(state => state.setContextUsage);
+  const addTranscriptMessage = useGemclawStore(state => state.addTranscriptMessage);
+  const setInterrupted = useGemclawStore(state => state.setInterrupted);
+  const setContextUsage = useGemclawStore(state => state.setContextUsage);
 
   // ─── Reconnection State (Gem #7: Gateway Backpressure) ────
   const reconnectAttemptsRef = useRef(0);
@@ -170,8 +170,8 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
       : `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${activeKey}`;
     
     const ws = new WebSocket(wsUrl);
-    const transcript = useGemigramStore.getState().transcript;
-    const setLinkType = useGemigramStore.getState().setLinkType;
+    const transcript = useGemclawStore.getState().transcript;
+    const setLinkType = useGemclawStore.getState().setLinkType;
 
     ws.onopen = () => {
       setIsConnected(true);
@@ -247,7 +247,7 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
               }
               
               try {
-                const activeProjectId = useGemigramStore.getState().activeProjectId;
+                const activeProjectId = useGemclawStore.getState().activeProjectId;
                 const result = await handleNeuralTool(call.name, { ...call.args, accessToken, activeProjectId });
                 
                 addLog(`Tool ${call.name} executed successfully.`, "tool");
@@ -314,10 +314,10 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
       
       if (intentionalDisconnectRef.current) {
         addLog("Connection closed.", "system");
-        useGemigramStore.getState().setLinkType('stateless');
+        useGemclawStore.getState().setLinkType('stateless');
       } else {
         addLog(`Connection lost (code: ${event.code}). Hibernating session...`, "system");
-        useGemigramStore.getState().setLinkType('hibernating');
+        useGemclawStore.getState().setLinkType('hibernating');
         scheduleReconnectRef.current();
       }
     };

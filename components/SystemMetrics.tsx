@@ -50,7 +50,7 @@ export default function SystemMetrics() {
     >
       <div>
         <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white/60 mb-1">System Overview</h3>
-        <p className="text-[8px] font-mono text-white/20 uppercase">Gemigram_AIOS / Sovereign • Kernel: Stable</p>
+        <p className="text-[8px] font-mono text-white/20 uppercase">Gemclaw_AIOS / Sovereign • Kernel: Stable</p>
       </div>
 
       <div className="space-y-4">

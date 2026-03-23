@@ -1,6 +1,6 @@
-# 🧬 GemigramOS Design System (v2.0)
+# 🧬 GemclawOS Design System (v2.0)
 
-This document serves as the **Single Source of Truth** for all visual and interactive elements within the GemigramOS project. All new features and components must adhere to these standards to maintain a "Zero-Friction" enterprise aesthetic.
+This document serves as the **Single Source of Truth** for all visual and interactive elements within the GemclawOS project. All new features and components must adhere to these standards to maintain a "Zero-Friction" enterprise aesthetic.
 
 ---
 

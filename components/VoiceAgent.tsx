@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useVoiceAgentLogic } from '@/lib/hooks/useVoiceAgentLogic';
-import { useGemigramStore, Agent } from '../lib/store/useGemigramStore';
+import { useGemclawStore, Agent } from '../lib/store/useGemclawStore';
 import { WidgetRenderer } from './WidgetRenderer';
 import { Mic, MicOff, Activity, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,7 +18,7 @@ const SovereignDashboard = dynamic(
 );
 
 export function VoiceAgent({ activeAgent, googleAccessToken }: { activeAgent: Agent; googleAccessToken?: string }) {
-  const setVoiceSession = useGemigramStore((state) => state.setVoiceSession);
+  const setVoiceSession = useGemclawStore((state) => state.setVoiceSession);
   const { tier, allowMotion, allowAmbientMotion, isMobile } = useVisualTier();
 
   const {

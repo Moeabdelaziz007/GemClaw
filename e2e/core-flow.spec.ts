@@ -4,7 +4,7 @@ test.describe('AetherOS Golden Path', () => {
   test('Voice -> Materialize -> Workspace flow', async ({ page }) => {
     // 1. Visit Landing Page
     await page.goto('/');
-    await expect(page).toHaveTitle(/Gemigram/);
+    await expect(page).toHaveTitle(/Gemclaw/);
 
     // 2. Trigger Auth (Launch_Terminal)
     const launchBtn = page.locator('button', { hasText: /Launch_Terminal/i });

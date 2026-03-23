@@ -1,4 +1,4 @@
-// 🧬 GemigramOS Sovereign Dictionary
+// 🧬 GemclawOS Sovereign Dictionary
 // Version: 1.1 (2026-03-21)
 
 export type Locale = 'en' | 'ar';

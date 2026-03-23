@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/Providers';
-import { useGemigramStore, Agent } from '@/lib/store/useGemigramStore';
+import { useGemclawStore, Agent } from '@/lib/store/useGemclawStore';
 import ConversationalAgentCreator from '@/components/ConversationalAgentCreator';
 import ForgeChamber from '@/components/ForgeChamber';
 import { useRouter } from 'next/navigation';
@@ -14,7 +14,7 @@ import { startAgentHeartbeat } from '@/lib/agents/heartbeat';
 
 export default function ForgePage() {
   const { user } = useAuth();
-  const { setActiveAgentId, pendingManifest, setPendingManifest, voiceSession, setVoiceSession } = useGemigramStore();
+  const { setActiveAgentId, pendingManifest, setPendingManifest, voiceSession, setVoiceSession } = useGemclawStore();
   const [isForging, setIsForging] = useState(false);
   const [pendingAgentData, setPendingAgentData] = useState<any>(null);
   const router = useRouter();

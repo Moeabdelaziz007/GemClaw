@@ -38,7 +38,7 @@ export const SELF_ANALYSIS_SKILL: SkillDefinition = {
     estimatedSetupTime: '15 minutes',
     tags: ['self-improvement', 'analytics', 'optimization', 'meta-cognition', 'performance'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/self-analysis'
   }
 };
@@ -74,7 +74,7 @@ export const CONTINUOUS_LEARNING_SKILL: SkillDefinition = {
     estimatedSetupTime: '20 minutes',
     tags: ['learning', 'adaptation', 'growth', 'ai-improvement', 'evolution'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/continuous-learning'
   }
 };
@@ -110,7 +110,7 @@ export const PERFORMANCE_OPTIMIZER_SKILL: SkillDefinition = {
     estimatedSetupTime: '18 minutes',
     tags: ['performance', 'optimization', 'speed', 'efficiency', 'resources'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/performance-optimizer'
   }
 };
@@ -146,7 +146,7 @@ export const ERROR_RECOVERY_SKILL: SkillDefinition = {
     estimatedSetupTime: '12 minutes',
     tags: ['error-handling', 'recovery', 'resilience', 'debugging', 'stability'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/error-recovery'
   }
 };
@@ -182,7 +182,7 @@ export const QUALITY_ASSURANCE_SKILL: SkillDefinition = {
     estimatedSetupTime: '15 minutes',
     tags: ['quality', 'testing', 'validation', 'assurance', 'verification'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/quality-assurance'
   }
 };

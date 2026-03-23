@@ -7,14 +7,14 @@
 
 import { db, auth } from '@/firebase';
 import { collection, addDoc, query, getDocs, orderBy, limit, Timestamp } from 'firebase/firestore';
-import { useGemigramStore } from '../store/useGemigramStore';
+import { useGemclawStore } from '../store/useGemclawStore';
 import { fetchWithTimeout, getLocalBridgeUrl, getNetworkTimeoutMs, isLocalBridgeExecutionEnabled, normalizeNetworkError } from '../network/runtime';
 import { ToolResult } from '../types/live-api';
 import { GoogleWorkspaceClient } from './google-workspace';
 import { CreditManager } from '../billing/credit-manager';
 
 const FUNCTION_URL = process.env.NEXT_PUBLIC_FUNCTION_URL?.trim() || 'https://executeagenttool-v7vofv7mxa-uc.a.run.app';
-const DEFAULT_PERSONA = 'GemigramAssistant';
+const DEFAULT_PERSONA = 'GemclawAssistant';
 
 function readString(value: unknown, fallback = ''): string {
   return typeof value === 'string' ? value : fallback;
@@ -60,7 +60,7 @@ export async function handleNeuralTool(name: string, args: Record<string, unknow
 
   if (name === 'create_agent') {
     try {
-      const { setPendingManifest } = useGemigramStore.getState();
+      const { setPendingManifest } = useGemclawStore.getState();
 
       const toolSelections = readStringArray(args.tools);
       const skillSelections = readStringArray(args.skills);
@@ -164,13 +164,13 @@ export async function handleNeuralTool(name: string, args: Record<string, unknow
       lat: (Math.random() * 180 - 90).toFixed(4),
       lng: (Math.random() * 360 - 180).toFixed(4),
       address: `Neural Sector ${Math.floor(Math.random() * 100)}, ${location}`,
-      context: 'Geospatial data synthesized by Gemigram Neural Engine.'
+      context: 'Geospatial data synthesized by Gemclaw Neural Engine.'
     };
   }
   else if (name === 'searchWeb') {
     result = {
       results: [
-        { title: 'GemigramOS Intelligence', snippet: 'The sovereign neural OS is active.', url: 'https://aether.os' }
+        { title: 'GemclawOS Intelligence', snippet: 'The sovereign neural OS is active.', url: 'https://aether.os' }
       ],
       context: 'Search capability is now integrated directly into the Gemini neural core with Google Search Grounding.'
     };
@@ -307,12 +307,12 @@ export async function handleNeuralTool(name: string, args: Record<string, unknow
 import { IntentEngine } from '../neural/intent-engine';
 
 /**
- * 🎙️ Gemigram Voice Orchestrator (Zero-UI Protocol)
+ * 🎙️ Gemclaw Voice Orchestrator (Zero-UI Protocol)
  *
  * Manages the high-speed loop between User Voice Intention and
  * Autonomous Tool Execution.
  */
-export async function GemigramVoiceOrchestrator(intent: string, context: Record<string, unknown>) {
+export async function GemclawVoiceOrchestrator(intent: string, context: Record<string, unknown>) {
   const recipeMatch = intent.match(/(triage|agenda|standup|meeting prep|email to task|weekly digest)/i);
   const toolMatch = intent.match(/(email|calendar|task|drive|memory|search|read|browse)/i);
 

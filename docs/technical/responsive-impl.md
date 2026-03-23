@@ -196,7 +196,7 @@ px-6 sm:px-8 py-3 sm:py-4
 
 ## 📝 Phase 4: Firebase Domain Name Update
 
-### Required Changes for "Gemigram" Domain:
+### Required Changes for "Gemclaw" Domain:
 
 The Firebase hosting domain configuration requires updating several files. However, **Firebase Hosting domains are managed through Firebase Console and CLI**, not just code changes.
 
@@ -293,7 +293,7 @@ import { Brain, Network, Zap, Activity } from 'lucide-react';
 - Activity: Real-time monitoring
 ```
 
-#### 2. **Cosmic/Gemigramial Icons** (For forge/galaxy)
+#### 2. **Cosmic/Gemclawial Icons** (For forge/galaxy)
 ```tsx
 import { Sparkles, Globe, Cloud, Flame } from 'lucide-react';
 

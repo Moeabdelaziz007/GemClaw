@@ -1,6 +1,6 @@
 /**
  * Sovereign GWS Tool-Chain
- * Bridges GemigramOS agents with the Google Workspace ecosystem.
+ * Bridges GemclawOS agents with the Google Workspace ecosystem.
  */
 
 export interface GWSFile {

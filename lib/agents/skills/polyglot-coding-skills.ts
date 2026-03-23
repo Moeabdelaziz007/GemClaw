@@ -39,7 +39,7 @@ export const PYTHON_EXPERT_SKILL: SkillDefinition = {
     estimatedSetupTime: '15 minutes',
     tags: ['python', 'programming', 'data-science', 'ai', 'web', 'django', 'flask'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/python-expert'
   }
 };
@@ -76,7 +76,7 @@ export const JAVASCRIPT_TYPESCRIPT_SKILL: SkillDefinition = {
     estimatedSetupTime: '18 minutes',
     tags: ['javascript', 'typescript', 'react', 'nodejs', 'full-stack', 'nextjs', 'vue'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/javascript-typescript'
   }
 };
@@ -113,7 +113,7 @@ export const RUST_PROGRAMMING_SKILL: SkillDefinition = {
     estimatedSetupTime: '25 minutes',
     tags: ['rust', 'systems', 'performance', 'wasm', 'native', 'memory-safe'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/rust-programming'
   }
 };
@@ -150,7 +150,7 @@ export const GO_PROGRAMMING_SKILL: SkillDefinition = {
     estimatedSetupTime: '18 minutes',
     tags: ['go', 'golang', 'concurrency', 'microservices', 'cloud-native', 'grpc'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/go-programming'
   }
 };
@@ -187,7 +187,7 @@ export const JAVA_ENTERPRISE_SKILL: SkillDefinition = {
     estimatedSetupTime: '22 minutes',
     tags: ['java', 'spring', 'enterprise', 'jvm', 'microservices', 'maven'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/java-enterprise'
   }
 };
@@ -224,7 +224,7 @@ export const CPP_PROGRAMMING_SKILL: SkillDefinition = {
     estimatedSetupTime: '30 minutes',
     tags: ['cpp', 'c++', 'performance', 'systems', 'games', 'hpc'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/cpp-programming'
   }
 };

@@ -11,7 +11,7 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { db } from '@/firebase';
-import type { Agent } from '@/lib/store/useGemigramStore';
+import type { Agent } from '@/lib/store/useGemclawStore';
 import type { Notification } from '@/lib/types/models';
 import { nanoid } from 'nanoid';
 

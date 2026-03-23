@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FloatingNav } from './ui/FloatingNav';
 import { HUD } from './ui/HUD';
 import { Cloud, Signal, Activity } from 'lucide-react';
-import { GemigramLogo } from './GemigramLogo';
+import { GemclawLogo } from './GemclawLogo';
 import { useAuth } from './Providers';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from './ThemeToggle';
@@ -14,7 +14,7 @@ import { BRAND } from '@/lib/constants/branding';
 import { useVisualTier } from '@/lib/hooks/useVisualTier';
 import { useFirestoreSync } from '../lib/hooks/useFirestoreSync';
 import { useVoiceCommandRouter } from '../lib/hooks/useVoiceCommandRouter';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import { useTranslation } from '../hooks/useTranslation';
 
 interface AppShellProps {
@@ -27,7 +27,7 @@ export default function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const { tier, allowMotion, allowAmbientMotion, isMobile } = useVisualTier();
   const telemetry = useSystemTelemetry();
-  const { linkType } = useGemigramStore();
+  const { linkType } = useGemclawStore();
   const { t } = useTranslation();
   
   // Activate Sovereign Sync & Command Router
@@ -73,7 +73,7 @@ export default function AppShell({ children }: AppShellProps) {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3 sm:gap-4">
               <div className="flex items-center gap-3 min-w-0">
-                <GemigramLogo variant="full" size={32} className="shrink-0" />
+                <GemclawLogo variant="full" size={32} className="shrink-0" />
                 <div className="hidden h-6 w-px bg-white/5 lg:block" />
               </div>
 

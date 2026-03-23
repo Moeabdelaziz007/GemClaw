@@ -1,6 +1,6 @@
-# 🤝 Contributing to GemigramOS
+# 🤝 Contributing to GemclawOS
 
-Welcome, Neural Architect. By contributing to GemigramOS, you are helping build the first Sovereign Intelligence Orchestration System.
+Welcome, Neural Architect. By contributing to GemclawOS, you are helping build the first Sovereign Intelligence Orchestration System.
 
 ---
 

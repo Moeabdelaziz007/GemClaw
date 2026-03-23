@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Smartphone, Download, X, Share2, Sparkles, Box, ShieldCheck, Zap } from 'lucide-react';
 import { generateAgentAvatarUrl } from '@/lib/pwa/avatar-generator';
 import { installAgentAsPWA } from '@/lib/pwa/dynamic-manifest';
-import { Agent } from '@/lib/store/useGemigramStore';
+import { Agent } from '@/lib/store/useGemclawStore';
 
 interface AddToHomeScreenProps {
   agent: Agent;

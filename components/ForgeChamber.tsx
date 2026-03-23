@@ -21,13 +21,13 @@ const FORGE_STEPS = [
 ];
 
 // Forge Chamber internal imports
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import DeployAgentButton from './DeployAgentButton';
 import { AgentFormData } from '@/lib/hooks/useForgeLogic';
 
 export default function ForgeChamber({ onComplete }: ForgeChamberProps) {
-  const pendingManifest = useGemigramStore(state => state.pendingManifest);
-  const setActiveAgentId = useGemigramStore(state => state.setActiveAgentId);
+  const pendingManifest = useGemclawStore(state => state.pendingManifest);
+  const setActiveAgentId = useGemclawStore(state => state.setActiveAgentId);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isFlashing, setIsFlashing] = useState(false);
   const [showDeployOption, setShowDeployOption] = useState(false);

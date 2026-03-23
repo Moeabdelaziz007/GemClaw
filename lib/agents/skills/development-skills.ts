@@ -40,7 +40,7 @@ export const FRONTEND_DEV_SKILL: SkillDefinition = {
     estimatedSetupTime: '20 minutes',
     tags: ['frontend', 'react', 'vue', 'web', 'ui', 'javascript', 'responsive'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/frontend-development'
   }
 };
@@ -78,7 +78,7 @@ export const BACKEND_DEV_SKILL: SkillDefinition = {
     estimatedSetupTime: '25 minutes',
     tags: ['backend', 'api', 'nodejs', 'python', 'cloud', 'microservices', 'serverless'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/backend-development'
   }
 };
@@ -116,7 +116,7 @@ export const DATABASE_ARCHITECT_SKILL: SkillDefinition = {
     estimatedSetupTime: '20 minutes',
     tags: ['database', 'sql', 'nosql', 'mongodb', 'postgresql', 'data', 'optimization'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/database-architect'
   }
 };
@@ -154,7 +154,7 @@ export const DEVOPS_SKILL: SkillDefinition = {
     estimatedSetupTime: '30 minutes',
     tags: ['devops', 'docker', 'kubernetes', 'ci-cd', 'automation', 'cloud', 'infrastructure'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/devops-cicd'
   }
 };
@@ -191,7 +191,7 @@ export const MOBILE_DEV_SKILL: SkillDefinition = {
     estimatedSetupTime: '25 minutes',
     tags: ['mobile', 'ios', 'android', 'react-native', 'flutter', 'app'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/mobile-development'
   }
 };
@@ -228,7 +228,7 @@ export const API_DESIGNER_SKILL: SkillDefinition = {
     estimatedSetupTime: '18 minutes',
     tags: ['api', 'rest', 'graphql', 'integration', 'webhooks', 'oauth'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/api-designer'
   }
 };
@@ -265,7 +265,7 @@ export const CLOUD_INFRASTRUCTURE_SKILL: SkillDefinition = {
     estimatedSetupTime: '30 minutes',
     tags: ['cloud', 'aws', 'azure', 'gcp', 'infrastructure', 'scalability'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/cloud-infrastructure'
   }
 };

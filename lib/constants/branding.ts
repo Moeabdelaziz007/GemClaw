@@ -1,21 +1,21 @@
 export const BRAND = {
   product: {
-    name: 'Gemigram',
-    platformName: 'Gemigram AIOS',
+    name: 'Gemclaw',
+    platformName: 'Gemclaw AIOS',
     tagline: 'Sovereign Intelligence Orchestration System',
     systemVersion: 'OS_Sovereign.v3.0',
   },
   subProducts: {
-    forge: 'Gemigram Forge',
-    galaxy: 'Gemigram Galaxy',
+    forge: 'Gemclaw Forge',
+    galaxy: 'Gemclaw Galaxy',
     hub: 'Neural Hub',
     workspace: 'Neural Workspace',
-    marketplace: 'Gemigram Market',
+    marketplace: 'Gemclaw Market',
   },
   naming: {
     aether: {
       role: 'architectural_framework',
-      note: 'Aether is the underlying neural spine. Gemigram is the Sovereign Interface.',
+      note: 'Aether is the underlying neural spine. Gemclaw is the Sovereign Interface.',
     },
   },
   labels: {
@@ -24,10 +24,10 @@ export const BRAND = {
       workspace: 'Neural Workspace',
       hub: 'Neural Hub',
       settings: 'Config Matrix',
-      forge: 'Gemigram Forge',
-      galaxy: 'Gemigram Galaxy',
-      about: 'About Gemigram',
-      marketplace: 'Gemigram Market',
+      forge: 'Gemclaw Forge',
+      galaxy: 'Gemclaw Galaxy',
+      about: 'About Gemclaw',
+      marketplace: 'Gemclaw Market',
     },
     nav: {
       home: 'SOVEREIGN_CORE',
@@ -51,7 +51,7 @@ export const BRAND = {
     },
     forgeMark: {
       path: '/assets/branding/logo.png', // Unified for now
-      usage: 'Gemigram Forge mark.',
+      usage: 'Gemclaw Forge mark.',
     },
     avatar: {
       default: '/avatars/default.png',

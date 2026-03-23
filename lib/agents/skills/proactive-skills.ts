@@ -39,7 +39,7 @@ export const PROACTIVE_TASKS_SKILL: SkillDefinition = {
     estimatedSetupTime: '18 minutes',
     tags: ['proactive', 'autonomous', 'initiative', 'automation', 'self-directed'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/proactive-tasks'
   }
 };
@@ -77,7 +77,7 @@ export const INTELLIGENT_MONITORING_SKILL: SkillDefinition = {
     estimatedSetupTime: '12 minutes',
     tags: ['monitoring', 'alerts', 'surveillance', 'detection', 'observability'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/intelligent-monitoring'
   }
 };
@@ -113,7 +113,7 @@ export const EVENT_DRIVEN_ACTIONS_SKILL: SkillDefinition = {
     estimatedSetupTime: '15 minutes',
     tags: ['events', 'automation', 'triggers', 'workflows', 'reactive'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/event-driven-actions'
   }
 };
@@ -149,7 +149,7 @@ export const PREDICTIVE_ENGAGEMENT_SKILL: SkillDefinition = {
     estimatedSetupTime: '20 minutes',
     tags: ['predictive', 'engagement', 'anticipation', 'personalization', 'ai-assistance'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/predictive-engagement'
   }
 };

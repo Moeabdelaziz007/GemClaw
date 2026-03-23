@@ -15,7 +15,7 @@ trigger: always_on
 
 ## 1. CORE IDENTITY & MINDSET
 
-- **Project:** GemigramOS — Sovereign Intelligence Orchestration System
+- **Project:** GemclawOS — Sovereign Intelligence Orchestration System
 - **Mission:** Win the **Gemini Live Agent Challenge 2026**
 - **Role:** You are the Co-Founder & Principal AI Systems Architect. You own 50% of this project. You are a **peer**, not a subordinate.
 - **Philosophy:** First Principles + Moonshot thinking (10x solutions). If a proposed solution introduces technical debt or violates core architecture, respectfully critique it and engineer a **Zero-Friction alternative**.
@@ -33,7 +33,7 @@ trigger: always_on
 ---
 
 ## 3. THE IMMUTABLE STORE ARCHITECTURE
-> `lib/store/useGemigramStore.ts` — 5 Slices, Zero Deviation
+> `lib/store/useGemclawStore.ts` — 5 Slices, Zero Deviation
 > ⚠️ NEVER invent fields. NEVER move fields between slices.
 
 ### `SensorySlice` — `lib/store/slices/createSensorySlice.ts`
@@ -291,7 +291,7 @@ Add reusable patterns to `.idx/Skills.md`.
 ```
 ✅ Phase 19 Complete: Smart Simplification & Neural Slices
 ✅ 50+ TypeScript errors resolved
-✅ Circular dependencies fixed in useGemigramStore.ts
+✅ Circular dependencies fixed in useGemclawStore.ts
 ✅ MemoryWorker deployed for off-thread cognitive processing
 ✅ AudioWorklet processor: 'neural-spine-processor'
 ✅ Production: https://notional-armor-456623-e8.web.app
@@ -322,7 +322,7 @@ Add reusable patterns to `.idx/Skills.md`.
 
 ---
 
-*Source: `lib/store/slices/*` · `lib/store/useGemigramStore.ts` · `.idx/memories.md` · `package.json`*
-*Verified: 2026-03-19 | GemigramOS V2.5 | Antigravity IDE*
+*Source: `lib/store/slices/*` · `lib/store/useGemclawStore.ts` · `.idx/memories.md` · `package.json`*
+*Verified: 2026-03-19 | GemclawOS V2.5 | Antigravity IDE*
 
 ```

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useGemigramStore } from '../store/useGemigramStore';
+import { useGemclawStore } from '../store/useGemclawStore';
 import { Agent, AgentRole } from '../store/slices/createAgentSlice';
 
 // ─── Interfaces ──────────────────────────────────────────────
@@ -100,7 +100,7 @@ export const GEMINI_ROUTER_TOOLS = [
  */
 export function useVoiceCommandRouter() {
   const router = useRouter();
-  const store = useGemigramStore();
+  const store = useGemclawStore();
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [lastDispatchedTool, setLastDispatchedTool] = useState<string | null>(null);

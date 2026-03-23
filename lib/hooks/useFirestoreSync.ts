@@ -8,7 +8,7 @@ import {
   query,
   where
 } from 'firebase/firestore';
-import { useGemigramStore } from '../store/useGemigramStore';
+import { useGemclawStore } from '../store/useGemclawStore';
 import { useAuth } from '@/components/Providers';
 
 /**
@@ -20,7 +20,7 @@ import { useAuth } from '@/components/Providers';
  */
 export function useFirestoreSync() {
   const { user } = useAuth();
-  const { setAgents } = useGemigramStore();
+  const { setAgents } = useGemclawStore();
   const isSyncing = useRef(false);
 
   // 1. Inbound Sync: Listen for remote changes

@@ -2,7 +2,7 @@
 > Autonomous Architectural Intelligence
 
 ## GOAL
-To discover, document, and learn from high-quality implementation patterns within the GemigramOS codebase, ensuring architectural consistency and evolution.
+To discover, document, and learn from high-quality implementation patterns within the GemclawOS codebase, ensuring architectural consistency and evolution.
 
 ## INSTRUCTIONS
 1. **Discovery Scan**: Periodically use `grep_search` and `github-manual` to find recurring architectural patterns (e.g., FIFO queues, state slicing, bridge status management).

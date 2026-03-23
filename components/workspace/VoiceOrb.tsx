@@ -2,23 +2,23 @@
 
 import { motion, useSpring } from 'framer-motion';
 import { useEffect } from 'react';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 
 interface VoiceOrbProps {
   size?: number;
 }
 
 /**
- * 🎙️ VoiceOrb — The heart of Gemigram AIOS.
+ * 🎙️ VoiceOrb — The heart of Gemclaw AIOS.
  * A high-fidelity, reactive orb that scales with microphone input
  * and changes color based on agent cognitive states.
  */
 export function VoiceOrb({ size = 160 }: VoiceOrbProps) {
   // 1. Precise Zustand Selectors (Minimize re-renders)
-  const micLevel = useGemigramStore((s) => s.micLevel);
-  const isSpeaking = useGemigramStore((s) => s.isSpeaking);
-  const isThinking = useGemigramStore((s) => s.isThinking);
-  const isInterrupted = useGemigramStore((s) => s.isInterrupted);
+  const micLevel = useGemclawStore((s) => s.micLevel);
+  const isSpeaking = useGemclawStore((s) => s.isSpeaking);
+  const isThinking = useGemclawStore((s) => s.isThinking);
+  const isInterrupted = useGemclawStore((s) => s.isInterrupted);
 
   // 2. Spring-driven Scaling (Zero-latency visual feel)
   const springConfig = { stiffness: 200, damping: 25, mass: 0.5 };

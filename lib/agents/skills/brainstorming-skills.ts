@@ -40,7 +40,7 @@ export const BRAINSTORMING_SKILL: SkillDefinition = {
     estimatedSetupTime: '10 minutes',
     tags: ['brainstorming', 'creativity', 'ideation', 'innovation', 'ideas', 'divergent-thinking'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/creative-brainstorming'
   }
 };
@@ -76,7 +76,7 @@ export const LATERAL_THINKING_SKILL: SkillDefinition = {
     estimatedSetupTime: '15 minutes',
     tags: ['lateral-thinking', 'unconventional', 'creativity', 'problem-solving', 'patterns'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/lateral-thinking'
   }
 };
@@ -112,7 +112,7 @@ export const DESIGN_THINKING_SKILL: SkillDefinition = {
     estimatedSetupTime: '12 minutes',
     tags: ['design', 'ux', 'human-centered', 'innovation', 'prototyping', 'empathy'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/design-thinking'
   }
 };
@@ -148,7 +148,7 @@ export const TRIZ_INNOVATION_SKILL: SkillDefinition = {
     estimatedSetupTime: '20 minutes',
     tags: ['triz', 'innovation', 'systematic', 'invention', 'engineering', 'methodology'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/triz-innovation'
   }
 };
@@ -183,7 +183,7 @@ export const SCENARIO_PLANNING_SKILL: SkillDefinition = {
     estimatedSetupTime: '18 minutes',
     tags: ['scenario', 'futures', 'planning', 'strategy', 'foresight', 'trends'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/scenario-planning'
   }
 };

@@ -39,7 +39,7 @@ export const VIDEO_PRODUCTION_SKILL: SkillDefinition = {
     estimatedSetupTime: '25 minutes',
     tags: ['video', 'editing', 'production', 'multimedia', 'youtube', 'motion-graphics'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/video-production'
   }
 };
@@ -76,7 +76,7 @@ export const PODCAST_PRODUCTION_SKILL: SkillDefinition = {
     estimatedSetupTime: '18 minutes',
     tags: ['podcast', 'audio', 'recording', 'broadcasting', 'media', 'radio'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/podcast-production'
   }
 };
@@ -113,7 +113,7 @@ export const GRAPHIC_DESIGN_SKILL: SkillDefinition = {
     estimatedSetupTime: '15 minutes',
     tags: ['design', 'graphics', 'illustration', 'branding', 'visual', 'logo'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/graphic-design'
   }
 };
@@ -149,7 +149,7 @@ export const COPYWRITING_SKILL: SkillDefinition = {
     estimatedSetupTime: '12 minutes',
     tags: ['copywriting', 'marketing', 'strategy', 'seo', 'content', 'advertising'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/copywriting-strategy'
   }
 };
@@ -186,7 +186,7 @@ export const THREE_D_ANIMATION_SKILL: SkillDefinition = {
     estimatedSetupTime: '35 minutes',
     tags: ['3d', 'modeling', 'animation', 'rendering', 'blender', 'visualization'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/3d-animation'
   }
 };
@@ -223,7 +223,7 @@ export const MUSIC_COMPOSITION_SKILL: SkillDefinition = {
     estimatedSetupTime: '25 minutes',
     tags: ['music', 'composition', 'production', 'audio', 'midi', 'mixing'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/music-composition'
   }
 };

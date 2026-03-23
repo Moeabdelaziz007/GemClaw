@@ -31,13 +31,13 @@ export async function analyzeRepository(repoUrl: string) {
     let commitSha = '';
     try {
       const commitUrl = `https://api.github.com/repos/${owner}/${repo}/commits/main`;
-      const commitRes = await fetch(commitUrl, { headers: { 'User-Agent': 'Gemigram-Voice-OS-Analyzer' } });
+      const commitRes = await fetch(commitUrl, { headers: { 'User-Agent': 'Gemclaw-Voice-OS-Analyzer' } });
       if (commitRes.ok) {
         const commitData = await commitRes.json();
         commitSha = commitData.sha;
       } else {
         const commitUrlMaster = `https://api.github.com/repos/${owner}/${repo}/commits/master`;
-        const commitResMaster = await fetch(commitUrlMaster, { headers: { 'User-Agent': 'Gemigram-Voice-OS-Analyzer' } });
+        const commitResMaster = await fetch(commitUrlMaster, { headers: { 'User-Agent': 'Gemclaw-Voice-OS-Analyzer' } });
         if (commitResMaster.ok) {
           const commitDataMaster = await commitResMaster.json();
           commitSha = commitDataMaster.sha;
@@ -66,7 +66,7 @@ export async function analyzeRepository(repoUrl: string) {
     const zipUrl = `https://api.github.com/repos/${owner}/${repo}/zipball/main`;
     const response = await fetch(zipUrl, {
       headers: {
-        'User-Agent': 'Gemigram-Voice-OS-Analyzer',
+        'User-Agent': 'Gemclaw-Voice-OS-Analyzer',
       },
     });
 
@@ -74,7 +74,7 @@ export async function analyzeRepository(repoUrl: string) {
     if (!response.ok) {
       const zipUrlMaster = `https://api.github.com/repos/${owner}/${repo}/zipball/master`;
       const responseMaster = await fetch(zipUrlMaster, {
-        headers: { 'User-Agent': 'Gemigram-Voice-OS-Analyzer' },
+        headers: { 'User-Agent': 'Gemclaw-Voice-OS-Analyzer' },
       });
       if (!responseMaster.ok) {
         throw new Error(`Failed to fetch repository: ${responseMaster.statusText}`);
@@ -112,7 +112,7 @@ export async function analyzeRepository(repoUrl: string) {
 أنت مهندس معماري رئيسي للذكاء الاصطناعي والأمن السيبراني (Principal AI Architecture & Cybersecurity Engineer).
 عقليتك تحليلية، هادئة، وتعتمد على المبادئ الأولى (First Principles).
 
-الهدف: تحليل مستودع "Gemigram-Voice-OS" لبناء نظام تشغيل صوتي (Voice-First OS) متطور للفوز بتحدي Gemini Live Agent.
+الهدف: تحليل مستودع "Gemclaw-Voice-OS" لبناء نظام تشغيل صوتي (Voice-First OS) متطور للفوز بتحدي Gemini Live Agent.
 يجب أن يكون النظام "Zero-UI" (يعتمد على الصوت كلياً مع واجهة محيطية Ambient)، ويستخدم بيئة Google (Gemini Live API, Firebase, Google Workspace).
 
 إليك الكود المصدري للمشروع بالكامل:

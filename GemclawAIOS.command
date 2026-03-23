@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 🧬 GemigramAIOS Sovereign Launcher
+# 🧬 GemclawAIOS Sovereign Launcher
 # Double-click this to ignite the Aether Neural Spine.
 
 clear
@@ -17,7 +17,7 @@ echo "
 "
 
 echo "------------------------------------------------"
-echo "🌐 GemigramAIOS V3.0: INITIALIZING SOVEREIGN NEURAL SPINE"
+echo "🌐 GemclawAIOS V3.0: INITIALIZING SOVEREIGN NEURAL SPINE"
 echo "------------------------------------------------"
 
 # 1. Directory Lock
@@ -49,6 +49,6 @@ echo "🖥️  Launching Aether Sovereign Dashboard..."
 open "http://localhost:3000"
 
 echo ""
-echo "✅ SUCCESS: GemigramAIOS is now active and conscious."
+echo "✅ SUCCESS: GemclawAIOS is now active and conscious."
 echo "Keep this terminal open for live logs or background it."
 echo "------------------------------------------------"

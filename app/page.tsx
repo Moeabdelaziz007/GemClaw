@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '@/components/Providers';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import HeroBackground from '@/components/HeroBackground';
 import { EnterpriseHeader } from '@/components/landing/Header';
 import { EnterpriseHero } from '@/components/landing/Hero';
@@ -23,8 +23,8 @@ function SovereignInitializer() {
   const agentId = searchParams.get('agent');
   const { user } = useAuth();
   const router = useRouter();
-  const voiceSession = useGemigramStore((state) => state.voiceSession);
-  const setVoiceSession = useGemigramStore((state) => state.setVoiceSession);
+  const voiceSession = useGemclawStore((state) => state.voiceSession);
+  const setVoiceSession = useGemclawStore((state) => state.setVoiceSession);
 
   useEffect(() => {
     // If agent ID is in URL, materialize the experience immediately
@@ -53,8 +53,8 @@ function SovereignInitializer() {
 export default function LandingPage() {
   const { user } = useAuth();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const voiceSession = useGemigramStore((state) => state.voiceSession);
-  const setVoiceSession = useGemigramStore((state) => state.setVoiceSession);
+  const voiceSession = useGemclawStore((state) => state.voiceSession);
+  const setVoiceSession = useGemclawStore((state) => state.setVoiceSession);
 
   const handleVoiceLogin = () => {
     setVoiceSession({

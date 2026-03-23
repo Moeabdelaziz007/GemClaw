@@ -1,6 +1,6 @@
 'use client';
 
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import { Brain, Globe, ZoomIn, ZoomOut, Move, Network, Radio } from 'lucide-react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -9,7 +9,7 @@ import { BRAND } from '@/lib/constants/branding';
 import { useVisualTier } from '@/lib/hooks/useVisualTier';
 
 export default function GalaxyScene() {
-  const { agents, setActiveAgentId, activeAgentId } = useGemigramStore();
+  const { agents, setActiveAgentId, activeAgentId } = useGemclawStore();
   const router = useRouter();
   const { tier, allowMotion, allowAmbientMotion, allowHeavyEffects, isMobile } = useVisualTier();
   const [zoom, setZoom] = useState(1);

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import type { Agent } from '@/lib/store/slices/createAgentSlice';
 import { ModelSelector } from './ModelSelector';
 import { useTranslation } from '../../lib/i18n/useTranslation';
@@ -20,14 +20,14 @@ interface PureVoiceCanvasProps {
  */
 export const PureVoiceCanvas: React.FC<PureVoiceCanvasProps> = ({ activeAgent }) => {
   // Individual ZUSTAND Selectors for performance
-  const micLevel = useGemigramStore((state) => state.micLevel);
-  const isThinking = useGemigramStore((state) => state.isThinking);
-  const isSpeaking = useGemigramStore((state) => state.isSpeaking);
-  const sessionState = useGemigramStore((state) => state.sessionState);
-  const latencyMs = useGemigramStore((state) => state.latencyMs);
-  const tokensUsed = useGemigramStore((state) => state.tokensUsed);
-  const tokenBudget = useGemigramStore((state) => state.tokenBudget);
-  const transcript = useGemigramStore((state) => state.transcript);
+  const micLevel = useGemclawStore((state) => state.micLevel);
+  const isThinking = useGemclawStore((state) => state.isThinking);
+  const isSpeaking = useGemclawStore((state) => state.isSpeaking);
+  const sessionState = useGemclawStore((state) => state.sessionState);
+  const latencyMs = useGemclawStore((state) => state.latencyMs);
+  const tokensUsed = useGemclawStore((state) => state.tokensUsed);
+  const tokenBudget = useGemclawStore((state) => state.tokenBudget);
+  const transcript = useGemclawStore((state) => state.transcript);
 
   // Local state for Agent Name fade logic
   const [showAgentName, setShowAgentName] = useState(true);

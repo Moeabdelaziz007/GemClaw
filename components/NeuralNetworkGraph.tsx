@@ -42,7 +42,7 @@ export default function NeuralNetworkGraph() {
       data-visual-tier={tier}
     >
       <div className="relative z-10 mb-4">
-        <h3 className="mb-1 text-[11px] font-black uppercase tracking-[0.3em] text-white/60">Gemigram Neural Net</h3>
+        <h3 className="mb-1 text-[11px] font-black uppercase tracking-[0.3em] text-white/60">Gemclaw Neural Net</h3>
         <div className="flex gap-4">
           <p className="font-mono text-[8px] uppercase text-aether-neon/60">Nodes: 14.7B</p>
           <p className="font-mono text-[8px] uppercase text-aether-neon/60">Latency: 2.1ms</p>

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLiveAPI } from '@/hooks/useLiveAPI';
 import { useNeuralFallback } from '@/hooks/useNeuralFallback';
 import { useAudioProcessor } from '@/hooks/useAudioProcessor';
-import { useGemigramStore, Agent } from '@/lib/store/useGemigramStore';
+import { useGemclawStore, Agent } from '@/lib/store/useGemclawStore';
 import { bridgeStatusManager } from '@/lib/utils/bridgeStatusManager';
 import { ToolResult, Tool, FunctionDeclaration } from '@/lib/types/live-api';
 
@@ -16,9 +16,9 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
   const [isThinking, setIsThinking] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
   
-  const transcript = useGemigramStore(state => state.transcript);
-  const linkType = useGemigramStore(state => state.linkType);
-  const setLinkType = useGemigramStore(state => state.setLinkType);
+  const transcript = useGemclawStore(state => state.transcript);
+  const linkType = useGemclawStore(state => state.linkType);
+  const setLinkType = useGemclawStore(state => state.setLinkType);
 
   useEffect(() => {
     const currentStatus = bridgeStatusManager.getStatus();
@@ -54,7 +54,7 @@ export function useVoiceAgentLogic({ activeAgent, googleAccessToken }: UseVoiceA
     if (localText && !isConnected) {
        console.log("[Neural Fallback] Local Transcript:", localText);
        // Sync local text to transcript store if cloud is dead
-       useGemigramStore.getState().addTranscriptMessage("user", `(Local) ${localText}`);
+       useGemclawStore.getState().addTranscriptMessage("user", `(Local) ${localText}`);
     }
   }, [localText, isConnected]);
 

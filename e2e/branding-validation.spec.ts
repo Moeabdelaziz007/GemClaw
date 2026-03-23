@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 /**
  * 🧪 Mission 06: Branding Validation
- * Verifies that the Gemigram AIOS branding and Aether Forge identity 
+ * Verifies that the Gemclaw AIOS branding and Aether Forge identity 
  * are correctly applied across the system.
  */
 test.describe('Mission 06: Branding & Identity', () => {
@@ -12,13 +12,13 @@ test.describe('Mission 06: Branding & Identity', () => {
     await page.goto('/dashboard');
   });
 
-  test('should display Gemigram AIOS branding in the title and dashboard', async ({ page }) => {
+  test('should display Gemclaw AIOS branding in the title and dashboard', async ({ page }) => {
     // Title check
-    await expect(page).toHaveTitle(/Gemigram/i);
+    await expect(page).toHaveTitle(/Gemclaw/i);
     
     // Header/Logo check (if applicable)
-    // Looking for Gemigram text in the UI
-    const branding = page.getByText(/Gemigram/i);
+    // Looking for Gemclaw text in the UI
+    const branding = page.getByText(/Gemclaw/i);
     await expect(branding.first()).toBeVisible();
   });
 
@@ -35,7 +35,7 @@ test.describe('Mission 06: Branding & Identity', () => {
   test('should verify branding consistency in setting/workspace', async ({ page }) => {
     // Workspace check
     await page.goto('/workspace');
-    await expect(page).toHaveTitle(/Gemigram/i);
+    await expect(page).toHaveTitle(/Gemclaw/i);
     
     // Settings check
     await page.goto('/settings');

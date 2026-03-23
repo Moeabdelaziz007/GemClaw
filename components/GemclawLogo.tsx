@@ -7,7 +7,7 @@ import { BRAND } from '@/lib/constants/branding';
 
 export type LogoVariant = 'icon' | 'wordmark' | 'full' | 'favicon';
 
-interface GemigramLogoProps {
+interface GemclawLogoProps {
   variant?: LogoVariant;
   size?: number;
   className?: string;
@@ -15,15 +15,15 @@ interface GemigramLogoProps {
 }
 
 /**
- * 🧬 GemigramOS Sovereign Logo Component
+ * 🧬 GemclawOS Sovereign Logo Component
  * Unified branding for the entire AIOS ecosystem.
  */
-export function GemigramLogo({ 
+export function GemclawLogo({ 
   variant = 'icon', 
   size = 32, 
   className = "",
   showTagline = true 
-}: GemigramLogoProps) {
+}: GemclawLogoProps) {
   
   // Icon Only
   if (variant === 'icon' || variant === 'favicon') {
@@ -71,7 +71,7 @@ export function GemigramLogo({
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {variant === 'full' && (
-        <GemigramLogo variant="icon" size={size} />
+        <GemclawLogo variant="icon" size={size} />
       )}
       
       <div className="flex flex-col justify-center">
@@ -100,4 +100,4 @@ export function GemigramLogo({
   );
 }
 
-export default GemigramLogo;
+export default GemclawLogo;

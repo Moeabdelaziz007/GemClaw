@@ -45,7 +45,7 @@ export const GMAIL_SKILL: SkillDefinition = {
     estimatedSetupTime: '5 minutes',
     tags: ['email', 'communication', 'google', 'messaging', 'inbox'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://developers.google.com/workspace/guides/create-credentials'
   }
 };
@@ -87,7 +87,7 @@ export const CALENDAR_SKILL: SkillDefinition = {
     estimatedSetupTime: '10 minutes',
     tags: ['calendar', 'scheduling', 'productivity', 'google', 'events', 'meetings'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://developers.google.com/workspace/calendar/api'
   }
 };
@@ -128,7 +128,7 @@ export const DRIVE_SKILL: SkillDefinition = {
     estimatedSetupTime: '5 minutes',
     tags: ['storage', 'files', 'cloud', 'google', 'documents', 'sharing'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://developers.google.com/workspace/drive/api'
   }
 };
@@ -169,7 +169,7 @@ export const DOCS_SKILL: SkillDefinition = {
     estimatedSetupTime: '7 minutes',
     tags: ['documents', 'writing', 'editing', 'google', 'text', 'collaboration'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://developers.google.com/workspace/docs/api'
   }
 };
@@ -210,7 +210,7 @@ export const SHEETS_SKILL: SkillDefinition = {
     estimatedSetupTime: '10 minutes',
     tags: ['spreadsheet', 'data', 'analysis', 'google', 'excel', 'calculations'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://developers.google.com/workspace/sheets/api'
   }
 };
@@ -251,7 +251,7 @@ export const SLIDES_SKILL: SkillDefinition = {
     estimatedSetupTime: '10 minutes',
     tags: ['presentation', 'slides', 'visual', 'google', 'pitch', 'display'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://developers.google.com/workspace/slides/api'
   }
 };
@@ -289,7 +289,7 @@ export const MAPS_SKILL: SkillDefinition = {
     estimatedSetupTime: '8 minutes',
     tags: ['location', 'map', 'navigation', 'google', 'places', 'directions'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://developers.google.com/maps/documentation'
   }
 };
@@ -330,7 +330,7 @@ export const PHOTOS_SKILL: SkillDefinition = {
     estimatedSetupTime: '5 minutes',
     tags: ['photos', 'images', 'gallery', 'google', 'memories', 'visual'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://developers.google.com/photos/library'
   }
 };

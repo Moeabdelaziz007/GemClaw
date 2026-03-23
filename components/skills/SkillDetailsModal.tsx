@@ -260,7 +260,7 @@ export default function SkillDetailsModal({
                     {/* Author */}
                     <div className="p-4 bg-white/5 rounded-xl border border-white/5">
                       <span className="text-white/40 text-xs uppercase tracking-wider block mb-2">Author</span>
-                      <p className="text-white font-semibold">{skill.metadata.author || 'Gemigram'}</p>
+                      <p className="text-white font-semibold">{skill.metadata.author || 'Gemclaw'}</p>
                     </div>
                   </div>
                 </section>

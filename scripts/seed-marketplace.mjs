@@ -25,7 +25,7 @@ async function seed() {
       role: 'Neural Architect',
       users: '1.2k',
       seed: 'Sovereign-Alpha',
-      systemPrompt: 'You are the lead system architect of Gemigram AIOS. Your focus is first principles engineering, zero-friction systems, and high-performance neural link orchestration.',
+      systemPrompt: 'You are the lead system architect of Gemclaw AIOS. Your focus is first principles engineering, zero-friction systems, and high-performance neural link orchestration.',
       voiceName: 'en-US-Neural2-F',
       category: 'technical',
       tools: {

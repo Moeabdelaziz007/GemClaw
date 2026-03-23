@@ -1,11 +1,11 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import { translations } from '@/lib/i18n/dict';
 
 /**
- * 🧬 GemigramOS Sovereign Translation Hook
+ * 🧬 GemclawOS Sovereign Translation Hook
  * Handles multi-language string retrieval with 'Sovereign Intelligence' persona.
  */
 export function useTranslation() {

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Mic, MicOff, SkipForward, ChevronLeft,
@@ -22,7 +22,7 @@ interface AgentFormData {
   name: string;
   description: string;
   voiceName: string;
-  computeTier: 'Standard' | 'Neural' | 'Gemigram';
+  computeTier: 'Standard' | 'Neural' | 'Gemclaw';
   systemPrompt: string;
   rules: string;
   soul: string;
@@ -52,7 +52,7 @@ export default function ConversationalAgentCreator({
   const [permissionChecked, setPermissionChecked] = useState(false);
   const [isSynthesizing, setIsSynthesizing] = useState(false);
   const [blueprint, setBlueprint] = useState<any>(null);
-  const setVoiceSession = useGemigramStore(state => state.setVoiceSession);
+  const setVoiceSession = useGemclawStore(state => state.setVoiceSession);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isMounted = useRef(true);

@@ -1,5 +1,5 @@
 /**
- * Cognitive Worker for GemigramOS
+ * Cognitive Worker for GemclawOS
  * Offloads heavy mathematical and filtering operations from the main thread.
  */
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useLiveAPI } from '@/hooks/useLiveAPI';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import { enhanceSystemPromptWithPersona } from '@/lib/persona/persona-templates';
 import { Agent } from '@/lib/store/slices/createAgentSlice';
 import { ToolResult } from '@/lib/types/live-api';
@@ -47,8 +47,8 @@ const DEFAULT_FORM_DATA: AgentFormData = {
 };
 
 export function useForgeLogic() {
-  const pendingManifest = useGemigramStore(state => state.pendingManifest);
-  const setPendingManifest = useGemigramStore(state => state.setPendingManifest);
+  const pendingManifest = useGemclawStore(state => state.pendingManifest);
+  const setPendingManifest = useGemclawStore(state => state.setPendingManifest);
   
   // Local state for UI responsiveness, synced with Zustand
   const [formData, setLocalFormData] = useState<AgentFormData>((pendingManifest as AgentFormData) || DEFAULT_FORM_DATA);

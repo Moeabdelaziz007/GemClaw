@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { db } from '@/firebase';
 import { doc, setDoc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore';
-import { Agent } from './useGemigramStore';
+import { Agent } from './useGemclawStore';
 
 interface SovereignState {
   isSaving: boolean;

@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import { Search, Plus } from 'lucide-react';
 import { AgentCard } from '@/components/ui/AgentCard';
 import { useRouter } from 'next/navigation';
 import { AgentCardSkeleton } from '@/components/ui/Skeleton';
 
 export default function HubPage() {
-  const { agents, setActiveAgentId, activeAgentId } = useGemigramStore();
+  const { agents, setActiveAgentId, activeAgentId } = useGemclawStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<'All' | 'AI Companion' | 'Creative Guide' | 'Specialist'>('All');
   const [isLoading, setIsLoading] = useState(true);

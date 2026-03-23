@@ -2,13 +2,13 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import { useAuth } from '@/components/Providers';
 import { Wifi, WifiOff, Database, Zap, RefreshCcw } from 'lucide-react';
 
 export function HUD() {
   const { user } = useAuth();
-  const lastSyncedAt = useGemigramStore((state) => state.lastSyncedAt);
+  const lastSyncedAt = useGemclawStore((state) => state.lastSyncedAt);
   const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
   const getSyncLabel = () => {

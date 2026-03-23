@@ -4,7 +4,7 @@
  */
 
 import { runSimpleReasoning, runNeuralIntelligence } from "./neural/client";
-import { useGemigramStore } from "./store/useGemigramStore";
+import { useGemclawStore } from "./store/useGemclawStore";
 
 /**
  * Standard Reasoning Flow

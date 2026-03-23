@@ -158,7 +158,7 @@ export const GITHUB_REPOSITORY_SKILL: SkillDefinition = {
     estimatedSetupTime: '10 minutes',
     tags: ['github', 'repository', 'git', 'version-control', 'collaboration'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/github-repository'
   }
 };
@@ -193,7 +193,7 @@ export const GITHUB_CODE_SEARCH_SKILL: SkillDefinition = {
     estimatedSetupTime: '5 minutes',
     tags: ['github', 'search', 'code-analysis', 'discovery'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/github-code-search'
   }
 };
@@ -230,7 +230,7 @@ export const GITHUB_PR_REVIEW_SKILL: SkillDefinition = {
     estimatedSetupTime: '12 minutes',
     tags: ['github', 'pull-request', 'code-review', 'collaboration', 'git'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/github-pr-review'
   }
 };
@@ -267,7 +267,7 @@ export const GITHUB_ISSUE_MANAGER_SKILL: SkillDefinition = {
     estimatedSetupTime: '8 minutes',
     tags: ['github', 'issues', 'project-management', 'tracking', 'labels'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/github-issue-manager'
   }
 };
@@ -303,7 +303,7 @@ export const GITHUB_ACTIONS_SKILL: SkillDefinition = {
     estimatedSetupTime: '15 minutes',
     tags: ['github', 'actions', 'ci-cd', 'automation', 'workflows', 'devops'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/github-actions'
   }
 };

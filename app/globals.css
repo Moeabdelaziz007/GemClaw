@@ -567,7 +567,7 @@
     scrollbar-width: none; 
   }
 
-  /* 🧬 GemigramOS Sovereign Design System (V2.0) */
+  /* 🧬 GemclawOS Sovereign Design System (V2.0) */
   .glass-sovereign {
     @apply backdrop-blur-[24px] bg-black/40 border border-white/[0.08] shadow-[inset_0_0_20px_rgba(255,255,255,0.02)];
     background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%);

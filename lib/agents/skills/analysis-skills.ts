@@ -39,7 +39,7 @@ export const DATA_ANALYSIS_SKILL: SkillDefinition = {
     estimatedSetupTime: '15 minutes',
     tags: ['analytics', 'data', 'statistics', 'visualization', 'machine-learning', 'insights'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/data-analysis'
   }
 };
@@ -77,7 +77,7 @@ export const WEB_SEARCH_SKILL: SkillDefinition = {
     estimatedSetupTime: '5 minutes',
     tags: ['search', 'research', 'information', 'web', 'google', 'discovery'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://serpapi.com/'
   }
 };
@@ -114,7 +114,7 @@ export const NEWS_AGGREGATION_SKILL: SkillDefinition = {
     estimatedSetupTime: '5 minutes',
     tags: ['news', 'media', 'current-events', 'journalism', 'updates', 'headlines'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://newsapi.org/'
   }
 };
@@ -152,7 +152,7 @@ export const WEATHER_SKILL: SkillDefinition = {
     estimatedSetupTime: '5 minutes',
     tags: ['weather', 'forecast', 'climate', 'temperature', 'meteorology', 'alerts'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://openweathermap.org/api'
   }
 };
@@ -190,7 +190,7 @@ export const CRYPTO_TRACKING_SKILL: SkillDefinition = {
     estimatedSetupTime: '8 minutes',
     tags: ['cryptocurrency', 'bitcoin', 'trading', 'blockchain', 'finance', 'investment'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://www.coingecko.com/en/api'
   }
 };
@@ -227,7 +227,7 @@ export const CALCULATOR_SKILL: SkillDefinition = {
     estimatedSetupTime: '2 minutes',
     tags: ['calculator', 'math', 'computation', 'numbers', 'arithmetic', 'science'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/calculator'
   }
 };
@@ -263,7 +263,7 @@ export const SEMANTIC_MEMORY_SKILL: SkillDefinition = {
     estimatedSetupTime: '10 minutes',
     tags: ['memory', 'learning', 'knowledge', 'semantic', 'recall', 'intelligence'],
     version: '1.0.0',
-    author: 'Gemigram',
+    author: 'Gemclaw',
     documentationUrl: 'https://gemigram.ai/docs/skills/semantic-memory'
   }
 };

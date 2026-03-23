@@ -47,7 +47,7 @@ export const retrieveMemories = async (
 
   // Fetch candidate memories (scoped to user/agent)
   // Note: For massive scale, we'd use a dedicated Vector DB. 
-  // For Gemigram's "Frugal Luxury", we fetch latest candidates and rank locally.
+  // For Gemclaw's "Frugal Luxury", we fetch latest candidates and rank locally.
   const q = query(
     collection(db, MEMORIES_COLLECTION),
     where("metadata.userId", "==", userId),

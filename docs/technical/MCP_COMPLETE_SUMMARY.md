@@ -421,7 +421,7 @@ const expiring = apiCredentialsManager.getExpiringCredentials(7);
 ---
 
 *تم التنفيذ بأعلى معايير الجودة مع الحفاظ على:*
-- *الالتزام بمعمارية Gemigram GemigramOS*
+- *الالتزام بمعمارية Gemclaw GemclawOS*
 - *جودة الإنتاجية العالية*
 - *الأمان المتقدم*
 - *القابلية الكاملة للصيانة والتوسع*

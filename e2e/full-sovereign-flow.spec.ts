@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { mockVoiceAPI, simulateVoiceInput } from './utils/voice-mock';
 
-test.describe('GemigramOS Full Sovereign Flow', () => {
+test.describe('GemclawOS Full Sovereign Flow', () => {
   test.beforeEach(async ({ page }) => {
     await mockVoiceAPI(page);
     // Navigate to landing
@@ -10,7 +10,7 @@ test.describe('GemigramOS Full Sovereign Flow', () => {
 
   test('should navigate from landing to forge via voice simulation', async ({ page }) => {
     // Check if landing page loads
-    await expect(page.locator('h1')).toContainText(/Gemigram/i);
+    await expect(page.locator('h1')).toContainText(/Gemclaw/i);
 
     // Click Enter or simulate voice navigation if implemented
     const enterButton = page.getByRole('button', { name: /Enter|Start/i });

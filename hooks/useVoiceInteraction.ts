@@ -103,8 +103,8 @@ export function useVoiceInteraction() {
         
         // Sync transcript to SensorySlice per Forge rules
         if (newTranscript) {
-           import('../lib/store/useGemigramStore').then(({ useGemigramStore }) => {
-             useGemigramStore.getState().setStreamingBuffer(newTranscript);
+           import('../lib/store/useGemclawStore').then(({ useGemclawStore }) => {
+             useGemclawStore.getState().setStreamingBuffer(newTranscript);
            });
         }
       };
@@ -149,8 +149,8 @@ export function useVoiceInteraction() {
         const level = average / 255;
         
         // Sync to CognitiveSlice
-        import('../lib/store/useGemigramStore').then(({ useGemigramStore }) => {
-           useGemigramStore.setState({ micLevel: level });
+        import('../lib/store/useGemclawStore').then(({ useGemclawStore }) => {
+           useGemclawStore.setState({ micLevel: level });
         });
 
         frameRef.current = requestAnimationFrame(updateMicLevel);
@@ -172,8 +172,8 @@ export function useVoiceInteraction() {
       audioContextRef.current.close();
       audioContextRef.current = null;
     }
-    import('../lib/store/useGemigramStore').then(({ useGemigramStore }) => {
-      useGemigramStore.setState({ micLevel: 0 });
+    import('../lib/store/useGemclawStore').then(({ useGemclawStore }) => {
+      useGemclawStore.setState({ micLevel: 0 });
     });
   };
 

@@ -1,4 +1,4 @@
-# 🔒 GemigramOS Security Implementation
+# 🔒 GemclawOS Security Implementation
 
 ## 🛡️ Current Hardening
 - **Secure API Proxy**: All Gemini API calls go through `/api/gemini-token` to prevent client-side key exposure.

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from './Providers';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import { runProactiveLoop } from '@/lib/orchestrator';
 import { Sparkles, Brain, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,7 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
  */
 export function ActiveIntelligence() {
   const { user } = useAuth();
-  const { agents } = useGemigramStore();
+  const { agents } = useGemclawStore();
   const [suggestion, setSuggestion] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 

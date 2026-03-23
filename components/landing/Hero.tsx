@@ -4,12 +4,12 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Zap, Globe, Fingerprint, Mic, ArrowRight } from 'lucide-react';
 import { useSystemTelemetry } from '../../hooks/useSystemTelemetry';
-import { useGemigramStore } from '../../lib/store/useGemigramStore';
+import { useGemclawStore } from '../../lib/store/useGemclawStore';
 import { BRAND } from '@/lib/constants/branding';
 
 export function EnterpriseHero({ onLogin }: { onLogin: () => void }) {
   const telemetry = useSystemTelemetry();
-  const totalAgents = useGemigramStore((state) => state.agents.length);
+  const totalAgents = useGemclawStore((state) => state.agents.length);
 
   useEffect(() => {
     // Stats are currently static or powered by telemetry hook

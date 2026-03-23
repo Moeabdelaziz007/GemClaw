@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Sparkles, Box } from 'lucide-react';
-import { useGemigramStore } from '@/lib/store/useGemigramStore';
+import { useGemclawStore } from '@/lib/store/useGemclawStore';
 import { MarketplaceCard } from '@/components/marketplace/MarketplaceCard';
 import { db } from '@/firebase';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
@@ -128,10 +128,10 @@ export default function NeuralMarketplace() {
   const [installingId, setInstallingId] = useState<string | null>(null);
   const { t } = useTranslation();
 
-  const userAgents = useGemigramStore((state) => state.agents);
+  const userAgents = useGemclawStore((state) => state.agents);
   const addAgentToStore = (agent: Agent) => {
-    const currentAgents = useGemigramStore.getState().agents;
-    useGemigramStore.setState({ agents: [...currentAgents, agent] });
+    const currentAgents = useGemclawStore.getState().agents;
+    useGemclawStore.setState({ agents: [...currentAgents, agent] });
   };
 
   const categories = [

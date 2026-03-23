@@ -1,5 +1,5 @@
 /**
- * 🧬 VoiceBiometric Types - GemigramOS V3
+ * 🧬 VoiceBiometric Types - GemclawOS V3
  * Sovereign Identity Verification Layer
  */
 

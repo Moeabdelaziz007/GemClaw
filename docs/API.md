@@ -1,4 +1,4 @@
-# 📡 GemigramOS API Reference (Placeholder)
+# 📡 GemclawOS API Reference (Placeholder)
 
 ## 🛠️ Internal API Routes
 

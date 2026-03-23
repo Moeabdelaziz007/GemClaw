@@ -10,14 +10,14 @@ import { createAuthSlice, AuthSlice } from './slices/createAuthSlice';
 export type { Agent };
 
 /**
- * Gemigram Global State Store
- * Centralized state management for the Gemigram AIOS.
+ * Gemclaw Global State Store
+ * Centralized state management for the Gemclaw AIOS.
  * Architecture: Sliced Pattern (Zustand)
  * Rules: 5 Slices - Sensory, Cognitive, Agent, Ui, Auth (Zero Deviation)
  */
-export interface GemigramState extends SensorySlice, AgentSlice, UiSlice, CognitiveSlice, AuthSlice {}
+export interface GemclawState extends SensorySlice, AgentSlice, UiSlice, CognitiveSlice, AuthSlice {}
 
-export const useGemigramStore = create<GemigramState>()(
+export const useGemclawStore = create<GemclawState>()(
   persist(
     (...a) => ({
       ...createSensorySlice(...a),
@@ -40,6 +40,6 @@ export const useGemigramStore = create<GemigramState>()(
 );
 
 // High-performance Selectors
-export const useUnreadNotifications = () => useGemigramStore((state) => state.unreadNotifications);
-export const useUnreadNotificationsCount = () => useGemigramStore((state) => state.unreadNotifications.length);
-export const useOwnedAgents = () => useGemigramStore((state) => state.agents);
+export const useUnreadNotifications = () => useGemclawStore((state) => state.unreadNotifications);
+export const useUnreadNotificationsCount = () => useGemclawStore((state) => state.unreadNotifications.length);
+export const useOwnedAgents = () => useGemclawStore((state) => state.agents);

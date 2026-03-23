@@ -2,7 +2,7 @@
  * 🏛️ Centralized Skill Registry System
  * 
  * Singleton-based registry for managing skill definitions, dependencies, and validation.
- * Provides a global access point for all skill-related operations in the Gemigram GemigramOS.
+ * Provides a global access point for all skill-related operations in the Gemclaw GemclawOS.
  */
 
 import { 

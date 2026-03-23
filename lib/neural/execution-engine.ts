@@ -9,7 +9,7 @@ export interface ExecutionStep {
 }
 
 /**
- * The Spinal Cord of GemigramOS Agents.
+ * The Spinal Cord of GemclawOS Agents.
  * Orchestrates multiple tool calls to achieve complex objectives.
  */
 export class ExecutionEngine {

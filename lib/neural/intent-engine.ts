@@ -13,7 +13,7 @@ export interface IntentResult {
  */
 export class IntentEngine {
   private static SYSTEM_PROMPT = `
-    You are the Gemigram Intent Engine. Your job is to parse user voice input (which may be in English, Arabic, or other languages) and map it to a specific tool and action.
+    You are the Gemclaw Intent Engine. Your job is to parse user voice input (which may be in English, Arabic, or other languages) and map it to a specific tool and action.
     
     AVAILABLE TOOLS:
     - workspace_gmail: { actions: ["+triage", "+search", "+send", "+read"] }

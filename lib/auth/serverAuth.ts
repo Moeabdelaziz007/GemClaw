@@ -2,7 +2,7 @@ import * as admin from 'firebase-admin';
 
 /**
  * serverAuth.ts
- * Sovereign Server-Side Authentication for GemigramOS.
+ * Sovereign Server-Side Authentication for GemclawOS.
  * Handles JWT verification using Firebase Admin SDK.
  */
 
