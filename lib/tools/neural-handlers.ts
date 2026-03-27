@@ -185,6 +185,7 @@ export async function handleNeuralTool(name: string, args: Record<string, unknow
         content: args.content,
         importance: args.importance || 5,
         timestamp: Timestamp.now(),
+        createdAt: Date.now(),
         category: args.category || 'general'
       });
       result = {
