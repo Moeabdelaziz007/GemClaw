@@ -35,3 +35,4 @@ firebase-debug.log
 # Internal Roadmaps (Gemclaw Sovereign Access Only)
 .kombai/
 .qoder/
+.cache/
