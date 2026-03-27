@@ -182,6 +182,7 @@ export default function LandingPage() {
                 <div className="relative z-10 flex justify-center">
                   <motion.button
                     onClick={() => setIsAuthOpen(true)}
+                    data-testid="launch-terminal-button"
                     whileHover={{ scale: 1.04, boxShadow: '0 0 80px rgba(57,255,20,0.6)' }}
                     whileTap={{ scale: 0.96 }}
                     className="inline-flex w-full max-w-xs items-center justify-center rounded-full bg-gemigram-neon px-8 py-4 text-base font-black uppercase tracking-[0.22em] text-black shadow-[0_0_50px_rgba(57,255,20,0.4)] transition-all sm:w-auto sm:max-w-none sm:px-12 sm:py-5 sm:text-lg"

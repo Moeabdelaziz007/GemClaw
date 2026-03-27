@@ -38,6 +38,24 @@ export async function mockVoiceAPI(page: Page) {
 }
 
 /**
+ * Mocks microphone permissions and media stream acquisition so Forge can auto-start voice flow in CI.
+ */
+export async function mockMediaDevices(page: Page) {
+  await page.addInitScript(() => {
+    const mediaDevices = {
+      getUserMedia: async () => ({
+        getTracks: () => [{ stop: () => {} }]
+      })
+    };
+
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: mediaDevices,
+      configurable: true,
+    });
+  });
+}
+
+/**
  * Simulates user voice input by setting a global variable used by the mock.
  */
 export async function simulateVoiceInput(page: Page, text: string) {

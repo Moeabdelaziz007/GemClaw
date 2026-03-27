@@ -334,7 +334,7 @@ export default function ConversationalAgentCreator({
   }, [currentStep]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
+    <div data-testid="forge-conversational-root" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -411,11 +411,12 @@ export default function ConversationalAgentCreator({
                   ))}
                 </AnimatePresence>
                 
-                {isAstraeusThinking && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex justify-start"
+                  {isAstraeusThinking && (
+                    <motion.div
+                      data-testid="forge-thinking-indicator"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="flex justify-start"
                   >
                     <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-2">
                       <div className="w-1.5 h-1.5 bg-[#8eff71]/60 rounded-full animate-bounce [animation-delay:-0.3s]" />
@@ -478,6 +479,8 @@ export default function ConversationalAgentCreator({
                 />
                 <button
                   onClick={isListening ? stopListening : startListening}
+                  aria-label="Voice Toggle"
+                  data-testid="forge-mic-toggle"
                   className={`w-24 h-24 rounded-[32px] flex items-center justify-center transition-all relative z-10 group ${
                     isListening 
                       ? 'bg-red-500/10 border-2 border-red-500 shadow-[0_0_50px_rgba(239,68,68,0.2)]' 
