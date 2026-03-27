@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="./public/gemigram_hero_cover.png" alt="Gemigram AIOS Hero Banner" width="800"/>
+  <img src="./assets/branding/gemclaw_hero_banner.png" alt="Gemclaw AIOS Hero Banner" width="800"/>
 </p>
 
-# 🌌 Gemigram AIOS — Sovereign Intelligence Orchestration System
+# 🌌 Gemclaw AIOS — Sovereign Intelligence Orchestration System
 > **Built entirely on the Google & Gemini Ecosystem** | **تم البناء بالكامل على منظومة جوجل وجيمناي**
 > Create, deploy, and interact with sovereign AI agents using nothing but your voice. | أنشئ وانشر وتفاعل مع الوكلاء الأذكياء باستخدام صوتك فقط.
 
