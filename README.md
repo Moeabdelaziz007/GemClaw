@@ -12,7 +12,7 @@
 
 ## 🎯 Vision | الرؤية
 
-**Eng:** Gemigram is an AI-first, voice-only agent creation platform inspired by Telegram bots and BotFather — but powered entirely by Google's Gemini ecosystem. Users create AI agents through natural voice conversation with "Aether Forge", our AI architect. **Zero manual API keys are required:** user authentication automatically gates and securely provisions system-level Gemini Live sessions.
+**Eng:** Gemigram is an AI-first, voice-only agent creation platform inspired by Telegram bots and BotFather; but powered entirely by Google's Gemini ecosystem. Users create AI agents through natural voice conversation with "Aether Forge", our AI architect. **Zero manual API keys are required:** user authentication automatically gates and securely provisions system-level Gemini Live sessions.
 
 **Ar:** جيميجزام (Gemigram) هي منصة مدعومة بالذكاء الاصطناعي لإنشاء الوكلاء الأذكياء عبر الصوت فقط. مبنية بالكامل على منظومة جوجل جيمناي. يقوم المستخدمون بإنشاء وكلاء ذكاء اصطناعي من خلال محادثة صوتية طبيعية مع "Aether Forge". **لا يلزم إدخال أي مفاتيح API يدوياً:** بمجرد تسجيل الدخول الآمن، يتم تهيئة مفاتيح النظام والجلسات تلقائياً عبر الخادم الخلفي (Backend).
 
