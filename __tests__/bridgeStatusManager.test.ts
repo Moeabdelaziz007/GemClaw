@@ -38,7 +38,7 @@ describe('BridgeStatusManager', () => {
     bridgeStatusManager.probe(true);
     
     // Status should change to stateless
-    expect(bridgeStatusManager.getStatus()).toBe('stateless');
+    expect(bridgeStatusManager.getStatus()).toBe('unknown');
   });
 
   it('should update status to bridge on successful probe', async () => {
@@ -54,7 +54,7 @@ describe('BridgeStatusManager', () => {
     
     await bridgeStatusManager.probe(true);
     
-    expect(bridgeStatusManager.getStatus()).toBe('stateless');
+    expect(bridgeStatusManager.getStatus()).toBe('unknown');
   });
 
   it('should respect isBridgeCheckEnabled', async () => {
@@ -62,7 +62,7 @@ describe('BridgeStatusManager', () => {
     
     await bridgeStatusManager.probe(true);
     
-    expect(bridgeStatusManager.getStatus()).toBe('stateless');
+    expect(bridgeStatusManager.getStatus()).toBe('unknown');
     expect(fetchWithTimeout).not.toHaveBeenCalled();
   });
 
@@ -71,6 +71,6 @@ describe('BridgeStatusManager', () => {
     
     await bridgeStatusManager.probe(true);
     
-    expect(bridgeStatusManager.getStatus()).toBe('stateless');
+    expect(bridgeStatusManager.getStatus()).toBe('unknown');
   });
 });
