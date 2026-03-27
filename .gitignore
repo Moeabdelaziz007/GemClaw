@@ -1,4 +1,7 @@
 node_modules/
+node_modules_clean/
+node_modules_old/
+
 .next/
 out/
 .firebase/
