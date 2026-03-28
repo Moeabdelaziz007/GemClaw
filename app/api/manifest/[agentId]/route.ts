@@ -1,6 +1,12 @@
+
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+
+// Disable static generation for this route because it reads from Firestore
+// which requires Firebase config that may not be available at build time.
+export const dynamic = 'force-dynamic';
 
 export async function GET(
   req: NextRequest,

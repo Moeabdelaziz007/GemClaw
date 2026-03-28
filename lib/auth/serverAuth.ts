@@ -50,6 +50,10 @@ export async function verifyIdToken(authHeader: string | null) {
   const token = authHeader.split('Bearer ')[1];
 
   try {
+    // If auth is null (e.g. during testing or missing config), we can't verify
+    if (!auth) {
+      throw new Error("Cannot read properties of null (reading 'verifyIdToken')");
+    }
     const decodedToken = await auth.verifyIdToken(token);
     return {
       uid: decodedToken.uid,
