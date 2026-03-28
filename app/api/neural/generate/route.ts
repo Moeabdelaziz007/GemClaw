@@ -6,6 +6,8 @@ import { retrieveMemories } from "@/lib/memory/indexer";
 
 const router = new NeuralRouter();
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request) {
   try {
     const { provider, messages, options, userId, agentId, useRAG } = await req.json();
