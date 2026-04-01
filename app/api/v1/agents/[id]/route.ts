@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * Sovereign Public Agent API (v1.0)
  * 

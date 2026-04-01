@@ -18,17 +18,18 @@ let db: Firestore;
 let auth: Auth;
 let storage: FirebaseStorage;
 
+// Initialize Firebase based on environment
 if (typeof window !== 'undefined') {
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  db = getFirestore(app);
-  auth = getAuth(app);
-  storage = getStorage(app);
+  app = !getApps().length && !!firebaseConfig.apiKey ? initializeApp(firebaseConfig) : (getApps().length ? getApp() : {} as FirebaseApp);
+  db = app && Object.keys(app).length > 0 ? getFirestore(app) : {} as Firestore;
+  auth = app && Object.keys(app).length > 0 ? getAuth(app) : {} as Auth;
+  storage = app && Object.keys(app).length > 0 ? getStorage(app) : {} as FirebaseStorage;
 } else {
   // SSR fallback
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  db = getFirestore(app);
-  auth = getAuth(app);
-  storage = getStorage(app);
+  app = !getApps().length && !!firebaseConfig.apiKey ? initializeApp(firebaseConfig) : (getApps().length ? getApp() : {} as FirebaseApp);
+  db = app && Object.keys(app).length > 0 ? getFirestore(app) : {} as Firestore;
+  auth = app && Object.keys(app).length > 0 ? getAuth(app) : {} as Auth;
+  storage = app && Object.keys(app).length > 0 ? getStorage(app) : {} as FirebaseStorage;
 }
 
 // Export specific instances as requested
