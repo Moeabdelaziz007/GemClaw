@@ -4,6 +4,8 @@ import { NeuralProvider } from "@/lib/neural/types";
 
 import { retrieveMemories } from "@/lib/memory/indexer";
 
+export const dynamic = 'force-dynamic';
+
 const router = new NeuralRouter();
 
 export async function POST(req: Request) {

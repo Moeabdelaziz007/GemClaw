@@ -50,7 +50,12 @@ export async function verifyIdToken(authHeader: string | null) {
   const token = authHeader.split('Bearer ')[1];
 
   try {
-    const decodedToken = await auth.verifyIdToken(token);
+    // In test environment or if admin is not initialized, try accessing admin.auth() directly if auth is null
+    const authInstance = auth || (admin.apps.length ? admin.auth() : null);
+    if (!authInstance) {
+        throw new Error("Firebase admin auth not initialized");
+    }
+    const decodedToken = await authInstance.verifyIdToken(token);
     return {
       uid: decodedToken.uid,
       email: decodedToken.email || '',
