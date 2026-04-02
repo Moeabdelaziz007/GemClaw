@@ -19,16 +19,31 @@ let auth: Auth;
 let storage: FirebaseStorage;
 
 if (typeof window !== 'undefined') {
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  db = getFirestore(app);
-  auth = getAuth(app);
-  storage = getStorage(app);
+  if (!!firebaseConfig.apiKey) {
+    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    db = getFirestore(app);
+    auth = getAuth(app);
+    storage = getStorage(app);
+  } else {
+    app = {} as FirebaseApp;
+    db = {} as Firestore;
+    auth = {} as Auth;
+    storage = {} as FirebaseStorage;
+  }
 } else {
   // SSR fallback
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  db = getFirestore(app);
-  auth = getAuth(app);
-  storage = getStorage(app);
+  // Memory constraint: conditionally check for a valid configuration to avoid Next.js build failures
+  if (!!firebaseConfig.apiKey) {
+    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    db = getFirestore(app);
+    auth = getAuth(app);
+    storage = getStorage(app);
+  } else {
+    app = {} as FirebaseApp;
+    db = {} as Firestore;
+    auth = {} as Auth;
+    storage = {} as FirebaseStorage;
+  }
 }
 
 // Export specific instances as requested
