@@ -21,6 +21,11 @@ export default defineConfig({
       'tests/firebase.test.ts',
       '__tests__/api/agents.test.ts',
       'tests/components/NeuralPulse.test.tsx',
+      '__tests__/AgentCard.test.tsx',
+      '__tests__/NeuralPulse.test.tsx',
+      'tests/athPackage.test.ts',
+      'tests/bridge.test.ts',
+      'tests/utils.test.ts',
     ],
     alias: {
       '@': path.resolve(__dirname, './'),
