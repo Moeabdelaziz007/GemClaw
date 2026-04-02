@@ -9,7 +9,7 @@ vi.mock('firebase-admin', () => {
   };
   const mockFirestore = vi.fn();
   return {
-    apps: [],
+    apps: [{}], // Initialize with 1 app so lib/auth/serverAuth.ts exports admin.auth() instead of null
     initializeApp: vi.fn(),
     credential: {
       cert: vi.fn(),
@@ -24,7 +24,7 @@ describe('serverAuth', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (admin.apps as any) = [];
+    (admin.apps as any) = [{}];
   });
 
   describe('verifyIdToken', () => {
