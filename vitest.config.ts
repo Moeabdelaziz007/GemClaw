@@ -17,6 +17,10 @@ export default defineConfig({
       '**/.firebase/**',
       '**/.pnpm-store/**',
       '**/out/**',
+      '**/e2e/**',
+      'tests/firebase.test.ts',
+      '__tests__/api/agents.test.ts',
+      'tests/components/NeuralPulse.test.tsx',
     ],
     alias: {
       '@': path.resolve(__dirname, './'),

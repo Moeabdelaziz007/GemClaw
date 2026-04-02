@@ -9,7 +9,25 @@ import { Wifi, WifiOff, Database, Zap, RefreshCcw } from 'lucide-react';
 export function HUD() {
   const { user } = useAuth();
   const lastSyncedAt = useGemclawStore((state) => state.lastSyncedAt);
-  const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+
+  const [isMounted, setIsMounted] = React.useState(false);
+  const [isOnline, setIsOnline] = React.useState(true);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+    setIsOnline(navigator.onLine);
+
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const getSyncLabel = () => {
     if (!lastSyncedAt) return 'Sync: Pending';
@@ -41,16 +59,18 @@ export function HUD() {
           </span>
         </div>
 
-        <div className="px-3 py-1.5 rounded-sm border border-white/5 bg-black/40 backdrop-blur-md flex items-center gap-2">
-          {isOnline ? (
-            <Wifi className="w-3 h-3 text-emerald-400" />
-          ) : (
-            <WifiOff className="w-3 h-3 text-red-500" />
-          )}
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
-            {isOnline ? 'Link: OK' : 'Offline'}
-          </span>
-        </div>
+        {isMounted && (
+          <div className="px-3 py-1.5 rounded-sm border border-white/5 bg-black/40 backdrop-blur-md flex items-center gap-2">
+            {isOnline ? (
+              <Wifi className="w-3 h-3 text-emerald-400" />
+            ) : (
+              <WifiOff className="w-3 h-3 text-red-500" />
+            )}
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+              {isOnline ? 'Link: OK' : 'Offline'}
+            </span>
+          </div>
+        )}
       </motion.div>
 
       {/* Top Right - Active Intelligence (Gemini Free + ADK) */}
