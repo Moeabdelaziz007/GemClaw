@@ -33,8 +33,8 @@ if (!admin.apps.length) {
 }
 
 // Safely export auth and db
-export const auth = admin.apps.length ? admin.auth() : null as unknown as admin.auth.Auth;
-export const db = admin.apps.length ? admin.firestore() : null as unknown as admin.firestore.Firestore;
+export const auth = admin.apps.length ? admin.auth() : admin.auth();
+export const db = admin.apps.length ? admin.firestore() : admin.firestore();
 
 /**
  * verifyIdToken
@@ -50,7 +50,8 @@ export async function verifyIdToken(authHeader: string | null) {
   const token = authHeader.split('Bearer ')[1];
 
   try {
-    const decodedToken = await auth.verifyIdToken(token);
+    const adminAuth = auth || admin.auth();
+    const decodedToken = await adminAuth.verifyIdToken(token);
     return {
       uid: decodedToken.uid,
       email: decodedToken.email || '',
