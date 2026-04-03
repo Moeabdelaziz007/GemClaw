@@ -540,6 +540,10 @@ export function useLiveAPI(apiKey: string, onFunctionCall: (call: ToolResult) =>
   }, [disconnect]);
 
   return { 
+    connect,
+    disconnect,
+    startRecording,
+    stopRecording,
     isConnected, 
     isRecording, 
     logs, 
