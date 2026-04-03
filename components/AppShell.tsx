@@ -23,7 +23,7 @@ interface AppShellProps {
 
 export default function AppShell({ children }: AppShellProps) {
   const { user, login, logout } = useAuth();
-  const [time, setTime] = useState(new Date());
+  const [time, setTime] = useState<Date | null>(null);
   const pathname = usePathname();
   const { tier, allowMotion, allowAmbientMotion, isMobile } = useVisualTier();
   const telemetry = useSystemTelemetry();
@@ -35,6 +35,7 @@ export default function AppShell({ children }: AppShellProps) {
   useVoiceCommandRouter();
 
   useEffect(() => {
+    setTime(new Date());
     const timer = setInterval(() => setTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
@@ -124,12 +125,21 @@ export default function AppShell({ children }: AppShellProps) {
 
               <div className="flex items-center gap-3">
                 <div className="hidden flex-col items-end sm:flex">
-                  <span className="text-[11px] font-mono font-black tabular-nums text-white">
-                    {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
-                  </span>
-                  <span className="text-[8px] font-mono font-bold uppercase tracking-widest leading-none text-white/20">
-                    {time.toLocaleDateString([], { day: '2-digit', month: 'short', year: 'numeric' })}
-                  </span>
+                  {time ? (
+                    <>
+                      <span className="text-[11px] font-mono font-black tabular-nums text-white">
+                        {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                      </span>
+                      <span className="text-[8px] font-mono font-bold uppercase tracking-widest leading-none text-white/20">
+                        {time.toLocaleDateString([], { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-[11px] font-mono font-black tabular-nums text-transparent">00:00:00</span>
+                      <span className="text-[8px] font-mono font-bold uppercase tracking-widest leading-none text-transparent">...</span>
+                    </>
+                  )}
                 </div>
 
                 <div className="group relative">
