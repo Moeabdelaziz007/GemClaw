@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ agentId: string }> }
@@ -11,9 +13,12 @@ export async function GET(
   try {
     // Attempt to fetch agent name for better personalization if possible
     // Note: This relies on the agent existing in Firestore
-    const agentRef = doc(db, 'agents', agentId);
-    const agentSnap = await getDoc(agentRef);
-    const agentData = agentSnap.exists() ? agentSnap.data() : null;
+    let agentData = null;
+    if (db) {
+        const agentRef = doc(db, 'agents', agentId);
+        const agentSnap = await getDoc(agentRef);
+        agentData = agentSnap.exists() ? agentSnap.data() : null;
+    }
     
     const agentName = agentData?.name || agentId;
     const seed = agentData?.seed || agentName;
