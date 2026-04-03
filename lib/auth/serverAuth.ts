@@ -50,7 +50,10 @@ export async function verifyIdToken(authHeader: string | null) {
   const token = authHeader.split('Bearer ')[1];
 
   try {
-    const decodedToken = await auth.verifyIdToken(token);
+    // Determine the auth instance to use. This provides fallback compatibility for tests
+    // that mock `admin.auth()` after initialization.
+    const activeAuth = auth || admin.auth();
+    const decodedToken = await activeAuth.verifyIdToken(token);
     return {
       uid: decodedToken.uid,
       email: decodedToken.email || '',

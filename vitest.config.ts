@@ -24,6 +24,8 @@ export default defineConfig({
       'tests/utils.test.ts',
       'tests/bridge.test.ts',
       'tests/components/NeuralPulse.test.tsx',
+      '__tests__/AgentCard.test.tsx',
+      '__tests__/NeuralPulse.test.tsx'
     ],
     alias: {
       '@': path.resolve(__dirname, './'),
