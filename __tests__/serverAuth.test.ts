@@ -24,7 +24,7 @@ describe('serverAuth', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (admin.apps as any) = [];
+    (admin.apps as any) = [{ name: '[DEFAULT]' }];
   });
 
   describe('verifyIdToken', () => {

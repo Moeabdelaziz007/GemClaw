@@ -19,7 +19,7 @@ describe('ThemeToggle Component', () => {
     vi.clearAllMocks();
   });
 
-  it('should render toggle button', () => {
+  it('should render toggle switch', () => {
     mockUseTheme.mockReturnValue({
       theme: 'dark',
       toggleTheme: vi.fn(),
@@ -27,7 +27,7 @@ describe('ThemeToggle Component', () => {
     });
 
     render(<ThemeToggle />);
-    const toggleButton = screen.getByRole('button'); // Adjusted based on actual implementation
+    const toggleButton = screen.getByRole('switch');
     expect(toggleButton).toBeInTheDocument();
   });
 });
