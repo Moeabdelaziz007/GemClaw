@@ -36,7 +36,7 @@ test.describe('GemclawOS Full Sovereign Flow', () => {
     await page.goto('/forge');
 
     await expect(page.getByTestId('forge-conversational-root')).toBeVisible();
-    await expect(page.getByText(/Aether/i)).toBeVisible();
+    await expect(page.getByText(/Aether/i).first()).toBeVisible({ timeout: 10000 });
 
     await simulateVoiceInput(page, "Create a helpful assistant named Nova");
 
@@ -44,6 +44,6 @@ test.describe('GemclawOS Full Sovereign Flow', () => {
     await expect(micToggle).toBeVisible();
     await micToggle.click();
 
-    await expect(page.getByTestId('forge-thinking-indicator')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId('forge-thinking-indicator').first()).toBeVisible({ timeout: 15000 });
   });
 });

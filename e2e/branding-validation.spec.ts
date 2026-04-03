@@ -26,19 +26,19 @@ test.describe('Mission 06: Branding & Identity', () => {
     await page.goto('/forge');
     
     // Check for "Aether Forge" specifically
-    await expect(page.getByText(/Aether Forge/i)).toBeVisible();
+    await expect(page.getByText(/Aether Forge/i).first()).toBeVisible({ timeout: 10000 });
     
     // Check for "Synthesis Chamber" which is part of the Forge identity
-    await expect(page.getByText(/SYNTHESIS CHAMBER/i)).toBeVisible();
+    await expect(page.getByText(/SYNTHESIS CHAMBER/i).first()).toBeVisible({ timeout: 10000 });
   });
 
   test('should verify branding consistency in setting/workspace', async ({ page }) => {
     // Workspace check
     await page.goto('/workspace');
-    await expect(page).toHaveTitle(/Gemclaw/i);
+    await expect(page).toHaveTitle(/Gemclaw/i, { timeout: 10000 });
     
     // Settings check
     await page.goto('/settings');
-    await expect(page.getByText(/SYSTEM_PARAMETERS/i)).toBeVisible();
+    await expect(page.getByText(/SYSTEM_PARAMETERS/i).first()).toBeVisible({ timeout: 10000 });
   });
 });

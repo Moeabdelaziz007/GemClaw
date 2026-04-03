@@ -9,7 +9,11 @@ import { Wifi, WifiOff, Database, Zap, RefreshCcw } from 'lucide-react';
 export function HUD() {
   const { user } = useAuth();
   const lastSyncedAt = useGemclawStore((state) => state.lastSyncedAt);
-  const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+  const [isOnline, setIsOnline] = React.useState(true);
+
+  React.useEffect(() => {
+    setIsOnline(navigator.onLine);
+  }, []);
 
   const getSyncLabel = () => {
     if (!lastSyncedAt) return 'Sync: Pending';

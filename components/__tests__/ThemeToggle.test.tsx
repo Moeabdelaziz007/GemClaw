@@ -27,7 +27,7 @@ describe('ThemeToggle Component', () => {
     });
 
     render(<ThemeToggle />);
-    const toggleButton = screen.getByRole('button'); // Adjusted based on actual implementation
+    const toggleButton = screen.getByRole('switch'); // Adjusted based on actual rendered role
     expect(toggleButton).toBeInTheDocument();
   });
 });

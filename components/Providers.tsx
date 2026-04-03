@@ -35,6 +35,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   } = useGemclawStore();
 
   useEffect(() => {
+    if (!firebaseAuth) {
+      setLoading(false);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(firebaseAuth, (nextUser) => {
       setUser((currentUser) => {
         const currentUserId = currentUser?.uid ?? null;
@@ -99,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [activeProjectId, googleAccessToken, setActiveProjectId, setUserProjects]);
 
   const login = useCallback(async () => {
+    if (!firebaseAuth) return;
     try {
       const result = await signInWithPopup(firebaseAuth, googleProvider);
       const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -109,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
+    if (!firebaseAuth) return;
     try {
       clearUserScopedState();
       useGemclawStore.setState({ agents: [], activeAgentId: null, transcript: [] });

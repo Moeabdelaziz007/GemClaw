@@ -20,11 +20,11 @@ vi.mock('firebase-admin', () => {
 });
 
 describe('serverAuth', () => {
-  const mockAuth = admin.auth() as any;
+  // No need to instantiate mockAuth immediately here, we can just use admin.auth() where needed or rely on the mock return
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (admin.apps as any) = [];
+    (admin.apps as any) = [{ name: '[DEFAULT]' }]; // Set a fake app to prevent null evaluation in serverAuth.ts
   });
 
   describe('verifyIdToken', () => {
@@ -54,6 +54,7 @@ describe('serverAuth', () => {
     });
 
     it('should return uid and email for a valid token', async () => {
+      const mockAuth = admin.auth() as any;
       mockAuth.verifyIdToken.mockResolvedValue({ uid: 'user-123', email: 'test@gemigram.com' });
       
       const result = await verifyIdToken('Bearer valid-token');
@@ -63,6 +64,7 @@ describe('serverAuth', () => {
     });
 
     it('should return empty string for email if email is missing in decoded token', async () => {
+      const mockAuth = admin.auth() as any;
       mockAuth.verifyIdToken.mockResolvedValue({ uid: 'user-123' });
       
       const result = await verifyIdToken('Bearer valid-token');
@@ -71,6 +73,7 @@ describe('serverAuth', () => {
     });
 
     it('should return null and log error when verifyIdToken throws', async () => {
+      const mockAuth = admin.auth() as any;
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       mockAuth.verifyIdToken.mockRejectedValue(new Error('Token expired'));
       
