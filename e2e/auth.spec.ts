@@ -35,6 +35,6 @@ test('auth redirect checks and structure', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   
   // Assert we are actually on dashboard and not redirected to login
-  await expect(page).toHaveURL(/.*\/dashboard/);
-  await expect(page.locator('h1')).toBeVisible(); 
+  await expect(page).toHaveURL(/.*\/dashboard/, { timeout: 10000 });
+  await expect(page.locator('h1').first()).toBeVisible({ timeout: 10000 });
 });

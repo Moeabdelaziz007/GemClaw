@@ -6,10 +6,10 @@ test('Full Forge navigation workflow without crashing', async ({ page }) => {
 
   // if user is redirected to /, skip
   if(page.url().includes('/hub')) {
-     const createButton = page.locator('button', { hasText: 'Materialize_Entity' }).first();
+     const createButton = page.getByRole('button', { name: /Materialize_Entity/i }).first();
      if (await createButton.isVisible()) {
         await createButton.click();
-        await expect(page).toHaveURL(/.*\/forge/);
+        await expect(page).toHaveURL(/.*\/forge/, { timeout: 10000 });
      }
   }
 

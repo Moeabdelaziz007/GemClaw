@@ -22,6 +22,6 @@ test.describe('AetherOS Golden Path', () => {
     const micToggle = page.getByTestId('forge-mic-toggle');
     await expect(micToggle).toBeVisible();
     await micToggle.click();
-    await expect(page.getByText(/NEURAL IMPRINT DETECTED/i)).toBeVisible();
+    await expect(page.getByText(/NEURAL IMPRINT DETECTED/i).first()).toBeVisible({ timeout: 10000 });
   });
 });

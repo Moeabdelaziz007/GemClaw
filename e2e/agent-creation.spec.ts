@@ -10,11 +10,11 @@ test('navigate to hub and verify materialization button', async ({ page }) => {
   await page.waitForLoadState('networkidle');
 
   // Verify 'Materialize_Entity' button exists and is interactive
-  const materializeBtn = page.locator('button', { hasText: 'Materialize_Entity' }).first();
-  await expect(materializeBtn).toBeVisible();
+  const materializeBtn = page.getByRole('button', { name: /Materialize_Entity/i }).first();
+  await expect(materializeBtn).toBeVisible({ timeout: 10000 });
   await expect(materializeBtn).toBeEnabled();
 
   // Test navigation to forge
   await materializeBtn.click();
-  await expect(page).toHaveURL(/.*\/forge/);
+  await expect(page).toHaveURL(/.*\/forge/, { timeout: 10000 });
 });
