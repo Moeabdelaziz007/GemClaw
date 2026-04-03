@@ -33,8 +33,8 @@ if (!admin.apps.length) {
 }
 
 // Safely export auth and db
-export const auth = admin.apps.length ? admin.auth() : admin.auth();
-export const db = admin.apps.length ? admin.firestore() : admin.firestore();
+export const auth = admin.apps.length ? admin.auth() : null as unknown as admin.auth.Auth;
+export const db = admin.apps.length ? admin.firestore() : null as unknown as admin.firestore.Firestore;
 
 /**
  * verifyIdToken
