@@ -45,6 +45,8 @@ jobs:
         run: npm run test
       - name: Install Playwright
         run: npx playwright install --with-deps
+      - name: Build Next.js for E2E Tests
+        run: npm run build
       - name: Run Playwright E2E
         run: npm run test:e2e
         env:
