@@ -13,44 +13,49 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase only once
-let app: FirebaseApp;
-let db: Firestore;
-let auth: Auth;
-let storage: FirebaseStorage;
+let app: FirebaseApp = {} as FirebaseApp;
+let db: Firestore = {} as Firestore;
+let auth: Auth = {} as Auth;
+let storage: FirebaseStorage = {} as FirebaseStorage;
+let googleProvider = {} as GoogleAuthProvider;
 
-if (typeof window !== 'undefined') {
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  db = getFirestore(app);
-  auth = getAuth(app);
-  storage = getStorage(app);
+if (!!firebaseConfig.apiKey) {
+  if (typeof window !== 'undefined') {
+    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    db = getFirestore(app);
+    auth = getAuth(app);
+    storage = getStorage(app);
+  } else {
+    // SSR fallback
+    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    db = getFirestore(app);
+    auth = getAuth(app);
+    storage = getStorage(app);
+  }
+
+  googleProvider = new GoogleAuthProvider();
+  googleProvider.addScope('https://www.googleapis.com/auth/cloud-platform.read-only');
+  googleProvider.addScope('https://www.googleapis.com/auth/cloud-platform');
+
+  // Connection testing logic (client-side only)
+  if (typeof window !== 'undefined') {
+    const testConnection = async () => {
+      try {
+        await getDocFromServer(doc(db, 'test', 'connection'));
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('the client is offline')) {
+          console.error('Please check your Firebase configuration. The client is offline.');
+        }
+      }
+    };
+    testConnection();
+  }
 } else {
-  // SSR fallback
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  db = getFirestore(app);
-  auth = getAuth(app);
-  storage = getStorage(app);
+  console.warn("Firebase configuration is missing or incomplete, skipping initialization.");
 }
 
 // Export specific instances as requested
-export { app, db, auth, storage };
-export const googleProvider = new GoogleAuthProvider();
-
-googleProvider.addScope('https://www.googleapis.com/auth/cloud-platform.read-only');
-googleProvider.addScope('https://www.googleapis.com/auth/cloud-platform');
-
-// Connection testing logic (client-side only)
-if (typeof window !== 'undefined') {
-  const testConnection = async () => {
-    try {
-      await getDocFromServer(doc(db, 'test', 'connection'));
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('the client is offline')) {
-        console.error('Please check your Firebase configuration. The client is offline.');
-      }
-    }
-  };
-  testConnection();
-}
+export { app, db, auth, storage, googleProvider };
 
 /**
  * 🧬 Sovereign Error Handling Matrix
