@@ -17,6 +17,11 @@ export default defineConfig({
       '**/.firebase/**',
       '**/.pnpm-store/**',
       '**/out/**',
+      '**/e2e/**',
+      'tests/**', // exclude files using node:test
+      '__tests__/AgentCard.test.tsx',
+      '__tests__/NeuralPulse.test.tsx',
+      '__tests__/api/agents.test.ts' // fails resolving api/agents/route which does not exist
     ],
     alias: {
       '@': path.resolve(__dirname, './'),

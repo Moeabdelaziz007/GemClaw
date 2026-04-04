@@ -50,7 +50,10 @@ export async function verifyIdToken(authHeader: string | null) {
   const token = authHeader.split('Bearer ')[1];
 
   try {
-    const decodedToken = await auth.verifyIdToken(token);
+    // When using Firebase Admin in server-side logic or test environments (`serverAuth.ts`),
+    // ensure robust fallback handling for the `auth` instance (e.g., `auth || admin.auth()`)
+    const authInstance = auth || admin.auth();
+    const decodedToken = await authInstance.verifyIdToken(token);
     return {
       uid: decodedToken.uid,
       email: decodedToken.email || '',

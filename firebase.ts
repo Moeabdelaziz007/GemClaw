@@ -33,6 +33,7 @@ if (typeof window !== 'undefined') {
 
 // Export specific instances as requested
 export { app, db, auth, storage };
+export type { FirebaseApp, Firestore, Auth, FirebaseStorage };
 export const googleProvider = new GoogleAuthProvider();
 
 googleProvider.addScope('https://www.googleapis.com/auth/cloud-platform.read-only');
