@@ -18,19 +18,17 @@ let db: Firestore;
 let auth: Auth;
 let storage: FirebaseStorage;
 
-if (!!firebaseConfig.apiKey) {
-  if (typeof window !== 'undefined') {
-    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    db = getFirestore(app);
-    auth = getAuth(app);
-    storage = getStorage(app);
-  } else {
-    // SSR fallback
-    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    db = getFirestore(app);
-    auth = getAuth(app);
-    storage = getStorage(app);
-  }
+if (typeof window !== 'undefined') {
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  db = getFirestore(app);
+  auth = getAuth(app);
+  storage = getStorage(app);
+} else {
+  // SSR fallback
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  db = getFirestore(app);
+  auth = getAuth(app);
+  storage = getStorage(app);
 }
 
 // Export specific instances as requested
