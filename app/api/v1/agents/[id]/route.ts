@@ -9,6 +9,8 @@ import { NextResponse } from 'next/server';
 import { db } from '@/firebase';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   try {
