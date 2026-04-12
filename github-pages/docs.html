@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation | GemClawOS</title>
+    <meta name="description" content="Official documentation for GemClawOS - Architecture, API, and Security protocols.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Outfit:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../public/icons/favicon.ico">
+</head>
+<body class="docs-page">
+    <!-- Background Canvas for Neural Particles -->
+    <canvas id="neuralCanvas"></canvas>
+
+    <!-- UI Overlay container -->
+    <div class="system-container docs-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="glass-sidebar fade-in">
+            <div class="logo">
+                <span class="logo-mark">🧬</span>
+                <a href="index.html" class="logo-text" style="text-decoration:none; color:inherit;">GemClaw<span class="highlight">OS</span></a>
+            </div>
+            
+            <nav class="docs-nav">
+                <div class="nav-section">
+                    <h4>Core Principles</h4>
+                    <ul>
+                        <li><a href="#architecture" class="active">Architecture</a></li>
+                        <li><a href="#vision">The Sovereign Vision</a></li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h4>Integration</h4>
+                    <ul>
+                        <li><a href="#api">API Reference</a></li>
+                        <li><a href="#security">Security Protocols</a></li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="https://github.com/Moeabdelaziz007/GemClaw" target="_blank">GitHub Repo ↗</a></li>
+                        <li><a href="https://notional-armor-456623-e8.web.app" target="_blank">Live Bridge ↗</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="docs-content slide-up">
+            <header class="docs-header">
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    Documentation Matrix Online
+                </div>
+                <h1 class="gradient-text">System Documentation</h1>
+                <p>Welcome to the Sovereign Knowledge Base of GemClawOS.</p>
+            </header>
+
+            <article id="architecture" class="doc-section glass-panel">
+                <div class="feature-icon glow-icon">🧠</div>
+                <h2>Architecture Overview</h2>
+                <p>GemClawOS represents a paradigm shift in AI integration, moving from passive tools to sovereign, proactive entities. The system relies on a decentralized Next.js 15 frontend architecture combined with a high-performance Go backend and Firebase Firestore for persistent semantic memory.</p>
+                
+                <h3>The Neural Bridge</h3>
+                <p>At the center of GemClawOS is the <span class="highlight">Neural Spine</span>, facilitating ultra-low latency, full-duplex communication between the user's voice inputs and the Gemini Live API.</p>
+                
+                <div class="code-block">
+                    <div class="code-header">
+                        <span>lib/store/useGemclawStore.ts</span>
+                        <div class="window-controls">
+                            <i></i><i></i><i></i>
+                        </div>
+                    </div>
+                    <pre><code>import { create } from 'zustand';
+import { createSensorySlice } from './slices/createSensorySlice';
+import { createCognitiveSlice } from './slices/createCognitiveSlice';
+
+export const useGemclawStore = create<State>()((...a) => ({
+  ...createSensorySlice(...a),
+  ...createCognitiveSlice(...a),
+}));</code></pre>
+                </div>
+            </article>
+
+            <article id="api" class="doc-section glass-panel">
+                <div class="feature-icon glow-icon">⚡</div>
+                <h2>Live API Integration</h2>
+                <p>The system connects to Gemini Multimodal endpoints via a secure WebSocket orchestration layer. All connections are routed through Edge functions to prevent client-side key exposure.</p>
+                
+                <h3>Authentication Flow</h3>
+                <ol class="glow-list">
+                    <li>Client requests brief lifecycle token via <code>/api/gemini-token</code></li>
+                    <li>Firebase Auth verifies the session integrity</li>
+                    <li>Client establishes WebRTC/WebSocket using the ephemeral token</li>
+                </ol>
+            </article>
+
+            <article id="security" class="doc-section glass-panel">
+                <div class="feature-icon glow-icon">🛡️</div>
+                <h2>Security Protocols</h2>
+                <p>AetherOS emphasizes absolute security in the browser environment.</p>
+                <ul class="glow-list">
+                    <li><strong>Zero Client Secrets:</strong> Never expose <code>GEMINI_API_KEY</code> to the window object.</li>
+                    <li><strong>CSP Enforced:</strong> Content Security Policy blocks arbitrary external script execution.</li>
+                    <li><strong>Manifest Validation:</strong> Agent capabilities (skills and tools) are cryptographically signed and checked at runtime before execution.</li>
+                </ul>
+            </article>
+
+            <footer class="docs-footer">
+                <a href="index.html" class="btn outline-btn">← Return to Gateway</a>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script>
+        // Docs specific scroll-spy
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('article.doc-section');
+            const navLinks = document.querySelectorAll('.docs-nav a[href^="#"]');
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (scrollY >= (sectionTop - 200)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
