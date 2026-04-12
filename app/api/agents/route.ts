@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyIdToken, db } from '@/lib/auth/serverAuth';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * /api/agents
  * Sovereign Agents API with strict UID isolation.
