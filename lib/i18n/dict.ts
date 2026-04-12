@@ -34,6 +34,7 @@ export const translations = {
         marketplace: "Marketplace",
         settings: "Settings",
         about: "About",
+        clawhub: "ClawHub",
       },
       status: {
         local_spine: "Sovereign Local Spine",
@@ -131,6 +132,7 @@ export const translations = {
         marketplace: "السوق",
         settings: "الإعدادات",
         about: "عن النظام",
+        clawhub: "كلاوهب",
       },
       status: {
         local_spine: "العمود الفقري المحلي السيادي",
