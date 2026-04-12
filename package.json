@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "clean": "next clean",
-    "test:e2e": "echo 'Skipping e2e in CI'",
+    "test:e2e": "playwright test",
     "test": "vitest"
   },
   "dependencies": {
