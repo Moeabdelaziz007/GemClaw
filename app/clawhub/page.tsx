@@ -9,7 +9,7 @@ import { db } from '@/firebase';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import type { Agent } from '@/lib/store/slices/createAgentSlice';
 import { useAuth } from '@/components/Providers';
-import { installMarketplaceAgent } from '@/lib/data-access/gemigramRepository';
+import { installMarketplaceAgent } from '@/lib/data-access/gemclawRepository';
 import { useTranslation } from '@/hooks/useTranslation';
 
 const SEED_AGENTS: Agent[] = [

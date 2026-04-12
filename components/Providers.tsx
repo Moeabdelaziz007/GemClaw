@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, type User } from 'firebase/auth';
 import { auth as firebaseAuth, googleProvider } from '@/firebase';
-import { fetchGoogleCloudProjects, subscribeToUnreadNotifications } from '@/lib/data-access/gemigramRepository';
+import { fetchGoogleCloudProjects, subscribeToUnreadNotifications } from '@/lib/data-access/gemclawRepository';
 import { useGemclawStore, useUnreadNotifications } from '@/lib/store/useGemclawStore';
 
 interface AuthContextType {

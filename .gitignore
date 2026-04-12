@@ -1,38 +1,97 @@
+# =========================
+# Dependencies
+# =========================
 node_modules/
 node_modules_clean/
 node_modules_old/
+functions/node_modules/
+.pnpm-store/
 
+# =========================
+# Build & Output
+# =========================
 .next/
 out/
-.firebase/
-coverage/
-.DS_Store
-*.log
-.env*
-!.env.example
-*.tsbuildinfo
-functions/lib/
-functions/node_modules/
 dist/
 build/
-.pnpm-store/
-.pnpm-debug.log
+functions/lib/
+coverage/
+*.tsbuildinfo
+
+# =========================
+# Environment & Secrets
+# =========================
+.env*
+!.env.example
+
+# =========================
+# AI Agent / IDE Configs (Local-Only)
+# =========================
+.agent/
+.agents/
+.qodo/
+.qoder/
+.kombai/
+.gemini/
+.cursor/
+.windsurf/
+.augment/
+.codex/
+.idx/
 .shadow/
 
-# Project IDX
-.idx/
+# =========================
+# IDE / Editor Files
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# Playwright
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Compiled Binaries
+# =========================
+backend/clawhub
+*.exe
+*.dll
+*.so
+*.dylib
+
+# =========================
+# Package Manager Lockfiles (project uses npm)
+# =========================
+bun.lock
+bun.lockb
+
+# =========================
+# Logs & Debug
+# =========================
+*.log
+.pnpm-debug.log
+firebase-debug.log
+lint_output.txt
+
+# =========================
+# Firebase
+# =========================
+.firebaserc
+.firebase/
+
+# =========================
+# Playwright & Testing
+# =========================
 playwright-report/
 test-results/
 e2e-results/
 
-# Firebase & External Tools
-.firebaserc
-.firebase/
-firebase-debug.log
-
-# Internal Roadmaps (Gemclaw Sovereign Access Only)
-.kombai/
-.qoder/
+# =========================
+# Cache
+# =========================
 .cache/
