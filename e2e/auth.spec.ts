@@ -28,7 +28,7 @@ test('auth redirect checks and structure', async ({ page }) => {
       }
     };
     // Adjust key based on your Firebase version/config if necessary
-    window.localStorage.setItem('firebase:authUser:mock-app-key', JSON.stringify(mockUser));
+    window.localStorage.setItem('firebase:authUser:dummy:[DEFAULT]', JSON.stringify(mockUser));
   });
 
   await page.goto('/dashboard');
