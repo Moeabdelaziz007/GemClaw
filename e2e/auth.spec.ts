@@ -27,8 +27,10 @@ test('auth redirect checks and structure', async ({ page }) => {
         expirationTime: Date.now() + 3600000
       }
     };
-    // Adjust key based on your Firebase version/config if necessary
+    // Ensure both dummy keys and specific mocked keys are present so auth always persists
+    window.localStorage.setItem('firebase:authUser:dummy:[DEFAULT]', JSON.stringify(mockUser));
     window.localStorage.setItem('firebase:authUser:mock-app-key:[DEFAULT]', JSON.stringify(mockUser));
+    window.localStorage.setItem('firebase:authUser::[DEFAULT]', JSON.stringify(mockUser));
   });
 
   await page.goto('/dashboard');

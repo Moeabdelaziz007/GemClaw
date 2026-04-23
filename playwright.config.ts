@@ -23,13 +23,5 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
-    env: {
-      NEXT_PUBLIC_FIREBASE_API_KEY: 'mock-app-key',
-      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: 'mock-app-key.firebaseapp.com',
-      NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'mock-app-key',
-      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: 'mock-app-key.appspot.com',
-      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: '1234567890',
-      NEXT_PUBLIC_FIREBASE_APP_ID: '1:1234567890:web:1234567890',
-    },
   },
 });
