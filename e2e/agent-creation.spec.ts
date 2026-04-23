@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test('navigate to hub and verify materialization button', async ({ page }) => {
   // Mock auth state for the test
   await page.addInitScript(() => {
-    window.localStorage.setItem('firebase:authUser:dummy:[DEFAULT]', JSON.stringify({ uid: 'test-user' }));
+    window.localStorage.setItem('firebase:authUser:mock-app-key:[DEFAULT]', JSON.stringify({ uid: 'test-user' }));
   });
 
   await page.goto('/hub');
