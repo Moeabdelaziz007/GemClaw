@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from './setup';
 
 test('auth redirect checks and structure', async ({ page }) => {
-  // Mock Firebase Auth REST API for sign-in check
   await page.route('**/identitytoolkit.googleapis.com/v1/accounts:lookup*', async route => {
     await route.fulfill({
       status: 200,
@@ -16,25 +16,11 @@ test('auth redirect checks and structure', async ({ page }) => {
     });
   });
 
-  // Inject a mock Firebase token into localStorage/cookies if needed by the app
-  await page.addInitScript(() => {
-    const mockUser = {
-      uid: 'test-user-123',
-      email: 'test@gemigram.os',
-      stsTokenManager: {
-        accessToken: 'mock-test-token',
-        refreshToken: 'mock-refresh-token',
-        expirationTime: Date.now() + 3600000
-      }
-    };
-    // Adjust key based on your Firebase version/config if necessary
-    window.localStorage.setItem('firebase:authUser:mock-app-key', JSON.stringify(mockUser));
-  });
-
   await page.goto('/dashboard');
   await page.waitForLoadState('networkidle');
   
   // Assert we are actually on dashboard and not redirected to login
   await expect(page).toHaveURL(/.*\/dashboard/);
-  await expect(page.locator('h1')).toBeVisible(); 
+  // It uses Sovereign_OS instead of h1
+  await expect(page.getByText(/Sovereign_OS/i).first()).toBeVisible();
 });
