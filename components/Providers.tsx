@@ -35,6 +35,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   } = useGemclawStore();
 
   useEffect(() => {
+    // E2E Test Mock Override
+    if (typeof window !== 'undefined' && (window as any).__e2eMockUser__) {
+      setUser((window as any).__e2eMockUser__);
+      setHydratedUserId((window as any).__e2eMockUser__.uid);
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(firebaseAuth, (nextUser) => {
       setUser((currentUser) => {
         const currentUserId = currentUser?.uid ?? null;

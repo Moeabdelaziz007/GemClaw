@@ -13,11 +13,18 @@ import { createMemory } from '@/lib/memory/memory-store';
 import { startAgentHeartbeat } from '@/lib/agents/heartbeat';
 
 export default function ForgePage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { setActiveAgentId, pendingManifest, setPendingManifest, voiceSession, setVoiceSession } = useGemclawStore();
   const [isForging, setIsForging] = useState(false);
   const [pendingAgentData, setPendingAgentData] = useState<any>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/');
+      return;
+    }
+  }, [user, loading, router]);
 
   useEffect(() => {
     setVoiceSession({
@@ -127,6 +134,8 @@ export default function ForgePage() {
       router.push('/dashboard');
     }
   };
+
+  if (loading || !user) return null;
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-bg-primary">

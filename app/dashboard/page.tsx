@@ -10,13 +10,13 @@ import { Layers, Database, Cpu, HardDrive, RefreshCcw, Plus } from 'lucide-react
 import { motion } from 'framer-motion';
 
 export default function DashboardPage() {
-  const { user, googleAccessToken } = useAuth();
+  const { user, googleAccessToken, loading } = useAuth();
   const { agents } = useGemclawStore();
   const router = useRouter();
   const [driveFiles, setDriveFiles] = useState<GWSFile[]>([]);
 
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
       router.push('/');
       return;
     }
@@ -26,9 +26,9 @@ export default function DashboardPage() {
         .then(setDriveFiles)
         .catch(console.error);
     }
-  }, [user, googleAccessToken, router]);
+  }, [user, loading, googleAccessToken, router]);
 
-  if (!user) return null;
+  if (loading || !user) return null;
 
   return (
     <div className="page-shell page-stack py-4 sm:py-6 md:py-8 min-h-screen relative overflow-x-hidden">
