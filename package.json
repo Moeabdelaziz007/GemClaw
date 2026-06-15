@@ -20,7 +20,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.80.0",
+    "@anthropic-ai/sdk": "^0.104.1",
     "@google/genai": "^1.46.0",
     "@google/generative-ai": "^0.24.1",
     "@ricky0123/vad-web": "^0.0.30",
@@ -28,21 +28,21 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "file-saver": "^2.0.5",
-    "firebase": "^12.10.0",
+    "firebase": "^12.14.0",
     "firebase-admin": "^13.7.0",
-    "framer-motion": "^12.36.0",
+    "framer-motion": "^12.40.0",
     "jszip": "^3.10.1",
     "lucide-react": "^0.553.0",
-    "nanoid": "^5.1.6",
+    "nanoid": "^5.1.11",
     "next": "^15.4.9",
-    "openai": "^6.32.0",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1",
+    "openai": "^6.42.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "react-hot-toast": "^2.6.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
-    "tailwind-merge": "^3.3.1",
-    "zustand": "^5.0.12"
+    "tailwind-merge": "^3.6.0",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
